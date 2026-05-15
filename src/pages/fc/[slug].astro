@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import SpecTable from '../../components/SpecTable.astro';
+import Tabs from '../../components/Tabs.astro';
 import { CATEGORY_LABEL } from '../../content.config';
 
 export async function getStaticPaths() {
@@ -10,24 +11,78 @@ export async function getStaticPaths() {
 }
 const { item } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const d = item.data;
+const galleryImgs = d.gallery && d.gallery.length > 0 ? d.gallery : (d.image ? [d.image] : []);
 ---
-<Layout title={`${item.data.name} — novaX Catalog`} activeCategory="fc">
+<Layout title={`${d.name} — novaX Catalog`} activeCategory="fc">
   <section class="detail-hero">
     <div class="container">
       <div class="crumbs"><a href={`${base}/#fc`}>{CATEGORY_LABEL.fc}</a></div>
       <div class="meta">Product · Catalog 2026</div>
-      <h1>{item.data.name}</h1>
-      {item.data.tagline && <div class="tag">{item.data.tagline}</div>}
+      <h1>{d.name}</h1>
+      {d.tagline && <div class="tag">{d.tagline}</div>}
     </div>
   </section>
 
   <section class="detail-body">
     <div class="container">
       <div class="row">
-        {item.data.image && (
-          <div class="imgwrap"><img src={`${base}${item.data.image}`} alt={item.data.name} /></div>
+        {d.image && (
+          <div class="imgwrap"><img src={`${base}${d.image}`} alt={d.name} /></div>
         )}
-        <SpecTable specs={item.data.specs} />
+        <SpecTable specs={d.specs} />
+      </div>
+
+      <div class="tabs-section">
+        <Tabs tabs={[
+          {id:'description', label:'Description'},
+          {id:'pinout', label:'Pinout'},
+          {id:'wiring', label:'Wiring'},
+          {id:'firmware', label:'Firmware'},
+          {id:'gallery', label:'Gallery'}
+        ]}>
+          <div class="tab-panel active" data-panel="description">
+            {d.description
+              ? <div class="prose"><p>{d.description}</p></div>
+              : <div class="panel-empty">Description coming soon</div>}
+          </div>
+
+          <div class="tab-panel" data-panel="pinout">
+            {d.pinoutImage ? (
+              <div class="panel-image"><img src={`${base}${d.pinoutImage}`} alt={`${d.name} pinout`} /></div>
+            ) : (
+              <div class="panel-empty">Pinout diagram coming soon</div>
+            )}
+            {d.pinoutNotes && <div class="prose panel-notes"><p>{d.pinoutNotes}</p></div>}
+          </div>
+
+          <div class="tab-panel" data-panel="wiring">
+            {d.wiringImage ? (
+              <div class="panel-image"><img src={`${base}${d.wiringImage}`} alt={`${d.name} wiring`} /></div>
+            ) : (
+              <div class="panel-empty">Wiring diagram coming soon</div>
+            )}
+            {d.wiringNotes && <div class="prose panel-notes"><p>{d.wiringNotes}</p></div>}
+          </div>
+
+          <div class="tab-panel" data-panel="firmware">
+            {d.firmwareNotes
+              ? <div class="prose"><p>{d.firmwareNotes}</p></div>
+              : <div class="panel-empty">Firmware information coming soon</div>}
+          </div>
+
+          <div class="tab-panel" data-panel="gallery">
+            {galleryImgs.length > 0 ? (
+              <div class="gallery-grid">
+                {galleryImgs.map((g) => (
+                  <div class="cell"><img src={`${base}${g}`} alt={d.name} /></div>
+                ))}
+              </div>
+            ) : (
+              <div class="panel-empty">Gallery coming soon</div>
+            )}
+          </div>
+        </Tabs>
       </div>
     </div>
   </section>

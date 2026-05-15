@@ -20,4 +20,12 @@ specs:
   - { key: Weight, value: "7 g" }
   - { key: Operating Temp, value: "-20 ~ +85 ℃" }
   - { key: Supported F/W, value: "BetaFlight, INAV, ArduPilot" }
+description: |
+  AF-H7 nano is a compact H7-class flight controller built around the STM32H743VIH6 running at 480 MHz with 1 MB RAM and 2 MB Flash. Dual ICM-42688-P IMUs and a DPS-368 barometer provide redundant attitude and altitude sensing, while the 30.5 × 30.5 mm mounting footprint and 7 g weight keep it suitable for 3"–7" platforms. Wide 6–36 V input (2S–8S LiPo) and a 5 V / 2.5 A regulator simplify integration without an external BEC. 12 PWM outputs, 7 UARTs and a dedicated CAN port cover modern peripheral stacks.
+pinoutNotes: |
+  Pinout follows the ArduPilot H7 mainline mapping. Servo rail provides up to 10 PWM channels with one dedicated WS2812 LED line. UART4 and UART7 are recommended for GPS and radio link respectively.
+wiringNotes: |
+  VBat input is routed through a 4-pin connector accepting 2S–8S LiPo. The on-board 5 V / 2.5 A regulator powers the FC, receiver and low-current peripherals. Servo rail is unregulated — feed it directly from a BEC or motor PDB.
+firmwareNotes: |
+  Supports Betaflight, INAV, and ArduPilot out of the box. Recommended targets: Betaflight MATEKH743 / ArduPilot MatekH743. Enter USB-C DFU bootloader by holding the BOOT button during power-up.
 ---

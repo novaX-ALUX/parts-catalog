@@ -32,29 +32,40 @@ const motorThrustTable = z.object({
   rows: z.array(motorThrustRow)
 });
 
+const detailSchema = baseSchema.extend({
+  description: z.string().optional(),
+  pinoutImage: z.string().optional(),
+  pinoutNotes: z.string().optional(),
+  wiringImage: z.string().optional(),
+  wiringNotes: z.string().optional(),
+  firmwareNotes: z.string().optional(),
+  configNotes: z.string().optional(),
+  gallery: z.array(z.string()).optional()
+});
+
 const fc = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/fc' }),
-  schema: baseSchema
+  schema: detailSchema
 });
 
 const esc = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/esc' }),
-  schema: baseSchema
+  schema: detailSchema
 });
 
 const gnss = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/gnss' }),
-  schema: baseSchema
+  schema: detailSchema
 });
 
 const camera = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/camera' }),
-  schema: baseSchema
+  schema: detailSchema
 });
 
 const motor = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/motor' }),
-  schema: baseSchema.extend({
+  schema: detailSchema.extend({
     thrust: z.array(motorThrustTable).optional(),
     testConditions: z.string().optional()
   })

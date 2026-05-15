@@ -1,0 +1,40 @@
+---
+interface Tab { id: string; label: string }
+interface Props { tabs: Tab[]; default?: string }
+const { tabs, default: defaultId } = Astro.props;
+const initial = defaultId ?? tabs[0]?.id;
+---
+<div class="tabs-wrap">
+  <div class="tabs-nav" role="tablist">
+    {tabs.map((t) => (
+      <button
+        type="button"
+        class={`tab ${t.id === initial ? 'active' : ''}`}
+        data-tab={t.id}
+        role="tab"
+        aria-selected={t.id === initial ? 'true' : 'false'}
+      >{t.label}</button>
+    ))}
+  </div>
+  <div class="tabs-body">
+    <slot />
+  </div>
+</div>
+<script>
+  document.querySelectorAll<HTMLElement>('.tabs-wrap').forEach((wrap) => {
+    const tabs = wrap.querySelectorAll<HTMLButtonElement>('.tab');
+    const panels = wrap.querySelectorAll<HTMLElement>('.tab-panel');
+    function activate(id: string) {
+      tabs.forEach((x) => {
+        const on = x.dataset.tab === id;
+        x.classList.toggle('active', on);
+        x.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      panels.forEach((p) => p.classList.toggle('active', p.dataset.panel === id));
+      try { history.replaceState(null, '', `#${id}`); } catch {}
+    }
+    tabs.forEach((t) => t.addEventListener('click', () => activate(t.dataset.tab!)));
+    const hash = location.hash.replace('#', '');
+    if (hash && wrap.querySelector(`.tab[data-tab="${hash}"]`)) activate(hash);
+  });
+</script>

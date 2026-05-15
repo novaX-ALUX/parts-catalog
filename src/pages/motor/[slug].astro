@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import SpecTable from '../../components/SpecTable.astro';
 import ThrustChart from '../../components/ThrustChart.astro';
+import Tabs from '../../components/Tabs.astro';
 import { CATEGORY_LABEL } from '../../content.config';
 
 export async function getStaticPaths() {
@@ -11,78 +12,110 @@ export async function getStaticPaths() {
 }
 const { item } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const d = item.data;
+const galleryImgs = d.gallery && d.gallery.length > 0 ? d.gallery : (d.image ? [d.image] : []);
+const hasThrust = d.thrust && d.thrust.length > 0;
 ---
-<Layout title={`${item.data.name} — novaX Catalog`} activeCategory="motor">
+<Layout title={`${d.name} — novaX Catalog`} activeCategory="motor">
   <section class="detail-hero">
     <div class="container">
       <div class="crumbs"><a href={`${base}/#motor`}>{CATEGORY_LABEL.motor}</a></div>
       <div class="meta">Motor · Catalog 2026</div>
-      <h1>{item.data.name}</h1>
-      {item.data.tagline && <div class="tag">{item.data.tagline}</div>}
+      <h1>{d.name}</h1>
+      {d.tagline && <div class="tag">{d.tagline}</div>}
     </div>
   </section>
 
   <section class="detail-body">
     <div class="container">
       <div class="row">
-        {item.data.image && (
-          <div class="imgwrap"><img src={`${base}${item.data.image}`} alt={item.data.name} /></div>
+        {d.image && (
+          <div class="imgwrap"><img src={`${base}${d.image}`} alt={d.name} /></div>
         )}
-        <SpecTable specs={item.data.specs} />
+        <SpecTable specs={d.specs} />
       </div>
 
-      {item.data.datasheet && (
-        <div class="datasheet">
-          <h2>Datasheet</h2>
-          <a class="datasheet-link" href={`${base}${item.data.datasheet}`} target="_blank" rel="noopener" download>
-            <img src={`${base}${item.data.datasheet}`} alt={`${item.data.name} datasheet`} />
-            <span class="datasheet-cta">Download datasheet (PNG)</span>
-          </a>
-        </div>
-      )}
+      <div class="tabs-section">
+        <Tabs tabs={[
+          {id:'description', label:'Description'},
+          {id:'thrust', label:'Thrust Data'},
+          {id:'gallery', label:'Gallery'}
+        ]}>
+          <div class="tab-panel active" data-panel="description">
+            {d.description
+              ? <div class="prose"><p>{d.description}</p></div>
+              : <div class="panel-empty">Description coming soon</div>}
+          </div>
 
-      {item.data.thrust && item.data.thrust.length > 0 && (
-        <div class="thrust">
-          <h2>Load Performance Data</h2>
-          {item.data.testConditions && <div class="testnote">{item.data.testConditions}</div>}
-          {item.data.thrust.map((t: any) => (
-            <ThrustChart rows={t.rows} propeller={t.propeller} />
-          ))}
-          {item.data.thrust.map((t: any) => (
-            <div class="prop">
-              <div class="head">Propeller {t.propeller}</div>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Throttle</th>
-                    <th>Voltage (V)</th>
-                    <th>Thrust (g)</th>
-                    <th>Torque (N·m)</th>
-                    <th>Current (A)</th>
-                    <th>Power (W)</th>
-                    <th>Eff (g/W)</th>
-                    <th>Temp (℃)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {t.rows.map((r: any) => (
-                    <tr>
-                      <td>{r.throttle}</td>
-                      <td>{r.voltage ?? '—'}</td>
-                      <td>{r.thrust ?? '—'}</td>
-                      <td>{r.torque ?? '—'}</td>
-                      <td>{r.current ?? '—'}</td>
-                      <td>{r.power ?? '—'}</td>
-                      <td>{r.eff ?? '—'}</td>
-                      <td>{r.temp ?? '—'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ))}
-        </div>
-      )}
+          <div class="tab-panel" data-panel="thrust">
+            {d.datasheet && (
+              <div class="datasheet" style="margin-top:0;">
+                <h2>Datasheet</h2>
+                <a class="datasheet-link" href={`${base}${d.datasheet}`} target="_blank" rel="noopener" download>
+                  <img src={`${base}${d.datasheet}`} alt={`${d.name} datasheet`} />
+                  <span class="datasheet-cta">Download datasheet (PNG)</span>
+                </a>
+              </div>
+            )}
+            {hasThrust ? (
+              <div class="thrust" style="margin-top:32px;">
+                <h2>Load Performance Data</h2>
+                {d.testConditions && <div class="testnote">{d.testConditions}</div>}
+                {d.thrust!.map((t: any) => (
+                  <ThrustChart rows={t.rows} propeller={t.propeller} />
+                ))}
+                {d.thrust!.map((t: any) => (
+                  <div class="prop">
+                    <div class="head">Propeller {t.propeller}</div>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Throttle</th>
+                          <th>Voltage (V)</th>
+                          <th>Thrust (g)</th>
+                          <th>Torque (N·m)</th>
+                          <th>Current (A)</th>
+                          <th>Power (W)</th>
+                          <th>Eff (g/W)</th>
+                          <th>Temp (℃)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {t.rows.map((r: any) => (
+                          <tr>
+                            <td>{r.throttle}</td>
+                            <td>{r.voltage ?? '—'}</td>
+                            <td>{r.thrust ?? '—'}</td>
+                            <td>{r.torque ?? '—'}</td>
+                            <td>{r.current ?? '—'}</td>
+                            <td>{r.power ?? '—'}</td>
+                            <td>{r.eff ?? '—'}</td>
+                            <td>{r.temp ?? '—'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              !d.datasheet && <div class="panel-empty">Thrust data coming soon</div>
+            )}
+          </div>
+
+          <div class="tab-panel" data-panel="gallery">
+            {galleryImgs.length > 0 ? (
+              <div class="gallery-grid">
+                {galleryImgs.map((g) => (
+                  <div class="cell"><img src={`${base}${g}`} alt={d.name} /></div>
+                ))}
+              </div>
+            ) : (
+              <div class="panel-empty">Gallery coming soon</div>
+            )}
+          </div>
+        </Tabs>
+      </div>
     </div>
   </section>
 </Layout>
