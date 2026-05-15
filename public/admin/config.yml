@@ -2,6 +2,7 @@ backend:
   name: github
   repo: novaX-ALUX/parts-catalog
   branch: main
+  base_url: https://sveltia-cms-auth.novax-cms.workers.dev
 
 site_url: https://novax-alux.github.io/parts-catalog
 publish_mode: editorial_workflow
