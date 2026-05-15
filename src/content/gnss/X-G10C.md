@@ -1,5 +1,5 @@
 ---
-name: X-G10C (Provisional)
+name: AP-M10
 tagline: Compact GNSS Module with Integrated Compass
 image: /images/products/gnss_X_G10C.png
 pictureKey: gnss_X_G10C

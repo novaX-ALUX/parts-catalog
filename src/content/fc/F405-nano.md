@@ -1,5 +1,5 @@
 ---
-name: F4 nano
+name: AF-F4 nano
 tagline: Compact F4 Flight Controller · Compatible Model X Blade
 image: /images/products/fc_F405_nano.png
 pictureKey: fc_F405_nano

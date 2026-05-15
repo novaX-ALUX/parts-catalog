@@ -1,5 +1,5 @@
 ---
-name: AX-GM1X
+name: AC-GM1X
 tagline: FPV Gimbal · 19 mm Camera Stabilization
 image: /images/products/cam_GM1X.png
 pictureKey: cam_GM1X

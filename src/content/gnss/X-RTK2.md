@@ -1,5 +1,5 @@
 ---
-name: X-RTK2
+name: AP-RTK dual
 tagline: Dual-Antenna High-Precision RTK GNSS
 image: /images/products/gnss_X_RTK2.png
 pictureKey: gnss_X_RTK2

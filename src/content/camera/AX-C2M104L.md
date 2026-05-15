@@ -1,5 +1,5 @@
 ---
-name: AX-C2M104L
+name: AC-C2M104L
 tagline: FPV Camera Module · Image Sensor + ISP + Comm Integrated
 image: /images/products/cam_C2M104L.png
 pictureKey: cam_C2M104L_module

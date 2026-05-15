@@ -1,5 +1,5 @@
 ---
-name: AX-THE02F
+name: AC-THE02F
 tagline: Thermal Imaging Module · SoC vs FPGA Variants
 image: /images/products/cam_THE02F.png
 pictureKey: cam_THE02F
