@@ -21,7 +21,7 @@ _spec_field: &spec_field
 _base_fields: &base_fields
   - { label: Name, name: name, widget: string }
   - { label: Tagline, name: tagline, widget: string, required: false }
-  - { label: Image, name: image, widget: image, required: false, allow_multiple: false, choose_url: false }
+  - { label: Image, name: image, widget: image, required: false, multiple: false }
   - { label: Picture Key, name: pictureKey, widget: string, required: false, hint: "PPTX identifier (auto-set by import)" }
   - { label: Order, name: order, widget: number, default: 999, value_type: int, hint: "Lower number = shown first within its category" }
   - <<: *spec_field
