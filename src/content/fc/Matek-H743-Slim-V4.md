@@ -1,5 +1,5 @@
 ---
-name: Matek H743 Slim V4
+name: H7 nano
 tagline: High-Performance H7 Flight Controller · 2–8S LiPo
 image: /images/products/fc_Matek_H743_Slim_V4.png
 pictureKey: fc_Matek_H743_Slim_V4

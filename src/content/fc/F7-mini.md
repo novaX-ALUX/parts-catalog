@@ -1,5 +1,5 @@
 ---
-name: FC F7 mini
+name: F7 mini
 tagline: F7 Mini Flight Controller
 image: /images/products/fc_F7_mini.png
 pictureKey: fc_F7_mini
