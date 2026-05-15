@@ -11,6 +11,7 @@ const baseSchema = z.object({
   tagline: z.string().optional(),
   image: z.string().optional(),
   pictureKey: z.string().optional(),
+  datasheet: z.string().optional(),
   order: z.number().default(999),
   specs: z.array(specPair)
 });

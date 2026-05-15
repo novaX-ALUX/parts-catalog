@@ -31,6 +31,16 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         <SpecTable specs={item.data.specs} />
       </div>
 
+      {item.data.datasheet && (
+        <div class="datasheet">
+          <h2>Datasheet</h2>
+          <a class="datasheet-link" href={`${base}${item.data.datasheet}`} target="_blank" rel="noopener" download>
+            <img src={`${base}${item.data.datasheet}`} alt={`${item.data.name} datasheet`} />
+            <span class="datasheet-cta">Download datasheet (PNG)</span>
+          </a>
+        </div>
+      )}
+
       {item.data.thrust && item.data.thrust.length > 0 && (
         <div class="thrust">
           <h2>Load Performance Data</h2>
