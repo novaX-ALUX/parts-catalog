@@ -12,13 +12,13 @@ firmware:
     size: "896 KB"
     sha256: "placeholder-replace-with-real-sha256-on-release"
     notes: "Flash via USB DFU mode (Boot0 high). Includes bootloader."
-  - kind: "App update (OTA)"
+  - kind: "App update (.bin)"
     file: /firmware/fc/af-h7-nano/v1.2.0/af-h7-nano_app_v1.2.0.bin
     version: "1.2.0"
     date: "2026-05-10"
     size: "612 KB"
     sha256: "placeholder-replace-with-real-sha256-on-release"
-    notes: "Application-only binary for bootloader OTA update."
+    notes: "Application-only binary loaded via on-board bootloader."
 specs:
   - { key: MCU, value: "STM32H743VIH6, 480 MHz (1MB RAM, 2MB Flash)" }
   - { key: IMU, value: "2× ICM-42688-P" }
