@@ -30,28 +30,29 @@ const galleryImgs = d.gallery && d.gallery.length > 0 ? d.gallery : (d.image ? [
         {d.image && (
           <div class="imgwrap"><img src={`${base}${d.image}`} alt={d.name} /></div>
         )}
-        <SpecTable specs={d.specs} />
+        <div class="right-col">
+          {d.description && (
+            <div class="spec-card">
+              <div class="head">Description</div>
+              <div class="prose"><p>{d.description}</p></div>
+            </div>
+          )}
+          <SpecTable specs={d.specs} />
+        </div>
       </div>
 
       <div class="tabs-section">
         <Tabs tabs={[
-          {id:'description', label:'Description'},
-          {id:'wiring', label:'Wiring'},
+          {id:'pinout', label:'Pinout'},
           {id:'gallery', label:'Gallery'}
         ]}>
-          <div class="tab-panel active" data-panel="description">
-            {d.description
-              ? <div class="prose"><p>{d.description}</p></div>
-              : <div class="panel-empty">Description coming soon</div>}
-          </div>
-
-          <div class="tab-panel" data-panel="wiring">
-            {d.wiringImage ? (
-              <div class="panel-image"><img src={`${base}${d.wiringImage}`} alt={`${d.name} wiring`} /></div>
+          <div class="tab-panel active" data-panel="pinout">
+            {d.pinoutImage ? (
+              <div class="panel-image"><img src={`${base}${d.pinoutImage}`} alt={`${d.name} pinout`} /></div>
             ) : (
-              <div class="panel-empty">Wiring diagram coming soon</div>
+              <div class="panel-empty">Pinout coming soon</div>
             )}
-            {d.wiringNotes && <div class="prose panel-notes"><p>{d.wiringNotes}</p></div>}
+            {d.pinoutNotes && <div class="prose panel-notes"><p>{d.pinoutNotes}</p></div>}
           </div>
 
           <div class="tab-panel" data-panel="gallery">

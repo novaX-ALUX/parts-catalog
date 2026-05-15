@@ -32,33 +32,26 @@ const hasThrust = d.thrust && d.thrust.length > 0;
         {d.image && (
           <div class="imgwrap"><img src={`${base}${d.image}`} alt={d.name} /></div>
         )}
-        <SpecTable specs={d.specs} />
+        <div class="right-col">
+          {d.description && (
+            <div class="spec-card">
+              <div class="head">Description</div>
+              <div class="prose"><p>{d.description}</p></div>
+            </div>
+          )}
+          <SpecTable specs={d.specs} />
+        </div>
       </div>
 
       <div class="tabs-section">
         <Tabs tabs={[
-          {id:'description', label:'Description'},
           {id:'thrust', label:'Thrust Data'},
+          {id:'drawing', label:'Drawing'},
           {id:'gallery', label:'Gallery'}
         ]}>
-          <div class="tab-panel active" data-panel="description">
-            {d.description
-              ? <div class="prose"><p>{d.description}</p></div>
-              : <div class="panel-empty">Description coming soon</div>}
-          </div>
-
-          <div class="tab-panel" data-panel="thrust">
-            {d.datasheet && (
-              <div class="datasheet" style="margin-top:0;">
-                <h2>Datasheet</h2>
-                <a class="datasheet-link" href={`${base}${d.datasheet}`} target="_blank" rel="noopener" download>
-                  <img src={`${base}${d.datasheet}`} alt={`${d.name} datasheet`} />
-                  <span class="datasheet-cta">Download datasheet (PNG)</span>
-                </a>
-              </div>
-            )}
+          <div class="tab-panel active" data-panel="thrust">
             {hasThrust ? (
-              <div class="thrust" style="margin-top:32px;">
+              <div class="thrust" style="margin-top:0;">
                 <h2>Load Performance Data</h2>
                 {d.testConditions && <div class="testnote">{d.testConditions}</div>}
                 {d.thrust!.map((t: any) => (
@@ -99,7 +92,20 @@ const hasThrust = d.thrust && d.thrust.length > 0;
                 ))}
               </div>
             ) : (
-              !d.datasheet && <div class="panel-empty">Thrust data coming soon</div>
+              <div class="panel-empty">Thrust data coming soon</div>
+            )}
+          </div>
+
+          <div class="tab-panel" data-panel="drawing">
+            {d.datasheet ? (
+              <div class="datasheet" style="margin-top:0;">
+                <a class="datasheet-link" href={`${base}${d.datasheet}`} target="_blank" rel="noopener" download>
+                  <img src={`${base}${d.datasheet}`} alt={`${d.name} drawing`} />
+                  <span class="datasheet-cta">Download drawing (PNG)</span>
+                </a>
+              </div>
+            ) : (
+              <div class="panel-empty">Drawing coming soon</div>
             )}
           </div>
 

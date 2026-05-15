@@ -32,13 +32,22 @@ const motorThrustTable = z.object({
   rows: z.array(motorThrustRow)
 });
 
+const firmwareItem = z.object({
+  kind: z.string(),
+  file: z.string(),
+  version: z.string(),
+  date: z.string().optional(),
+  size: z.string().optional(),
+  sha256: z.string().optional(),
+  notes: z.string().optional()
+});
+
 const detailSchema = baseSchema.extend({
   description: z.string().optional(),
   pinoutImage: z.string().optional(),
   pinoutNotes: z.string().optional(),
-  wiringImage: z.string().optional(),
-  wiringNotes: z.string().optional(),
   firmwareNotes: z.string().optional(),
+  firmware: z.array(firmwareItem).optional(),
   configNotes: z.string().optional(),
   gallery: z.array(z.string()).optional()
 });

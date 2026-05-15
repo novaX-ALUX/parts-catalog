@@ -31,7 +31,6 @@ specs:
     value: AM32, novaX ef 1.0
 description: AE-8S 60A is a high-voltage 32-bit ESC rated for 8S LiPo at 60 A continuous. Shares the DShot / AM32 firmware stack with the 6S variant and adds an enlarged 56 × 57 mm footprint for sustained high-current heat dissipation.
 pinoutNotes: ''
-wiringNotes: ''
 firmwareNotes: ''
 configNotes: ''
 ---
