@@ -1,15 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>novaX Catalog · Admin</title>
+  <style>
+    body { background:#111; color:#eee; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; margin:0; }
+    .gate { max-width:520px; margin:100px auto; padding:36px; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:8px; }
+    .gate h1 { margin:0 0 6px; font-size:22px; letter-spacing:-.01em; }
+    .gate .sub { color:#888; font-size:13px; margin-bottom:24px; }
+    .gate label { display:block; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#888; margin-bottom:8px; }
+    .gate input { width:100%; padding:12px 14px; background:#0a0a0a; color:#eee; border:1px solid #333; border-radius:4px; font-family:ui-monospace,monospace; font-size:13px; box-sizing:border-box; }
+    .gate input:focus { outline:none; border-color:#666; }
+    .gate button { width:100%; padding:12px; margin-top:16px; background:#fff; color:#000; border:0; border-radius:4px; cursor:pointer; font-weight:600; font-size:14px; }
+    .gate button:hover { background:#ccc; }
+    .gate .links { margin-top:20px; padding-top:20px; border-top:1px solid #2a2a2a; font-size:12px; color:#888; line-height:1.8; }
+    .gate .links a { color:#7cf; text-decoration:none; }
+    .gate .links a:hover { text-decoration:underline; }
+    .gate .err { color:#f66; font-size:12px; margin-top:8px; min-height:18px; }
+    .loader { text-align:center; padding:80px; color:#666; }
+  </style>
 </head>
 <body>
+  <div id="gate" class="gate" style="display:none">
+    <h1>novaX Catalog · Sign in</h1>
+    <div class="sub">GitHub Personal Access Token (PAT) 으로 로그인</div>
+    <label for="pat">Personal Access Token</label>
+    <input id="pat" type="password" placeholder="github_pat_... 또는 ghp_..." autocomplete="off" spellcheck="false" />
+    <div class="err" id="err"></div>
+    <button onclick="signIn()">Sign in</button>
+    <div class="links">
+      Fine-grained PAT: <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">새로 생성 →</a><br>
+      Classic PAT: <a href="https://github.com/settings/tokens/new?scopes=repo&description=Sveltia%20CMS%20novaX" target="_blank">새로 생성 (repo scope) →</a><br>
+      <span style="color:#555">토큰은 브라우저 localStorage 에만 저장되며 외부 전송되지 않습니다.</span>
+    </div>
+  </div>
+  <div id="loader" class="loader">Loading Sveltia CMS…</div>
   <script>
-    // 죽은 Netlify OAuth 폴백으로 빠지는 진행중 인증 잔재만 제거. 정상 PAT 세션 토큰은 유지.
+    // 진행중 OAuth 잔재 / 자동 Netlify 폴백 트리거 제거
     try { localStorage.removeItem('sveltia-cms.auth'); } catch (e) {}
+
+    function readToken() {
+      try {
+        const u = JSON.parse(localStorage.getItem('sveltia-cms.user') || 'null');
+        return u && u.token ? u : null;
+      } catch (e) { return null; }
+    }
+
+    function signIn() {
+      const tok = document.getElementById('pat').value.trim();
+      const err = document.getElementById('err');
+      err.textContent = '';
+      if (!tok) { err.textContent = 'PAT 가 비어있습니다.'; return; }
+      if (!/^(github_pat_|ghp_|gho_|ghu_|ghs_)/.test(tok)) {
+        err.textContent = 'GitHub PAT 형식이 아닙니다 (github_pat_... 또는 ghp_...).';
+        return;
+      }
+      localStorage.setItem('sveltia-cms.user', JSON.stringify({
+        backendName: 'github',
+        token: tok,
+      }));
+      location.reload();
+    }
+
+    function loadCMS() {
+      const s = document.createElement('script');
+      s.type = 'module';
+      s.src = 'https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js';
+      document.body.appendChild(s);
+    }
+
+    function showGate() {
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('gate').style.display = 'block';
+      document.getElementById('pat').focus();
+    }
+
+    // 시작
+    if (readToken()) {
+      loadCMS();
+    } else {
+      showGate();
+    }
+
+    // Enter 키로 로그인
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && document.getElementById('gate').style.display !== 'none') {
+        signIn();
+      }
+    });
+
+    // 로그아웃 헬퍼 (콘솔에서: signOut())
+    window.signOut = () => {
+      localStorage.removeItem('sveltia-cms.user');
+      localStorage.removeItem('sveltia-cms.auth');
+      location.reload();
+    };
   </script>
-  <script type="module" src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>
 </body>
 </html>
