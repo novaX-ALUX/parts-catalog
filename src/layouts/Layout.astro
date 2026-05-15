@@ -1,0 +1,46 @@
+---
+import '../styles/global.css';
+import { CATEGORY_LABEL, CATEGORY_ORDER } from '../content.config';
+
+interface Props {
+  title: string;
+  activeCategory?: string;
+}
+const { title, activeCategory } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content="novaX Product Catalog — Flight Controllers, GNSS, ESCs, Motors, Cameras" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="inner">
+        <a class="site-brand" href={`${base}/`}>
+          <span class="dot"></span>
+          novaX <small>Product Catalog</small>
+        </a>
+        <nav class="site-nav">
+          {CATEGORY_ORDER.map((c) => (
+            <a href={`${base}/#${c}`} class={activeCategory === c ? 'active' : ''}>
+              {CATEGORY_LABEL[c]}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <span>© novaX · www.aluxonline.com</span>
+        <span>Specifications subject to change without notice.</span>
+      </div>
+    </footer>
+  </body>
+</html>

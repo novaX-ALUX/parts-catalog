@@ -1,0 +1,88 @@
+backend:
+  name: github
+  repo: novaX-ALUX/parts-catalog
+  branch: main
+  base_url: https://auth.sveltia-cms.dev
+  auth_endpoint: oauth/authorize
+
+site_url: https://novax-alux.github.io/parts-catalog
+publish_mode: editorial_workflow
+media_folder: public/images/products
+public_folder: /parts-catalog/images/products
+
+_spec_field: &spec_field
+  label: Spec Rows
+  name: specs
+  widget: list
+  fields:
+    - { label: Key, name: key, widget: string }
+    - { label: Value, name: value, widget: string }
+
+_base_fields: &base_fields
+  - { label: Name, name: name, widget: string }
+  - { label: Tagline, name: tagline, widget: string, required: false }
+  - { label: Image, name: image, widget: image, required: false, allow_multiple: false, choose_url: false }
+  - { label: Picture Key, name: pictureKey, widget: string, required: false, hint: "PPTX identifier (auto-set by import)" }
+  - { label: Order, name: order, widget: number, default: 999, value_type: int, hint: "Lower number = shown first within its category" }
+  - <<: *spec_field
+
+collections:
+  - name: fc
+    label: Flight Controllers
+    folder: src/content/fc
+    create: true
+    slug: "{{slug}}"
+    fields: *base_fields
+
+  - name: gnss
+    label: GNSS / RTK
+    folder: src/content/gnss
+    create: true
+    slug: "{{slug}}"
+    fields: *base_fields
+
+  - name: esc
+    label: ESC
+    folder: src/content/esc
+    create: true
+    slug: "{{slug}}"
+    fields: *base_fields
+
+  - name: camera
+    label: Cameras & Gimbals
+    folder: src/content/camera
+    create: true
+    slug: "{{slug}}"
+    fields: *base_fields
+
+  - name: motor
+    label: Motors
+    folder: src/content/motor
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: Name, name: name, widget: string }
+      - { label: Tagline, name: tagline, widget: string, required: false }
+      - { label: Image, name: image, widget: image, required: false }
+      - { label: Picture Key, name: pictureKey, widget: string, required: false }
+      - { label: Order, name: order, widget: number, default: 999, value_type: int }
+      - <<: *spec_field
+      - { label: Test Conditions, name: testConditions, widget: string, required: false }
+      - label: Thrust Tables
+        name: thrust
+        widget: list
+        required: false
+        fields:
+          - { label: Propeller, name: propeller, widget: string }
+          - label: Rows
+            name: rows
+            widget: list
+            fields:
+              - { label: Throttle, name: throttle, widget: string }
+              - { label: Voltage (V), name: voltage, widget: string, required: false }
+              - { label: Thrust (g), name: thrust, widget: string, required: false }
+              - { label: Torque (N·m), name: torque, widget: string, required: false }
+              - { label: Current (A), name: current, widget: string, required: false }
+              - { label: Power (W), name: power, widget: string, required: false }
+              - { label: Eff (g/W), name: eff, widget: string, required: false }
+              - { label: Temp (℃), name: temp, widget: string, required: false }

@@ -1,0 +1,211 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const specs = [
+  { key: 'MCU', value: 'STM32F405' },
+  { key: 'IMU', value: 'ICM-42688-P' },
+  { key: 'Barometer', value: 'DPS-310' },
+  { key: 'Operating Voltage', value: '9 – 25 V DC' },
+  { key: 'Output Voltage', value: '3.3V/1A · 5V/3A · 10V/3A' },
+  { key: 'USB Input', value: 'USB Type-C (Firmware & Power)' },
+  { key: 'PWM Output', value: '9 Channel' },
+  { key: 'Serial Ports', value: '5 Port' },
+  { key: 'Servo Output', value: '2 Port' },
+  { key: 'RC Input', value: 'PWM / PPM / S.Bus' },
+  { key: 'Size', value: '39.4 × 39.4 mm' },
+  { key: 'Mount Hole', value: '30.5 × 30.5 mm / M4' },
+  { key: 'Weight', value: '9.3 g' },
+  { key: 'Operating Temp', value: '-20 ~ +70 ℃' },
+  { key: 'Supported F/W', value: 'Betaflight, ArduPilot, PX4' },
+];
+
+function pair(arr) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += 2) out.push([arr[i], arr[i + 1] ?? null]);
+  return out;
+}
+const rows = pair(specs);
+---
+<Layout title="Spec Table Variants — Comparison">
+  <section style="background:#1A1A1A; color:#fff; padding:48px 0;">
+    <div class="container">
+      <div style="font-size:11px; letter-spacing:0.22em; text-transform:uppercase; opacity:0.55;">Internal Comparison</div>
+      <h1 style="font-size:32px; font-weight:700; margin-top:8px;">Spec Table Style Variants</h1>
+      <p style="opacity:0.6; font-size:14px; margin-top:8px;">Same data, 4 different treatments. Pick the one to apply globally.</p>
+    </div>
+  </section>
+
+  <div class="container" style="padding:48px 0 96px;">
+
+    {/* === Variant A: Mono-line (very minimal) === */}
+    <section style="margin-bottom:80px;">
+      <div style="font-size:11px; letter-spacing:0.18em; color:#999; margin-bottom:4px;">VARIANT A</div>
+      <h2 style="font-size:20px; font-weight:600; margin-bottom:4px;">Mono-line — top & bottom rule only</h2>
+      <p style="font-size:13px; color:#707070; margin-bottom:24px;">No row dividers · padding does the spacing · single hairline above/below</p>
+
+      <div class="v-a">
+        <div class="v-a-head">Basic Specifications</div>
+        <div class="v-a-grid">
+          {rows.map(([a, b]) => (
+            <Fragment>
+              <div class="v-a-k">{a.key}</div>
+              <div class="v-a-v">{a.value}</div>
+              {b ? <div class="v-a-k">{b.key}</div> : <div></div>}
+              {b ? <div class="v-a-v">{b.value}</div> : <div></div>}
+            </Fragment>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* === Variant B: Editorial — index numbers === */}
+    <section style="margin-bottom:80px;">
+      <div style="font-size:11px; letter-spacing:0.18em; color:#999; margin-bottom:4px;">VARIANT B</div>
+      <h2 style="font-size:20px; font-weight:600; margin-bottom:4px;">Editorial — indexed rows</h2>
+      <p style="font-size:13px; color:#707070; margin-bottom:24px;">Small numeric index · larger value typography · feels like a print catalog</p>
+
+      <div class="v-b">
+        <div class="v-b-head">
+          <span>Basic Specifications</span>
+          <span class="v-b-count">{specs.length} items</span>
+        </div>
+        <div class="v-b-list">
+          {specs.map((s, i) => (
+            <div class="v-b-row">
+              <div class="v-b-idx">{String(i + 1).padStart(2, '0')}</div>
+              <div class="v-b-k">{s.key}</div>
+              <div class="v-b-v">{s.value}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* === Variant C: DJI / Apple-style emphasis === */}
+    <section style="margin-bottom:80px;">
+      <div style="font-size:11px; letter-spacing:0.18em; color:#999; margin-bottom:4px;">VARIANT C</div>
+      <h2 style="font-size:20px; font-weight:600; margin-bottom:4px;">Hero spec — key tiny, value bold</h2>
+      <p style="font-size:13px; color:#707070; margin-bottom:24px;">Inspired by DJI / Apple product pages · 2-column card grid · value is the headline</p>
+
+      <div class="v-c">
+        {specs.map((s) => (
+          <div class="v-c-cell">
+            <div class="v-c-k">{s.key}</div>
+            <div class="v-c-v">{s.value}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {/* === Variant D: Mono / Tech sheet === */}
+    <section style="margin-bottom:80px;">
+      <div style="font-size:11px; letter-spacing:0.18em; color:#999; margin-bottom:4px;">VARIANT D</div>
+      <h2 style="font-size:20px; font-weight:600; margin-bottom:4px;">Tech sheet — monospace values</h2>
+      <p style="font-size:13px; color:#707070; margin-bottom:24px;">Monospace value font · dotted leader between key and value · datasheet vibe</p>
+
+      <div class="v-d">
+        <div class="v-d-head">
+          <span>// BASIC SPECIFICATIONS</span>
+          <span>NovaX F405 nano FC</span>
+        </div>
+        <ul class="v-d-list">
+          {specs.map((s) => (
+            <li>
+              <span class="v-d-k">{s.key}</span>
+              <span class="v-d-dot"></span>
+              <span class="v-d-v">{s.value}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+  </div>
+</Layout>
+
+<style>
+  /* Variant A — Mono-line */
+  .v-a { border-top: 1px solid #1A1A1A; border-bottom: 1px solid #1A1A1A; padding: 20px 0; }
+  .v-a-head {
+    font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: #707070; margin-bottom: 24px;
+  }
+  .v-a-grid {
+    display: grid; grid-template-columns: 160px 1fr 160px 1fr;
+    row-gap: 18px; column-gap: 24px; align-items: baseline;
+  }
+  .v-a-k {
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: #909090; font-weight: 400;
+  }
+  .v-a-v { font-size: 14px; color: #1A1A1A; }
+
+  /* Variant B — Editorial indexed */
+  .v-b { }
+  .v-b-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding-bottom: 12px; border-bottom: 2px solid #1A1A1A; margin-bottom: 0;
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #1A1A1A; font-weight: 600;
+  }
+  .v-b-count { color: #909090; font-weight: 400; letter-spacing: 0.06em; }
+  .v-b-list { }
+  .v-b-row {
+    display: grid; grid-template-columns: 40px 200px 1fr;
+    align-items: baseline; padding: 18px 0;
+    border-bottom: 1px solid #ECECEC;
+  }
+  .v-b-row:last-child { border-bottom: none; }
+  .v-b-idx {
+    font-size: 11px; color: #B0B0B0; font-variant-numeric: tabular-nums;
+    letter-spacing: 0.06em;
+  }
+  .v-b-k {
+    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: #707070; font-weight: 500;
+  }
+  .v-b-v {
+    font-size: 16px; color: #1A1A1A; font-weight: 500; letter-spacing: -0.005em;
+  }
+
+  /* Variant C — Hero cells */
+  .v-c {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 1px; background: #ECECEC;
+    border: 1px solid #ECECEC;
+  }
+  .v-c-cell {
+    background: #fff; padding: 22px 24px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .v-c-k {
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: #909090; font-weight: 500;
+  }
+  .v-c-v {
+    font-size: 18px; color: #1A1A1A; font-weight: 600; letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
+  /* Variant D — Mono tech sheet */
+  .v-d {
+    background: #FAFAFA; border: 1px solid #E8E8E8; padding: 24px;
+    font-family: "JetBrains Mono", "SF Mono", "Consolas", "Menlo", monospace;
+  }
+  .v-d-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding-bottom: 12px; border-bottom: 1px dashed #B0B0B0; margin-bottom: 16px;
+    font-size: 11px; color: #707070; letter-spacing: 0.04em;
+  }
+  .v-d-head span:last-child { color: #1A1A1A; font-weight: 600; }
+  .v-d-list { list-style: none; padding: 0; margin: 0; }
+  .v-d-list li {
+    display: flex; align-items: baseline; gap: 8px;
+    padding: 7px 0; font-size: 13px;
+  }
+  .v-d-k { color: #707070; flex-shrink: 0; }
+  .v-d-dot {
+    flex: 1; border-bottom: 1px dotted #C8C8C8;
+    transform: translateY(-2px); min-width: 24px;
+  }
+  .v-d-v { color: #1A1A1A; font-weight: 600; flex-shrink: 0; text-align: right; }
+</style>

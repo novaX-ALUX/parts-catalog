@@ -1,0 +1,75 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import { CATEGORY_LABEL, CATEGORY_ORDER } from '../content.config';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const cats: Record<string, { id: string; data: any }[]> = {};
+for (const c of CATEGORY_ORDER) {
+  const items = await getCollection(c as any);
+  cats[c] = items.sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999));
+}
+
+const total = Object.values(cats).reduce((sum, arr) => sum + arr.length, 0);
+---
+<Layout title="novaX Product Catalog 2026">
+  <section class="hero">
+    <div class="container">
+      <div>
+        <div class="meta">Product · Catalog 2026</div>
+        <h1>novaX <span>Product Catalog</span></h1>
+      </div>
+      <div class="sub">Flight Controllers · GNSS · ESCs · Motors · Cameras<br/>www.aluxonline.com</div>
+    </div>
+  </section>
+
+  <div class="filterbar">
+    <div class="container" id="filters">
+      <button class="chip active" data-cat="all">All<span class="count">{total}</span></button>
+      {CATEGORY_ORDER.map((c) => (
+        <button class="chip" data-cat={c}>
+          {CATEGORY_LABEL[c]}<span class="count">{cats[c].length}</span>
+        </button>
+      ))}
+    </div>
+  </div>
+
+  {CATEGORY_ORDER.map((c) => (
+    <section class="section" id={c} data-cat={c}>
+      <div class="container">
+        <h2>{CATEGORY_LABEL[c]}</h2>
+        {cats[c].length === 0 ? (
+          <p style="color: var(--ink-4); font-size: 13px;">No products yet in this category.</p>
+        ) : (
+          <div class="grid">
+            {cats[c].map((item) => (
+              <ProductCard
+                href={`${base}/${c}/${item.id}/`}
+                category={CATEGORY_LABEL[c]}
+                name={item.data.name}
+                tagline={item.data.tagline}
+                image={item.data.image}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  ))}
+</Layout>
+
+<script>
+  const chips = document.querySelectorAll<HTMLButtonElement>('#filters .chip');
+  const sections = document.querySelectorAll<HTMLElement>('section[data-cat]');
+  chips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      const cat = chip.dataset.cat!;
+      chips.forEach((c) => c.classList.toggle('active', c === chip));
+      sections.forEach((s) => {
+        s.style.display = cat === 'all' || s.dataset.cat === cat ? '' : 'none';
+      });
+    });
+  });
+</script>

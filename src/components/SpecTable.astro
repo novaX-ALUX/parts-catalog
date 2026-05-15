@@ -1,0 +1,30 @@
+---
+interface Spec { key: string; value: string }
+interface Props {
+  specs: Spec[];
+  title?: string;
+}
+const { specs, title = 'Basic Specifications' } = Astro.props;
+
+function pair<T>(arr: T[]): [T, T | null][] {
+  const out: [T, T | null][] = [];
+  for (let i = 0; i < arr.length; i += 2) {
+    out.push([arr[i], arr[i + 1] ?? null]);
+  }
+  return out;
+}
+const rows = pair(specs);
+---
+<div class="spec-card">
+  <div class="head">{title}</div>
+  <div class="spec-grid">
+    {rows.map(([a, b]) => (
+      <Fragment>
+        <div class="k">{a.key}</div>
+        <div class="v">{a.value}</div>
+        {b ? <div class="k">{b.key}</div> : <div></div>}
+        {b ? <div class="v">{b.value}</div> : <div></div>}
+      </Fragment>
+    ))}
+  </div>
+</div>

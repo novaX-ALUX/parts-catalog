@@ -1,0 +1,23 @@
+---
+interface Props {
+  href: string;
+  category: string;
+  name: string;
+  tagline?: string;
+  image?: string;
+}
+const { href, category, name, tagline, image } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<a class="card" href={href}>
+  {image ? (
+    <div class="imgwrap"><img src={`${base}${image}`} alt={name} loading="lazy" /></div>
+  ) : (
+    <div class="imgwrap placeholder">No image yet</div>
+  )}
+  <div class="body">
+    <div class="cat">{category}</div>
+    <div class="name">{name}</div>
+    {tagline && <div class="tag">{tagline}</div>}
+  </div>
+</a>

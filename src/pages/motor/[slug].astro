@@ -1,0 +1,78 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import SpecTable from '../../components/SpecTable.astro';
+import ThrustChart from '../../components/ThrustChart.astro';
+import { CATEGORY_LABEL } from '../../content.config';
+
+export async function getStaticPaths() {
+  const items = await getCollection('motor');
+  return items.map((item) => ({ params: { slug: item.id }, props: { item } }));
+}
+const { item } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<Layout title={`${item.data.name} — novaX Catalog`} activeCategory="motor">
+  <section class="detail-hero">
+    <div class="container">
+      <div class="crumbs"><a href={`${base}/#motor`}>{CATEGORY_LABEL.motor}</a></div>
+      <div class="meta">Motor · Catalog 2026</div>
+      <h1>{item.data.name}</h1>
+      {item.data.tagline && <div class="tag">{item.data.tagline}</div>}
+    </div>
+  </section>
+
+  <section class="detail-body">
+    <div class="container">
+      <div class="row">
+        {item.data.image && (
+          <div class="imgwrap"><img src={`${base}${item.data.image}`} alt={item.data.name} /></div>
+        )}
+        <SpecTable specs={item.data.specs} />
+      </div>
+
+      {item.data.thrust && item.data.thrust.length > 0 && (
+        <div class="thrust">
+          <h2>Load Performance Data</h2>
+          {item.data.testConditions && <div class="testnote">{item.data.testConditions}</div>}
+          {item.data.thrust.map((t: any) => (
+            <ThrustChart rows={t.rows} propeller={t.propeller} />
+          ))}
+          {item.data.thrust.map((t: any) => (
+            <div class="prop">
+              <div class="head">Propeller {t.propeller}</div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Throttle</th>
+                    <th>Voltage (V)</th>
+                    <th>Thrust (g)</th>
+                    <th>Torque (N·m)</th>
+                    <th>Current (A)</th>
+                    <th>Power (W)</th>
+                    <th>Eff (g/W)</th>
+                    <th>Temp (℃)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {t.rows.map((r: any) => (
+                    <tr>
+                      <td>{r.throttle}</td>
+                      <td>{r.voltage ?? '—'}</td>
+                      <td>{r.thrust ?? '—'}</td>
+                      <td>{r.torque ?? '—'}</td>
+                      <td>{r.current ?? '—'}</td>
+                      <td>{r.power ?? '—'}</td>
+                      <td>{r.eff ?? '—'}</td>
+                      <td>{r.temp ?? '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</Layout>
