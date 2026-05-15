@@ -7,7 +7,7 @@ backend:
 site_url: https://novax-alux.github.io/parts-catalog
 publish_mode: editorial_workflow
 media_folder: public/images/products
-public_folder: /parts-catalog/images/products
+public_folder: /images/products
 
 _spec_field: &spec_field
   label: Spec Rows
