@@ -6,6 +6,10 @@
   <title>novaX Catalog · Admin</title>
 </head>
 <body>
+  <script>
+    // 죽은 Netlify OAuth 폴백으로 빠지는 진행중 인증 잔재만 제거. 정상 PAT 세션 토큰은 유지.
+    try { localStorage.removeItem('sveltia-cms.auth'); } catch (e) {}
+  </script>
   <script type="module" src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>
 </body>
 </html>
