@@ -17,4 +17,6 @@ specs:
   - { key: PWM Frequency, value: "24 – 48 kHz (Bluejay 96 kHz)" }
   - { key: Supported Protocols, value: "DShot150 / 300 / 600, MultiShot, OneShot" }
   - { key: Firmware, value: "AM32, novaX ef 1.0" }
+description: |
+  AE-6S 60A is a 32-bit ESC rated for 6S LiPo and 60 A continuous current. Supports DShot150 / 300 / 600, MultiShot and OneShot protocols with BDShot telemetry. Compatible with AM32 and novaX ef 1.0 firmware. Designed for X-Blade 10/15 class platforms.
 ---

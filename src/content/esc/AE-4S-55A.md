@@ -15,4 +15,6 @@ specs:
   - { key: PWM Frequency, value: "24 – 48 kHz (Bluejay 96 kHz)" }
   - { key: Supported Protocols, value: "DShot150 / 300 / 600, MultiShot, OneShot" }
   - { key: Firmware, value: "BLHeli-S, novaX ef 1.0" }
+description: |
+  AE-4S 55A is a compact 4S 32-bit ESC delivering 55 A continuous current in a 45.5 × 52.2 mm footprint. Supports BLHeli-S and novaX ef 1.0 firmware. Designed for Blade8-class platforms requiring lightweight power delivery.
 ---

@@ -24,4 +24,6 @@ specs:
   - { key: Weight, value: "36 g" }
   - { key: Operating Temp, value: "-20 ~ +85 ℃" }
   - { key: Operating Voltage, value: "4.7 – 5.2 V" }
+description: |
+  AP-RTK dual is a high-precision dual-antenna RTK GNSS receiver built on an STM32F4 processor. Centimeter-level positioning and dual-antenna heading make it ideal for survey-grade autonomous platforms and applications that demand reliable yaw determination independent of magnetic interference.
 ---

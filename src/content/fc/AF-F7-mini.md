@@ -26,4 +26,6 @@ specs:
   - { key: Weight, value: "39.7 g" }
   - { key: Operating Temp, value: "-20 ~ +85 ℃" }
   - { key: Supported F/W, value: "ArduPilot, PX4" }
+description: |
+  AF-F7 mini is an F7-class flight controller powered by the STM32F765 running at 216 MHz. Dual IMUs (ICM-20689 primary, ICM-20602 / BMI055 secondary), an IST8310 magnetometer and an MS5611 barometer deliver redundant attitude, heading and altitude sensing. 8 PWM outputs, 4 UARTs, 3 I²C ports and 2 CAN buses cover mid-range UAV payload stacks running ArduPilot or PX4.
 ---

@@ -25,6 +25,14 @@ _base_fields: &base_fields
   - { label: Picture Key, name: pictureKey, widget: string, required: false, hint: "PPTX identifier (auto-set by import)" }
   - { label: Order, name: order, widget: number, default: 999, value_type: int, hint: "Lower number = shown first within its category" }
   - <<: *spec_field
+  - { label: Description, name: description, widget: text, required: false, hint: "Description 탭에 표시되는 긴 설명" }
+  - { label: Pinout Image, name: pinoutImage, widget: image, required: false, hint: "FC 전용 — Pinout 탭" }
+  - { label: Pinout Notes, name: pinoutNotes, widget: text, required: false, hint: "FC 전용" }
+  - { label: Wiring Image, name: wiringImage, widget: image, required: false, hint: "Wiring 탭 이미지" }
+  - { label: Wiring Notes, name: wiringNotes, widget: text, required: false, hint: "Wiring 탭 본문" }
+  - { label: Firmware Notes, name: firmwareNotes, widget: text, required: false, hint: "FC / ESC — Firmware 탭" }
+  - { label: Configuration Notes, name: configNotes, widget: text, required: false, hint: "GNSS — Configuration 탭" }
+  - { label: Gallery, name: gallery, widget: list, required: false, field: { label: Image, name: image, widget: image }, hint: "Gallery 탭 이미지들" }
 
 collections:
   - name: fc
@@ -67,6 +75,8 @@ collections:
       - { label: Picture Key, name: pictureKey, widget: string, required: false }
       - { label: Order, name: order, widget: number, default: 999, value_type: int }
       - <<: *spec_field
+      - { label: Description, name: description, widget: text, required: false, hint: "Description 탭" }
+      - { label: Gallery, name: gallery, widget: list, required: false, field: { label: Image, name: image, widget: image } }
       - { label: Test Conditions, name: testConditions, widget: string, required: false }
       - label: Thrust Tables
         name: thrust

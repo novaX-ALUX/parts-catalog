@@ -26,4 +26,6 @@ specs:
   - { key: Weight, value: "99 g (Core 43g + Baseboard 56g)" }
   - { key: Operating Temp, value: "-20 ~ +85 ℃" }
   - { key: Supported F/W, value: "PX4, ArduPilot" }
+description: |
+  AF-H7E is an enterprise-class H7 flight controller based on the Pixhawk FMUv6x standard. An STM32H753 at 480 MHz drives triple-redundant IMUs (BMI088 / ICM-42688-P / ICM-20649), an RM3100 magnetometer and dual ICP-20100 barometers. 16 PWM outputs, 8 UARTs, 2 CAN buses and a modular core / baseboard design support large industrial and commercial UAV platforms with PX4 and ArduPilot.
 ---

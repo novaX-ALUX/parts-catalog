@@ -13,4 +13,6 @@ specs:
   - { key: Voltage, value: "7 – 26 V" }
   - { key: Power Consumption, value: "1.0 W" }
   - { key: Manufacturer, value: "ER Co., Ltd." }
+description: |
+  AC-GM1X is an FPV gimbal designed for 19 mm cameras, providing stabilized footage with ±0.005° stabilization and ±120° pitch travel for FPV and inspection workloads.
 ---

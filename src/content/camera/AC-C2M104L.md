@@ -16,4 +16,6 @@ specs:
   - { key: Lens Configuration, value: "4G 2GM" }
   - { key: Lens Mount, value: "M12 S mount" }
   - { key: Module Size, value: "23 × 19 × 27 mm" }
+description: |
+  AC-C2M104L is a 1920 × 1080 FPV camera module with an integrated image sensor, ISP and communication interface in a single compact unit.
 ---
