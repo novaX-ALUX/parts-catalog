@@ -8,13 +8,13 @@ specs:
   - key: Mounting Hole
     value: 56 × 57 mm / Φ 4 mm
   - key: Weight
-    value: 22.5 g
+    value: 28 g
   - key: Voltage Range
     value: 4 – 8S LiPo (16.8 – 33.6 V)
   - key: Constant Current
     value: 60 A
   - key: Burst Current
-    value: 90 A
+    value: 70 A
   - key: BDShot
     value: Supported
   - key: Current Sensor
