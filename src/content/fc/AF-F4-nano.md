@@ -3,6 +3,7 @@ name: AF-F4 nano
 tagline: Compact F4 Flight Controller · Compatible Model X Blade
 image: /images/products/fc_F405_nano.png
 pictureKey: fc_F405_nano
+pinoutImage: /images/products/fc_F405_nano_pinout.png
 order: 10
 specs:
   - { key: MCU, value: "STM32F405" }

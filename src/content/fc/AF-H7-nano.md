@@ -3,6 +3,7 @@ name: AF-H7 nano
 tagline: High-Performance H7 Flight Controller · 2–8S LiPo
 image: /images/products/fc_Matek_H743_Slim_V4.png
 pictureKey: fc_Matek_H743_Slim_V4
+pinoutImage: /images/products/fc_H743_nano_pinout.png
 order: 20
 firmware:
   - kind: "DFU (Boot+App)"
