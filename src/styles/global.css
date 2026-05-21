@@ -272,7 +272,12 @@ img { display: block; max-width: 100%; height: auto; }
   background: var(--paper); border-radius: var(--radius); padding: 24px;
   display: grid; place-items: center;
 }
-.panel-image img { width: 100%; height: auto; max-height: 640px; object-fit: contain; mix-blend-mode: multiply; }
+.panel-image a { display: block; width: 100%; max-width: 920px; }
+.panel-image img { width: 100%; max-width: 920px; height: auto; object-fit: contain; mix-blend-mode: multiply; }
+.panel-image .zoom-hint {
+  margin-top: 12px; text-align: center;
+  color: var(--ink-4); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+}
 .panel-notes { margin-top: 24px; }
 
 .gallery-grid {

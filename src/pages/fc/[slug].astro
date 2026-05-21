@@ -50,7 +50,12 @@ const galleryImgs = d.gallery && d.gallery.length > 0 ? d.gallery : (d.image ? [
         ]}>
           <div class="tab-panel active" data-panel="pinout">
             {d.pinoutImage ? (
-              <div class="panel-image"><img src={`${base}${d.pinoutImage}`} alt={`${d.name} pinout`} /></div>
+              <div class="panel-image">
+                <a href={`${base}${d.pinoutImage}`} target="_blank" rel="noopener">
+                  <img src={`${base}${d.pinoutImage}`} alt={`${d.name} pinout`} />
+                </a>
+                <div class="zoom-hint">Click to open full size</div>
+              </div>
             ) : (
               <div class="panel-empty">Pinout diagram coming soon</div>
             )}
