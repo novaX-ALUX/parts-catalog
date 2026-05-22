@@ -1,7 +1,7 @@
 ---
 name: AE-8S 60A
 tagline: 32-bit ESC for X-Blade 10/15 · 8S LiPo
-image: /images/products/pasted-image-1778827733907.png
+image: /images/products/esc_32-8S-60A.png
 pictureKey: esc_32-8S-60A
 order: 30
 specs:

@@ -38,7 +38,7 @@ specs:
   - key: Operating Voltage
     value: 3.3 – 5.0 V
 description: AP-M10 is a compact GNSS module based on the u-blox M10 series, with an integrated BMM350 compass and built-in ceramic patch antenna. Multi-constellation tracking (BDS / GPS / GLONASS / Galileo / QZSS) provides H 1.5 m / V 2.5 m RMS accuracy and a cold start under 27 seconds. UART (TTL) interface and 1–18 Hz update rate suit close-coupled FC integration in an 18.2 × 18.2 mm, 8 g footprint.
-pinoutImage: /images/products/f1dfa314fbaa966b749dbaaf1167043b.png
+pinoutImage: /images/products/gnss_X_G10C_pinout.png
 pinoutNotes: ''
 firmwareNotes: ''
 configNotes: ''
