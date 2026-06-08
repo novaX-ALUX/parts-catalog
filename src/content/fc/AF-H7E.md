@@ -1,7 +1,7 @@
 ---
 name: AF-H7E
 tagline: Pixhawk FMUv6x Flight Controller · Modular Design
-image: /images/products/fc_CUAV_V6X.jpg
+image: /images/products/pixhawkv6x-size (1).jpg
 pictureKey: fc_CUAV_V6X
 order: 40
 specs:
