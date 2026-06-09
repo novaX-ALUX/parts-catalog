@@ -45,6 +45,9 @@ const firmwareItem = z.object({
 const detailSchema = baseSchema.extend({
   description: z.string().optional(),
   pinoutImage: z.string().optional(),
+  // Multiple pinout/diagram images shown stacked in the Pinout tab.
+  // When present this takes priority over the single `pinoutImage`.
+  pinoutImages: z.array(z.string()).optional(),
   pinoutNotes: z.string().optional(),
   firmwareNotes: z.string().optional(),
   firmware: z.array(firmwareItem).optional(),

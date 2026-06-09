@@ -25,7 +25,8 @@ _base_fields: &base_fields
   - { label: Order, name: order, widget: number, default: 999, value_type: int, hint: "Lower number = shown first within its category" }
   - <<: *spec_field
   - { label: Description, name: description, widget: text, required: false, hint: "Description 탭에 표시되는 긴 설명" }
-  - { label: Pinout Image, name: pinoutImage, widget: image, required: false, hint: "Pinout 탭 이미지" }
+  - { label: Pinout Image, name: pinoutImage, widget: image, required: false, hint: "Pinout 탭 이미지 (한 장). 여러 장이면 아래 Pinout Images 사용" }
+  - { label: Pinout Images, name: pinoutImages, widget: list, required: false, field: { label: Image, name: image, widget: image }, hint: "Pinout 탭 이미지 여러 장 — 위에서부터 표시 순서. 설정 시 위의 단일 Pinout Image보다 우선" }
   - { label: Pinout Notes, name: pinoutNotes, widget: text, required: false, hint: "Pinout 탭 본문" }
   - { label: Firmware Notes, name: firmwareNotes, widget: text, required: false, hint: "FC / ESC — Firmware 탭 상단 텍스트" }
   - label: Firmware Downloads

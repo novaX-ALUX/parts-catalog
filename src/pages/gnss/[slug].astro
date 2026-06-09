@@ -13,6 +13,9 @@ const { item } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const d = item.data;
 const galleryImgs = d.gallery && d.gallery.length > 0 ? d.gallery : (d.image ? [d.image] : []);
+const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
+  ? d.pinoutImages
+  : (d.pinoutImage ? [d.pinoutImage] : []);
 ---
 <Layout title={`${d.name} — novaX Catalog`} activeCategory="gnss">
   <section class="detail-hero">
@@ -48,8 +51,12 @@ const galleryImgs = d.gallery && d.gallery.length > 0 ? d.gallery : (d.image ? [
           {id:'gallery', label:'Gallery'}
         ]}>
           <div class="tab-panel active" data-panel="pinout">
-            {d.pinoutImage ? (
-              <div class="panel-image"><img src={`${base}${d.pinoutImage}`} alt={`${d.name} pinout`} /></div>
+            {pinoutImgs.length > 0 ? (
+              <div class="panel-images">
+                {pinoutImgs.map((src) => (
+                  <div class="panel-image"><img src={`${base}${src}`} alt={`${d.name} pinout`} /></div>
+                ))}
+              </div>
             ) : (
               <div class="panel-empty">Pinout coming soon</div>
             )}

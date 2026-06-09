@@ -274,7 +274,9 @@ img { display: block; max-width: 100%; height: auto; }
 }
 .panel-image a { display: block; width: 100%; max-width: 920px; }
 .panel-image img { width: 100%; max-width: 920px; height: auto; object-fit: contain; mix-blend-mode: multiply; }
-.panel-image .zoom-hint {
+/* Stack multiple pinout/diagram images vertically, each at its natural size. */
+.panel-images { display: flex; flex-direction: column; gap: 16px; }
+.zoom-hint {
   margin-top: 12px; text-align: center;
   color: var(--ink-4); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
 }
