@@ -1,10 +1,14 @@
 ---
+import { niceScale } from '../lib/scale';
 interface Row { throttle: string; thrust?: string }
 interface Props {
   rows: Row[];
   propeller: string;
+  // Shared Y-axis max across all charts on the page (keeps charts comparable).
+  // When omitted, the chart scales to its own data.
+  yMax?: number;
 }
-const { rows, propeller } = Astro.props;
+const { rows, propeller, yMax } = Astro.props;
 
 const points = rows
   .map((r) => ({
@@ -22,26 +26,17 @@ const pad = { l: 48, r: 16, t: 16, b: 28 };
 const innerW = W - pad.l - pad.r;
 const innerH = H - pad.t - pad.b;
 
-const maxY = hasData ? Math.max(...valid.map((p) => p.y)) : 1;
-function niceCeil(v: number): number {
-  if (v <= 0) return 1;
-  const mag = Math.pow(10, Math.floor(Math.log10(v)));
-  const norm = v / mag;
-  let nice: number;
-  if (norm <= 1) nice = 1;
-  else if (norm <= 2) nice = 2;
-  else if (norm <= 5) nice = 5;
-  else nice = 10;
-  return nice * mag;
-}
-const niceMax = niceCeil(maxY) || 1;
+const dataMax = hasData ? Math.max(...valid.map((p) => p.y)) : 1;
+// Use the page-wide max when provided so every chart shares one Y scale.
+const scale = niceScale(yMax && yMax > 0 ? yMax : dataMax);
+const niceMax = scale.max || 1;
 
 function sx(x: number) { return pad.l + (x / 100) * innerW; }
 function sy(y: number) { return pad.t + innerH - (y / niceMax) * innerH; }
 
 const path = valid.map((p, i) => `${i === 0 ? 'M' : 'L'} ${sx(p.x)} ${sy(p.y)}`).join(' ');
 
-const yTicks = [0, 0.25, 0.5, 0.75, 1].map((f) => Math.round(niceMax * f));
+const yTicks = scale.ticks;
 const xTicks = [0, 20, 40, 60, 80, 100];
 ---
 <div class="chart-wrap">

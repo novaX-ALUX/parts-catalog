@@ -5,6 +5,7 @@ import SpecTable from '../../components/SpecTable.astro';
 import ThrustChart from '../../components/ThrustChart.astro';
 import Tabs from '../../components/Tabs.astro';
 import { CATEGORY_LABEL } from '../../content.config';
+import { maxThrust } from '../../lib/scale';
 
 export async function getStaticPaths() {
   const items = await getCollection('motor');
@@ -15,6 +16,8 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const d = item.data;
 const galleryImgs = d.gallery && d.gallery.length > 0 ? d.gallery : (d.image ? [d.image] : []);
 const hasThrust = d.thrust && d.thrust.length > 0;
+// One Y-axis max shared by every propeller chart so larger thrust always draws taller.
+const sharedThrustMax = maxThrust(d.thrust);
 ---
 <Layout title={`${d.name} — novaX Catalog`} activeCategory="motor">
   <section class="detail-hero">
@@ -55,7 +58,7 @@ const hasThrust = d.thrust && d.thrust.length > 0;
                 <h2>Load Performance Data</h2>
                 {d.testConditions && <div class="testnote">{d.testConditions}</div>}
                 {d.thrust!.map((t: any) => (
-                  <ThrustChart rows={t.rows} propeller={t.propeller} />
+                  <ThrustChart rows={t.rows} propeller={t.propeller} yMax={sharedThrustMax} />
                 ))}
                 {d.thrust!.map((t: any) => (
                   <div class="prop">
