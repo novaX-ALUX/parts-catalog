@@ -261,6 +261,8 @@ img { display: block; max-width: 100%; height: auto; }
 }
 .prose p { margin-bottom: 16px; }
 .prose strong { color: var(--ink); font-weight: 600; }
+.prose a { color: #1a73e8; text-decoration: none; word-break: break-all; }
+.prose a:hover { text-decoration: underline; }
 
 .panel-empty {
   background: var(--paper); border: 1px dashed var(--line-2);

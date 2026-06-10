@@ -1,0 +1,11 @@
+---
+// Renders plain text with any http(s) URLs converted to clickable links.
+interface Props { text: string }
+const { text } = Astro.props;
+const parts = text.split(/(https?:\/\/[^\s]+)/g);
+---
+{parts.map((p) =>
+  /^https?:\/\//.test(p)
+    ? <a href={p} target="_blank" rel="noopener">{p}</a>
+    : p
+)}

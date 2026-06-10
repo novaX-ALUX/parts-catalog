@@ -4,6 +4,7 @@ import Layout from '../../layouts/Layout.astro';
 import SpecTable from '../../components/SpecTable.astro';
 import Tabs from '../../components/Tabs.astro';
 import FirmwareTable from '../../components/FirmwareTable.astro';
+import Linkify from '../../components/Linkify.astro';
 import { CATEGORY_LABEL } from '../../content.config';
 
 export async function getStaticPaths() {
@@ -62,7 +63,7 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
             ) : (
               <div class="panel-empty">Pinout coming soon</div>
             )}
-            {d.pinoutNotes && <div class="prose panel-notes"><p>{d.pinoutNotes}</p></div>}
+            {d.pinoutNotes && <div class="prose panel-notes"><p><Linkify text={d.pinoutNotes} /></p></div>}
           </div>
 
           <div class="tab-panel" data-panel="firmware">
@@ -71,7 +72,7 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
             ) : (
               !d.firmwareNotes && <div class="panel-empty">Firmware downloads coming soon</div>
             )}
-            {d.firmwareNotes && <div class="prose panel-notes"><p>{d.firmwareNotes}</p></div>}
+            {d.firmwareNotes && <div class="prose panel-notes"><p><Linkify text={d.firmwareNotes} /></p></div>}
           </div>
 
           <div class="tab-panel" data-panel="config">
@@ -99,7 +100,7 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
               </table>
             )}
             {d.configNotes
-              ? <div class="prose panel-notes"><p class="cfg-steps">{d.configNotes}</p></div>
+              ? <div class="prose panel-notes"><p class="cfg-steps"><Linkify text={d.configNotes} /></p></div>
               : (!d.configImages && !d.configParams && <div class="panel-empty">Configuration notes coming soon</div>)}
           </div>
 
