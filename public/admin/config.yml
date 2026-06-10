@@ -42,7 +42,17 @@ _base_fields: &base_fields
       - { label: Size, name: size, widget: string, required: false, hint: "예) 896 KB" }
       - { label: SHA-256, name: sha256, widget: string, required: false }
       - { label: Notes, name: notes, widget: string, required: false }
-  - { label: Configuration Notes, name: configNotes, widget: text, required: false, hint: "GNSS — Configuration 탭" }
+  - { label: Configuration Notes, name: configNotes, widget: text, required: false, hint: "GNSS — Configuration 탭 단계별 안내 (줄바꿈 유지됨)" }
+  - { label: Config Images, name: configImages, widget: list, required: false, field: { label: Image, name: image, widget: image }, hint: "Configuration 탭 상단 다이어그램 (안테나 배치도 등)" }
+  - label: Config Parameters
+    name: configParams
+    widget: list
+    required: false
+    hint: "Configuration 탭 파라미터 표 (예: ArduPilot 설정값)"
+    fields:
+      - { label: Parameter, name: name, widget: string }
+      - { label: Value, name: value, widget: string }
+      - { label: Description, name: note, widget: string, required: false }
   - { label: Gallery, name: gallery, widget: list, required: false, field: { label: Image, name: image, widget: image }, hint: "Gallery 탭 이미지들" }
 
 collections:

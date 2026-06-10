@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 420" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
+  <rect width="880" height="420" fill="#ffffff"/>
+
+  <!-- title -->
+  <text x="40" y="44" font-size="15" letter-spacing="3" fill="#1a1a1a" font-weight="600">ANTENNA PLACEMENT · DUAL-ANTENNA HEADING</text>
+
+  <!-- flight direction arrow -->
+  <line x1="700" y1="120" x2="800" y2="120" stroke="#1a1a1a" stroke-width="1.6"/>
+  <path d="M 800 120 l -12 -6 v 12 z" fill="#1a1a1a"/>
+  <text x="700" y="104" font-size="11" letter-spacing="2" fill="#666">FLIGHT DIRECTION</text>
+
+  <!-- airframe centerline -->
+  <line x1="120" y1="170" x2="760" y2="170" stroke="#c8c8c8" stroke-width="1" stroke-dasharray="6 5"/>
+  <text x="766" y="174" font-size="10" fill="#999">X (body)</text>
+
+  <!-- ANT2 (slave, rear) -->
+  <circle cx="260" cy="170" r="34" fill="#f5f5f5" stroke="#1a1a1a" stroke-width="1.6"/>
+  <circle cx="260" cy="170" r="5" fill="#1a1a1a"/>
+  <text x="260" y="232" font-size="13" font-weight="600" fill="#1a1a1a" text-anchor="middle">ANT 2 · SLAVE</text>
+  <text x="260" y="250" font-size="11" fill="#777" text-anchor="middle">rear</text>
+
+  <!-- ANT1 (master, front) -->
+  <circle cx="620" cy="170" r="34" fill="#f5f5f5" stroke="#1a1a1a" stroke-width="1.6"/>
+  <circle cx="620" cy="170" r="5" fill="#1a1a1a"/>
+  <text x="620" y="232" font-size="13" font-weight="600" fill="#1a1a1a" text-anchor="middle">ANT 1 · MASTER</text>
+  <text x="620" y="250" font-size="11" fill="#777" text-anchor="middle">front · primary RTK position</text>
+
+  <!-- separation dimension -->
+  <line x1="260" y1="118" x2="260" y2="136" stroke="#1a1a1a" stroke-width="1"/>
+  <line x1="620" y1="118" x2="620" y2="136" stroke="#1a1a1a" stroke-width="1"/>
+  <line x1="260" y1="127" x2="620" y2="127" stroke="#1a1a1a" stroke-width="1"/>
+  <path d="M 260 127 l 12 -5 v 10 z" fill="#1a1a1a"/>
+  <path d="M 620 127 l -12 -5 v 10 z" fill="#1a1a1a"/>
+  <text x="440" y="116" font-size="12" fill="#1a1a1a" text-anchor="middle">antenna separation ≥ 300 mm  ( = GPS_MB1_OFS_X, in meters )</text>
+
+  <!-- module -->
+  <rect x="380" y="290" width="140" height="56" rx="6" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.6"/>
+  <text x="450" y="314" font-size="13" font-weight="600" fill="#1a1a1a" text-anchor="middle">AP-RTK dual</text>
+  <text x="450" y="332" font-size="10" letter-spacing="1" fill="#777" text-anchor="middle">GNSS MODULE</text>
+
+  <!-- antenna feed lines -->
+  <path d="M 286 194 C 330 250, 360 280, 392 290" fill="none" stroke="#888" stroke-width="1.3"/>
+  <path d="M 594 194 C 550 250, 540 280, 508 290" fill="none" stroke="#888" stroke-width="1.3"/>
+
+  <!-- FC -->
+  <rect x="660" y="290" width="170" height="56" rx="6" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.6"/>
+  <text x="745" y="314" font-size="13" font-weight="600" fill="#1a1a1a" text-anchor="middle">Flight Controller</text>
+  <text x="745" y="332" font-size="10" letter-spacing="1" fill="#777" text-anchor="middle">CAN 1 PORT</text>
+
+  <!-- CAN link -->
+  <line x1="520" y1="318" x2="660" y2="318" stroke="#1a1a1a" stroke-width="1.6"/>
+  <text x="590" y="308" font-size="11" fill="#666" text-anchor="middle">DroneCAN</text>
+
+  <!-- footnote -->
+  <text x="40" y="396" font-size="11" fill="#888">Mount both antennas on the airframe centerline with ANT 1 toward the nose. Keep clear sky view; keep equal height (GPS_MB1_OFS_Z = 0).</text>
+</svg>

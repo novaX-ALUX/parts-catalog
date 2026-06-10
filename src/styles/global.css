@@ -282,6 +282,22 @@ img { display: block; max-width: 100%; height: auto; }
 }
 .panel-notes { margin-top: 24px; }
 
+/* Configuration tab: parameter table + step text with preserved line breaks */
+.cfg-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.cfg-table th, .cfg-table td {
+  text-align: left; padding: 12px 14px;
+  border-bottom: 1px solid var(--line-2, #eee); vertical-align: top;
+}
+.cfg-table th {
+  font-weight: 600; color: var(--ink-3, #555);
+  background: var(--paper, #fafafa); border-bottom: 1px solid #e2e2e2;
+}
+.cfg-table code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px; color: var(--ink, #222);
+}
+.cfg-steps { white-space: pre-line; }
+
 .gallery-grid {
   display: grid; gap: 16px;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));

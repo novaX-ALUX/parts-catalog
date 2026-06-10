@@ -42,6 +42,12 @@ const firmwareItem = z.object({
   notes: z.string().optional()
 });
 
+const configParam = z.object({
+  name: z.string(),
+  value: z.string(),
+  note: z.string().optional()
+});
+
 const detailSchema = baseSchema.extend({
   description: z.string().optional(),
   pinoutImage: z.string().optional(),
@@ -52,6 +58,10 @@ const detailSchema = baseSchema.extend({
   firmwareNotes: z.string().optional(),
   firmware: z.array(firmwareItem).optional(),
   configNotes: z.string().optional(),
+  // Configuration tab extras: diagrams shown above the notes and a
+  // parameter table (e.g. ArduPilot setup parameters).
+  configImages: z.array(z.string()).optional(),
+  configParams: z.array(configParam).optional(),
   gallery: z.array(z.string()).optional()
 });
 
