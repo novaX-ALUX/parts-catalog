@@ -28,4 +28,13 @@ specs:
   - { key: Supported F/W, value: "ArduPilot, PX4" }
 description: |
   AF-F7 mini is an F7-class flight controller powered by the STM32F765 running at 216 MHz. Dual IMUs (ICM-20689 primary, ICM-20602 / BMI055 secondary), an IST8310 magnetometer and an MS5611 barometer deliver redundant attitude, heading and altitude sensing. 8 PWM outputs, 4 UARTs, 3 I²C ports and 2 CAN buses cover mid-range UAV payload stacks running ArduPilot or PX4.
+firmware:
+  - kind: "ArduPilot (Copter)"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.1.4/AF-F7_mini_v0.1.4.zip
+    version: "0.1.4"
+    date: "2026-06-04"
+    size: "4.0 MB"
+    sha256: "b042be8e695c2467c9938c9e265561069a5a25d52da603f47dcffbfafd283d0e"
+    notes: "ZIP — arducopter_with_bl.hex (full flash), arducopter.apj (Mission Planner upload), bootloader. Build 92b0cd788e."
+firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases'
 ---

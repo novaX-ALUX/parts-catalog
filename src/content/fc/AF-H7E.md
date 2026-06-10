@@ -55,6 +55,14 @@ pinoutImages:
   - /images/products/fc_AF-H7E_dimensions.png
   - /images/products/cuav-pixhawk6x-connectors.png
 pinoutNotes: ''
-firmwareNotes: ''
+firmware:
+  - kind: "ArduPilot (Copter)"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.1.4/AF-H7E_v0.1.4.zip
+    version: "0.1.4"
+    date: "2026-06-04"
+    size: "4.7 MB"
+    sha256: "6688fb9b5f40d49c758cdcbaabb9a14aec6349e2c452dcf325d1cca7e13ec456"
+    notes: "ZIP — arducopter_with_bl.hex (full flash), arducopter.apj (Mission Planner upload), bootloader. Build 92b0cd788e."
+firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases'
 configNotes: ''
 ---

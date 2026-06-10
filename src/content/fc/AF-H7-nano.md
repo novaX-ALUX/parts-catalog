@@ -6,20 +6,13 @@ pictureKey: fc_Matek_H743_Slim_V4
 pinoutImage: /images/products/fc_H743_nano_pinout.png
 order: 20
 firmware:
-  - kind: "DFU (Boot+App)"
-    file: /firmware/fc/af-h7-nano/v1.2.0/af-h7-nano_bootapp_v1.2.0.hex
-    version: "1.2.0"
-    date: "2026-05-10"
-    size: "896 KB"
-    sha256: "placeholder-replace-with-real-sha256-on-release"
-    notes: "Flash via USB DFU mode (Boot0 high). Includes bootloader."
-  - kind: "App update (USB)"
-    file: /firmware/fc/af-h7-nano/v1.2.0/af-h7-nano_app_v1.2.0.bin
-    version: "1.2.0"
-    date: "2026-05-10"
-    size: "612 KB"
-    sha256: "placeholder-replace-with-real-sha256-on-release"
-    notes: "Application-only binary uploaded over USB via on-board bootloader."
+  - kind: "ArduPilot (Copter)"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.1.3/AF-H7_nano_v0.1.3.zip
+    version: "0.1.3"
+    date: "2026-05-28"
+    size: "2.8 MB"
+    sha256: "d3bb9b82eb0dade836c02c027c86d34f0292696a0ad201d5d11aacedc487eb82"
+    notes: "ZIP — arducopter_with_bl.hex (full flash), arducopter.apj (Mission Planner upload), bootloader. Build 92b0cd788e."
 specs:
   - { key: MCU, value: "STM32H743VIH6, 480 MHz (1MB RAM, 2MB Flash)" }
   - { key: IMU, value: "2× ICM-42688-P" }
@@ -43,5 +36,5 @@ pinoutNotes: |
 
   VBat input is routed through a 4-pin connector accepting 2S–8S LiPo. The on-board 5 V / 2.5 A regulator powers the FC, receiver and low-current peripherals. Servo rail is unregulated — feed it directly from a BEC or motor PDB.
 firmwareNotes: |
-  Supports Betaflight, INAV, and ArduPilot out of the box. Recommended targets: Betaflight MATEKH743 / ArduPilot MatekH743. Enter USB-C DFU bootloader by holding the BOOT button during power-up.
+  Supports Betaflight, INAV, and ArduPilot out of the box. Recommended targets: Betaflight MATEKH743 / ArduPilot MatekH743. Enter USB-C DFU bootloader by holding the BOOT button during power-up. All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases
 ---
