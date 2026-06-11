@@ -18,6 +18,7 @@ const baseSchema = z.object({
 
 const motorThrustRow = z.object({
   throttle: z.string(),
+  rpm: z.string().optional(),
   voltage: z.string().optional(),
   thrust: z.string().optional(),
   torque: z.string().optional(),
@@ -29,6 +30,11 @@ const motorThrustRow = z.object({
 
 const motorThrustTable = z.object({
   propeller: z.string(),
+  // ESC used on the test stand (e.g. "BLDC ESC", "FOC ESC") — shown in the
+  // chart title and table heading so datasets from different drives stay distinct.
+  esc: z.string().optional(),
+  // Extra line shown under the table (e.g. full-throttle peak summary).
+  note: z.string().optional(),
   rows: z.array(motorThrustRow)
 });
 

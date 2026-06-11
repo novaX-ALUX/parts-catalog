@@ -18,6 +18,9 @@ const galleryImgs = d.gallery && d.gallery.length > 0 ? d.gallery : (d.image ? [
 const hasThrust = d.thrust && d.thrust.length > 0;
 // One Y-axis max shared by every propeller chart so larger thrust always draws taller.
 const sharedThrustMax = maxThrust(d.thrust);
+// Show a column only when at least one row in the table has a value for it
+// (e.g. FOC datasets carry rpm but no torque; BLDC datasets the opposite).
+const hasCol = (rows: any[], key: string) => rows.some((r) => r[key] && r[key] !== '—');
 ---
 <Layout title={`${d.name} — novaX Catalog`} activeCategory="motor">
   <section class="detail-hero">
@@ -58,18 +61,19 @@ const sharedThrustMax = maxThrust(d.thrust);
                 <h2>Load Performance Data</h2>
                 {d.testConditions && <div class="testnote">{d.testConditions}</div>}
                 {d.thrust!.map((t: any) => (
-                  <ThrustChart rows={t.rows} propeller={t.propeller} yMax={sharedThrustMax} />
+                  <ThrustChart rows={t.rows} propeller={t.propeller} esc={t.esc} yMax={sharedThrustMax} />
                 ))}
                 {d.thrust!.map((t: any) => (
                   <div class="prop">
-                    <div class="head">Propeller {t.propeller}</div>
+                    <div class="head">Propeller {t.propeller}{t.esc ? ` · ${t.esc}` : ''}</div>
                     <table>
                       <thead>
                         <tr>
                           <th>Throttle</th>
+                          {hasCol(t.rows, 'rpm') && <th>Speed (rpm)</th>}
                           <th>Voltage (V)</th>
                           <th>Thrust (g)</th>
-                          <th>Torque (N·m)</th>
+                          {hasCol(t.rows, 'torque') && <th>Torque (N·m)</th>}
                           <th>Current (A)</th>
                           <th>Power (W)</th>
                           <th>Eff (g/W)</th>
@@ -80,9 +84,10 @@ const sharedThrustMax = maxThrust(d.thrust);
                         {t.rows.map((r: any) => (
                           <tr>
                             <td>{r.throttle}</td>
+                            {hasCol(t.rows, 'rpm') && <td>{r.rpm ?? '—'}</td>}
                             <td>{r.voltage ?? '—'}</td>
                             <td>{r.thrust ?? '—'}</td>
-                            <td>{r.torque ?? '—'}</td>
+                            {hasCol(t.rows, 'torque') && <td>{r.torque ?? '—'}</td>}
                             <td>{r.current ?? '—'}</td>
                             <td>{r.power ?? '—'}</td>
                             <td>{r.eff ?? '—'}</td>
@@ -91,6 +96,7 @@ const sharedThrustMax = maxThrust(d.thrust);
                         ))}
                       </tbody>
                     </table>
+                    {t.note && <div class="testnote" style="margin-top: 8px;">{t.note}</div>}
                   </div>
                 ))}
               </div>

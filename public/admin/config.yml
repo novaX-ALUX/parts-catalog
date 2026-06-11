@@ -106,11 +106,14 @@ collections:
         required: false
         fields:
           - { label: Propeller, name: propeller, widget: string }
+          - { label: ESC Type, name: esc, widget: string, required: false, hint: "예) BLDC ESC, FOC ESC (Combo) — 차트 제목/표 머리글에 표시" }
+          - { label: Note, name: note, widget: string, required: false, hint: "표 아래 한 줄 메모 (예: Full throttle 피크 요약)" }
           - label: Rows
             name: rows
             widget: list
             fields:
               - { label: Throttle, name: throttle, widget: string }
+              - { label: Speed (rpm), name: rpm, widget: string, required: false }
               - { label: Voltage (V), name: voltage, widget: string, required: false }
               - { label: Thrust (g), name: thrust, widget: string, required: false }
               - { label: Torque (N·m), name: torque, widget: string, required: false }
