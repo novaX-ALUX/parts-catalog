@@ -284,6 +284,15 @@ img { display: block; max-width: 100%; height: auto; }
 }
 /* Stack multiple pinout/diagram images vertically. */
 .panel-images { display: flex; flex-direction: column; gap: 16px; }
+
+/* Pinout tab only: frame every product's pinout image in an identical 4:3 box so
+   portrait and landscape sources render at the same footprint. Config figures
+   (data-panel="config") keep the height-cap sizing above. */
+[data-panel="pinout"] .panel-images { align-items: center; }
+[data-panel="pinout"] .panel-image {
+  width: 100%; max-width: 760px; aspect-ratio: 4 / 3; padding: 22px;
+}
+[data-panel="pinout"] .panel-image img { max-width: 100%; max-height: 100%; }
 .zoom-hint {
   margin-top: 12px; text-align: center;
   color: var(--ink-4); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
