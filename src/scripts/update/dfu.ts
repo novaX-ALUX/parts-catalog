@@ -10,7 +10,6 @@ import type { ParsedHex } from './intel-hex';
 
 const STM_VID = 0x0483, STM_PID = 0xdf11;
 const DNLOAD = 1, GETSTATUS = 3, CLRSTATUS = 4, ABORT = 6;
-const XFER = 1024; // safe chunk; STM32 bootloader accepts >= this
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export type Log = (msg: string) => void;
@@ -24,6 +23,10 @@ export class STM32Dfu {
   private dev: USBDevice;
   private iface = 0;
   private sectors: Sector[] = [];
+  // wTransferSize from the device's DFU functional descriptor. DfuSe computes the
+  // write address as base + (blockNum-2)*wTransferSize, so the chunk size MUST equal
+  // it — otherwise writes land at the wrong address (errTARGET past flash end). Default 2048.
+  private xfer = 2048;
 
   private constructor(dev: USBDevice) { this.dev = dev; }
 
@@ -57,6 +60,7 @@ export class STM32Dfu {
     await dev.claimInterface(self.iface);
     await dev.selectAlternateInterface(self.iface, 0);
     self.sectors = parseMemoryLayout(ifc.alternates[0].interfaceName || '');
+    self.xfer = (await readTransferSize(dev)) || 2048;
     await self.clearIfError();
     return self;
   }
@@ -114,15 +118,20 @@ export class STM32Dfu {
   async flash(hex: ParsedHex, log: Log, progress: Progress) {
     const eraseStarts = this.sectorsInRange(hex.minAddress, hex.maxAddress);
     log(`Erase ${eraseStarts.length} sector(s) over 0x${hex.minAddress.toString(16)}–0x${hex.maxAddress.toString(16)} …`);
-    for (const s of eraseStarts) await this.dfuseCmd(0x41, s);
+    for (let i = 0; i < eraseStarts.length; i++) {
+      await this.dfuseCmd(0x41, eraseStarts[i]);
+      log(`  erased ${i + 1}/${eraseStarts.length} (0x${eraseStarts[i].toString(16)})`);
+      progress(i + 1, eraseStarts.length);
+    }
     log('Erase done.');
 
+    log(`Write ${hex.totalBytes} bytes in ${this.xfer}-byte blocks …`);
     let written = 0;
     for (const seg of hex.segments) {
       await this.dfuseCmd(0x21, seg.address); // set address pointer
       let block = 2;
-      for (let off = 0; off < seg.data.length; off += XFER) {
-        const chunk = seg.data.subarray(off, Math.min(off + XFER, seg.data.length));
+      for (let off = 0; off < seg.data.length; off += this.xfer) {
+        const chunk = seg.data.subarray(off, Math.min(off + this.xfer, seg.data.length));
         await this.dnload(block, chunk);
         let st = await this.getStatus();
         await sleep(st.poll);
@@ -147,6 +156,22 @@ export class STM32Dfu {
   }
 
   async close() { try { await this.dev.close(); } catch { /* ignore */ } }
+}
+
+/** Read wTransferSize from the DFU functional descriptor (bDescriptorType 0x21). 0 if not found. */
+async function readTransferSize(dev: USBDevice): Promise<number> {
+  try {
+    const r = await dev.controlTransferIn(
+      { requestType: 'standard', recipient: 'device', request: 6 /* GET_DESCRIPTOR */, value: 0x0200 /* CONFIG 0 */, index: 0 }, 4096);
+    const d = new Uint8Array(r.data!.buffer);
+    for (let i = 0; i + 1 < d.length;) {
+      const len = d[i], type = d[i + 1];
+      if (len === 0) break;
+      if (type === 0x21 && i + 7 <= d.length) return d[i + 5] | (d[i + 6] << 8);
+      i += len;
+    }
+  } catch { /* descriptor read failed — caller uses the 2048 default */ }
+  return 0;
 }
 
 /** Parse a DfuSe interface name e.g. "@Internal Flash /0x08000000/04*016Kg,01*064Kg,07*128Kg". */
