@@ -133,10 +133,9 @@ export class STM32Dfu {
       for (let off = 0; off < seg.data.length; off += this.xfer) {
         const chunk = seg.data.subarray(off, Math.min(off + this.xfer, seg.data.length));
         await this.dnload(block, chunk);
-        let st = await this.getStatus();
-        await sleep(st.poll);
-        st = await this.getStatus();
+        const st = await this.getStatus(); // commit; bStatus catches errTARGET immediately
         if (st.status !== 0) throw new DfuError(`쓰기 실패 @0x${(seg.address + off).toString(16)} (status ${st.status})`);
+        if (st.poll) await sleep(st.poll); // wait the device's stated program time before next block
         block++;
         written += chunk.length;
         progress(written, hex.totalBytes);

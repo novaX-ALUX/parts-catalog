@@ -137,6 +137,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
+  const BUILD = '2026-06-17 · DFU 2048B + erase-progress + 1x-status';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -164,6 +165,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
       }
     } catch { /* no authorized device / open failed — fall back to manual Connect */ }
   }
+  log('Web Updater build ' + BUILD, 'pend');
   autoDetect();
 
   // ---- mode toggle ----
