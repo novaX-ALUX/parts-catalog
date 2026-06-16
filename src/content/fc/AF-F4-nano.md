@@ -24,12 +24,23 @@ specs:
 description: |
   AF-F4 nano is a compact F4-class flight controller built around the STM32F405. Equipped with an ICM-42688-P IMU and DPS-310 barometer, it delivers reliable attitude and altitude sensing in a 39.4×39.4 mm form factor at just 9.3 g. Wide 9–25 V DC input with regulated 3.3 / 5 / 10 V rails and 9 PWM outputs make it suitable for compact 3"–5" multirotors running Betaflight, ArduPilot or PX4.
 firmware:
-  - kind: "ArduPilot (Copter)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.1.3/AF-F4_nano_v0.1.3.zip
-    version: "0.1.3"
-    date: "2026-05-28"
-    size: "1.6 MB"
-    sha256: "abe9b1c24a66a55012be24c239781de86a72ff8878fe3ac494643275acc02730"
-    notes: "ZIP — arducopter_with_bl.hex (full flash), arducopter.apj (Mission Planner upload), bootloader. Build 92b0cd788e."
+  - kind: "ArduPilot (.apj package)"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F4_nano-v0.1.4/AF-F4_nano-v0.1.4.apj
+    version: "0.1.4"
+    date: "2026-06-16"
+    size: "811 KB"
+    sha256: "2c3160c82f41526ed0fe918d1242bef85eb3f7939d857a9573cf9ffbba16fb39"
+    notes: "ArduPilot Copter app. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater → Firmware Update."
+    method: ardupilot
+    webPath: /firmware/AF-F4_nano-v0.1.4.apj
+  - kind: "Bootloader + App (merged HEX · DFU / SWD)"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F4_nano-v0.1.4/AF-F4_nano-v0.1.4_with_bl.hex
+    version: "0.1.4"
+    date: "2026-06-16"
+    size: "2.5 MB"
+    sha256: "ed90af2eeef7c5b06187fce4ff08c5f6f8299b6390087689793e03d934ae20c3"
+    notes: "Bootloader + application combined image based at 0x08000000. Flash via SWD/ST-Link or the catalog Web Updater → DFU Recovery for a blank/bricked board."
+    method: dfu
+    webPath: /firmware/AF-F4_nano-v0.1.4_with_bl.hex
 firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases'
 ---
