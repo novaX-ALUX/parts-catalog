@@ -1,8 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
-  <rect width="960" height="560" fill="#f5f5f5"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 660" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
+  <rect width="960" height="660" fill="#f5f5f5"/>
 
   <text x="40" y="44" font-size="15" letter-spacing="2" fill="#1a1a1a" font-weight="600">MOVING-BASELINE OFFSET · SIGN CONVENTION</text>
   <text x="40" y="66" font-size="11" letter-spacing="1" fill="#888">Offset measured from Slave (ANT2) to Master (ANT1), in body frame · per ArduPilot / CUAV manual</text>
+
+  <defs>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#1a1a1a"/></marker>
+  </defs>
 
   <!-- ================= LEFT: X / Y top-down cross ================= -->
   <g>
@@ -24,9 +28,6 @@
     </g>
 
     <!-- axes -->
-    <defs>
-      <marker id="ar" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#1a1a1a"/></marker>
-    </defs>
     <line x1="150" y1="320" x2="450" y2="320" stroke="#1a1a1a" stroke-width="1.2" stroke-dasharray="5 4" marker-start="url(#ar)" marker-end="url(#ar)"/>
     <line x1="300" y1="200" x2="300" y2="440" stroke="#1a1a1a" stroke-width="1.2" stroke-dasharray="5 4" marker-start="url(#ar)" marker-end="url(#ar)"/>
     <text x="158" y="312" font-size="12" fill="#1a1a1a" font-weight="600">X</text>
@@ -58,12 +59,13 @@
   <!-- divider -->
   <line x1="620" y1="100" x2="620" y2="500" stroke="#dcdcdc" stroke-width="1"/>
 
-  <!-- ================= RIGHT: Z side view (ArduPilot: +Z = below) ================= -->
+  <!-- ================= RIGHT: Z side view (ArduPilot NED: +Z = down = below) ================= -->
   <g>
     <text x="790" y="108" font-size="12" letter-spacing="2" fill="#555" text-anchor="middle" font-weight="600">SIDE VIEW · Z</text>
+    <text x="790" y="126" font-size="9.5" letter-spacing="1" fill="#999" text-anchor="middle">NED frame — +Z points down</text>
 
-    <!-- Z axis (NED: down positive) -->
-    <line x1="790" y1="200" x2="790" y2="440" stroke="#1a1a1a" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#ar)"/>
+    <!-- Z axis (down positive) -->
+    <line x1="790" y1="205" x2="790" y2="440" stroke="#1a1a1a" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#ar)"/>
     <text x="800" y="430" font-size="12" fill="#1a1a1a" font-weight="600">+Z</text>
 
     <!-- level line + slave -->
@@ -72,16 +74,38 @@
     <circle cx="790" cy="320" r="8" fill="#444"/>
     <text x="762" y="324" font-size="11" fill="#1a1a1a" text-anchor="end" font-weight="600">Slave</text>
 
-    <!-- master below = positive -->
-    <rect x="778" y="392" width="24" height="40" rx="3" fill="#bdbdbd"/>
-    <text x="790" y="456" font-size="11" fill="#1a1a1a" text-anchor="middle" font-weight="600">Master · OFS_Z (+)</text>
-    <text x="790" y="472" font-size="10" fill="#777" text-anchor="middle">below Slave</text>
-
     <!-- master above = negative -->
-    <rect x="778" y="208" width="24" height="40" rx="3" fill="#dcdcdc"/>
-    <text x="790" y="190" font-size="11" fill="#1a1a1a" text-anchor="middle" font-weight="600">Master · OFS_Z (−)</text>
-    <text x="790" y="174" font-size="10" fill="#777" text-anchor="middle">above Slave</text>
+    <rect x="778" y="212" width="24" height="40" rx="3" fill="#dcdcdc"/>
+    <text x="790" y="196" font-size="11" fill="#1a1a1a" text-anchor="middle" font-weight="600">Master · OFS_Z (−)</text>
+    <text x="790" y="180" font-size="10" fill="#777" text-anchor="middle">above Slave</text>
+
+    <!-- master below = positive -->
+    <rect x="778" y="388" width="24" height="40" rx="3" fill="#bdbdbd"/>
+    <text x="790" y="452" font-size="11" fill="#1a1a1a" text-anchor="middle" font-weight="600">Master · OFS_Z (+)</text>
+    <text x="790" y="468" font-size="10" fill="#777" text-anchor="middle">below Slave</text>
   </g>
 
-  <text x="40" y="534" font-size="11" fill="#888">Recommended layout: antennas at equal height on the centerline, Master toward the nose → OFS_X = +0.50, OFS_Y = 0, OFS_Z = 0.</text>
+  <!-- ================= BOTTOM: explicit Z sign table ================= -->
+  <g>
+    <rect x="40" y="524" width="880" height="96" rx="6" fill="#ffffff" stroke="#e2e2e2" stroke-width="1"/>
+    <text x="60" y="550" font-size="12" letter-spacing="1" fill="#1a1a1a" font-weight="600">Z SIGN depends only on relative height of the two antennas</text>
+
+    <!-- column dividers -->
+    <line x1="353" y1="562" x2="353" y2="606" stroke="#ececec" stroke-width="1"/>
+    <line x1="607" y1="562" x2="607" y2="606" stroke="#ececec" stroke-width="1"/>
+
+    <!-- col 1: above -->
+    <text x="72" y="582" font-size="12" fill="#1a1a1a" font-weight="600">Master ABOVE Slave</text>
+    <text x="72" y="600" font-size="11" fill="#777">GPS1_MB_OFS_Z = negative (−)</text>
+
+    <!-- col 2: equal (recommended) -->
+    <text x="373" y="582" font-size="12" fill="#1a1a1a" font-weight="600">Equal height — recommended</text>
+    <text x="373" y="600" font-size="11" fill="#777">GPS1_MB_OFS_Z = 0</text>
+
+    <!-- col 3: below -->
+    <text x="627" y="582" font-size="12" fill="#1a1a1a" font-weight="600">Master BELOW Slave</text>
+    <text x="627" y="600" font-size="11" fill="#777">GPS1_MB_OFS_Z = positive (+)</text>
+  </g>
+
+  <text x="40" y="644" font-size="11" fill="#888">Recommended layout: antennas at equal height on the centerline, Master toward the nose → OFS_X = +0.50, OFS_Y = 0, OFS_Z = 0.</text>
 </svg>
