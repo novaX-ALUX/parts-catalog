@@ -43,6 +43,8 @@ firmware:
     size: "157 KB"
     sha256: "886c19a1bb251f0168bca72744c26f743261d3fcb6262488513226e785df4ac3"
     notes: "ArduPilot firmware package for upload via the USB-C bootloader (e.g. Mission Planner custom firmware)."
+    method: ardupilot
+    webPath: /firmware/AP-RTK_dual-v0.1.0.apj
   - kind: "Bootloader + App (merged HEX · SWD)"
     file: https://github.com/novaX-ALUX/flight_controller/releases/download/AP-RTK_dual-v0.1.0/AP-RTK_dual-v0.1.0_with_bl.hex
     version: "0.1.0"
@@ -50,6 +52,8 @@ firmware:
     size: "608 KB"
     sha256: "1ed5a9af0044ba585978ddb4cde3eabe7f45b78504d61313967ad5463ad96f7a"
     notes: "Bootloader + application combined image based at 0x08000000. Flash once via SWD/ST-Link (e.g. STM32CubeProgrammer) for factory bring-up or recovery on a blank MCU — no separate bootloader step. For routine updates use the DroneCAN OTA or .apj methods above."
+    method: dfu
+    webPath: /firmware/AP-RTK_dual-v0.1.0_with_bl.hex
 firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases'
 configImages:
   - { src: /images/products/gnss_AP-RTK-dual_antenna-setup.png, caption: "Antenna placement & wiring — Master (ANT1) front, Slave (ANT2) rear, ≥ 500 mm apart" }

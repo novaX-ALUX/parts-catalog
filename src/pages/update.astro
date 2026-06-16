@@ -1,0 +1,244 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+// Gather every firmware asset that opts into the web Update tool (has method + webPath).
+const all = [
+  ...await getCollection('fc'),
+  ...await getCollection('gnss'),
+  ...await getCollection('esc'),
+  ...await getCollection('motor'),
+  ...await getCollection('camera'),
+];
+type Row = { product: string; version: string; kind: string; method: string; path: string; file: string };
+const rows: Row[] = [];
+for (const e of all) {
+  for (const fw of e.data.firmware ?? []) {
+    if (fw.method && fw.webPath) {
+      rows.push({ product: e.data.name, version: fw.version, kind: fw.kind, method: fw.method, path: base + fw.webPath, file: fw.webPath.split('/').pop() || '' });
+    }
+  }
+}
+const fwRows = rows.filter((r) => r.method !== 'dfu');
+const dfuRows = rows.filter((r) => r.method === 'dfu');
+---
+<Layout title="Firmware Update — novaX Catalog" activeCategory="update">
+  <section class="detail-body">
+    <div class="container update-tool">
+      <div class="crumb">Update</div>
+      <h1>Firmware Update</h1>
+
+      <div class="seg" role="tablist">
+        <button data-mode="fw" class="on">⚡ Firmware Update <span class="tag">· normal</span></button>
+        <button data-mode="dfu">🛠 DFU Recovery <span class="tag">· blank / bricked</span></button>
+      </div>
+
+      <p class="mode-note" data-note="fw">Normal update over USB — device stays running, no jumper. Switch to <b>DFU Recovery</b> only if the board is blank or won't boot.</p>
+      <p class="mode-note" data-note="dfu" hidden>Low-level recovery: re-flashes bootloader + app. Hold <b>BOOT0</b> and plug in USB, then connect. Windows needs a one-time WinUSB driver (Zadig).</p>
+
+      <div class="banner" data-banner="fw">
+        <div class="step"><b>① Connect</b>Just plug in USB-C. No BOOT0 jumper.</div>
+        <div class="step"><b>② Browser</b>Chrome or Edge (desktop). Uses Web Serial.</div>
+        <div class="step good"><b>③ Driver</b>None — standard USB serial (CDC).</div>
+      </div>
+      <div class="banner" data-banner="dfu" hidden>
+        <div class="step"><b>① Enter DFU</b>Hold BOOT0 and plug in USB, then release.</div>
+        <div class="step"><b>② Browser</b>Chrome or Edge (desktop). Uses WebUSB.</div>
+        <div class="step warn"><b>③ Windows</b>One-time WinUSB driver via Zadig.</div>
+      </div>
+
+      <div class="row-connect">
+        <button id="connect" class="btn btn-line">🔌 Connect</button>
+        <span id="status" class="chip">Not connected</span>
+      </div>
+
+      <div class="card">
+        <div class="head">Select firmware <span id="listmode">(application image)</span></div>
+        <table class="cfg-table fwsel">
+          <thead><tr><th style="width:34px"></th><th>Product</th><th>Version</th><th>File</th></tr></thead>
+          <tbody data-list="fw">
+            {fwRows.length === 0 && <tr><td colspan="4" class="empty">No web-flashable app firmware yet.</td></tr>}
+            {fwRows.map((r, i) => (
+              <tr class="fwrow" data-method={r.method} data-path={r.path} data-name={`${r.product} ${r.version}`}>
+                <td><span class="rad" data-radio></span></td>
+                <td class="pname">{r.product}</td><td>{r.version}</td>
+                <td><code>{r.file}</code> <span class="mtag">{r.method}</span></td>
+              </tr>
+            ))}
+          </tbody>
+          <tbody data-list="dfu" hidden>
+            {dfuRows.length === 0 && <tr><td colspan="4" class="empty">No web-flashable recovery image yet.</td></tr>}
+            {dfuRows.map((r) => (
+              <tr class="fwrow" data-method={r.method} data-path={r.path} data-name={`${r.product} ${r.version}`}>
+                <td><span class="rad" data-radio></span></td>
+                <td class="pname">{r.product}</td><td>{r.version}</td>
+                <td><code>{r.file}</code> <span class="mtag">{r.method}</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <label class="drop" id="drop">… or drag &amp; drop a firmware file here (<span data-droptypes>.apj / .bin</span>)
+          <input type="file" id="file" hidden /></label>
+      </div>
+
+      <div class="actions">
+        <button id="flash" class="btn btn-primary" disabled>⚡ Update firmware</button>
+        <span class="hint" id="flowhint">reboot to bootloader → erase → program → verify → boot</span>
+      </div>
+
+      <div class="log" id="log"><div class="bar"><i id="bar"></i></div><div id="loglines"><span class="pend">Connect a device and pick firmware to begin.</span></div></div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .update-tool { max-width: 960px; }
+  .update-tool [hidden] { display: none !important; } /* author .banner{display:flex} would otherwise override UA [hidden] */
+  .update-tool .crumb { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-4); }
+  .update-tool h1 { font-size: 30px; margin: 8px 0 18px; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-bottom: 8px; }
+  .seg button { border: 0; background: #fff; padding: 12px 20px; font-size: 14px; font-weight: 600; color: var(--ink-3); cursor: pointer; }
+  .seg button.on { background: var(--blue, #1a73e8); color: #fff; }
+  .seg .tag { font-size: 11px; font-weight: 500; opacity: .8; }
+  .mode-note { font-size: 12.5px; color: var(--ink-4); margin: 4px 0 22px; }
+  .banner { display: flex; gap: 14px; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin-bottom: 22px; }
+  .banner .step { flex: 1; font-size: 12.5px; color: var(--ink-3); }
+  .banner .step b { display: block; color: var(--ink); font-size: 13px; margin-bottom: 3px; }
+  .banner .good { color: #127a2e; } .banner .warn { color: #b26a00; }
+  .row-connect { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+  .btn { border: 0; border-radius: 8px; padding: 11px 18px; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+  .btn-line { background: #fff; border: 1px solid #cfcfcf; color: var(--ink); }
+  .btn-primary { background: var(--blue, #1a73e8); color: #fff; }
+  .btn-primary[disabled] { background: #c7d6f3; cursor: not-allowed; }
+  .chip { font-size: 12.5px; padding: 5px 11px; border-radius: 20px; border: 1px solid var(--line); color: var(--ink-3); }
+  .chip.ok { color: #127a2e; border-color: #bfe3c8; background: #f1faf3; }
+  .chip.err { color: #b22; border-color: #f0c4c4; background: #fcf2f2; }
+  .fwsel .fwrow { cursor: pointer; }
+  .fwsel .fwrow.sel td { background: #f3f8ff; }
+  .fwsel .empty { color: var(--ink-4); text-align: center; }
+  .rad { width: 15px; height: 15px; border-radius: 50%; border: 2px solid #bbb; display: inline-block; vertical-align: middle; }
+  .fwrow.sel .rad { border-color: var(--blue, #1a73e8); box-shadow: inset 0 0 0 3px var(--blue, #1a73e8); }
+  .mtag { font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 5px; background: #eef; color: #3651c9; margin-left: 6px; }
+  .drop { display: block; margin: 4px 18px 16px; padding: 14px; border: 1px dashed var(--line); border-radius: 8px; color: var(--ink-4); font-size: 12.5px; text-align: center; cursor: pointer; }
+  .drop.over { border-color: var(--blue, #1a73e8); color: var(--blue, #1a73e8); }
+  .actions { display: flex; align-items: center; gap: 16px; margin: 16px 0; }
+  .actions .hint { font-size: 12.5px; color: var(--ink-4); }
+  .log { background: #0e0f12; color: #cdd3da; border-radius: 10px; padding: 14px 16px; font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; line-height: 1.7; }
+  .log .bar { height: 8px; border-radius: 5px; background: #2a2d33; overflow: hidden; margin-bottom: 10px; }
+  .log .bar i { display: block; height: 100%; width: 0; background: var(--blue, #1a73e8); transition: width .15s; }
+  .log .ok { color: #5fd08a; } .log .pend { color: #6f7888; } .log .err { color: #ef6f6f; }
+</style>
+
+<script>
+  import { STM32Dfu } from '../scripts/update/dfu';
+  import { parseIntelHex } from '../scripts/update/intel-hex';
+  import { Px4Updater } from '../scripts/update/serial-px4';
+  import { parseApj, parseBin } from '../scripts/update/apj';
+
+  const $ = (s: string) => document.querySelector(s) as HTMLElement;
+  const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
+  const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
+  let mode: 'fw' | 'dfu' = 'fw';
+  let conn: any = null;
+  let selectedPath: string | null = null;
+  let droppedFile: File | null = null;
+
+  const log = (m: string, cls = '') => { const d = document.createElement('div'); if (cls) d.className = cls; d.textContent = m; logEl.appendChild(d); logEl.scrollTop = 1e9; };
+  const progress = (done: number, total: number) => { barEl.style.width = total ? `${Math.round((done / total) * 100)}%` : '0'; };
+  const setStatus = (t: string, cls = '') => { statusEl.textContent = t; statusEl.className = 'chip ' + cls; };
+  const refreshFlashEnabled = () => { flashBtn.disabled = !(conn && (selectedPath || droppedFile)); };
+
+  // ---- mode toggle ----
+  document.querySelectorAll<HTMLButtonElement>('.seg button').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('.seg button').forEach((x) => x.classList.remove('on'));
+    b.classList.add('on');
+    mode = (b.dataset.mode as 'fw' | 'dfu');
+    document.querySelectorAll('[data-note]').forEach((n) => (n as HTMLElement).hidden = (n as HTMLElement).dataset.note !== mode);
+    document.querySelectorAll('[data-banner]').forEach((n) => (n as HTMLElement).hidden = (n as HTMLElement).dataset.banner !== mode);
+    document.querySelectorAll('[data-list]').forEach((n) => (n as HTMLElement).hidden = (n as HTMLElement).dataset.list !== mode);
+    $('#listmode').textContent = mode === 'dfu' ? '(bootloader + app image)' : '(application image)';
+    $('#flowhint').textContent = mode === 'dfu' ? 'erase → write → verify → leave DFU' : 'reboot to bootloader → erase → program → verify → boot';
+    $('#flash').textContent = mode === 'dfu' ? '⚡ Flash (DFU)' : '⚡ Update firmware';
+    ($('[data-droptypes]') as HTMLElement).textContent = mode === 'dfu' ? '.hex' : '.apj / .bin';
+    // reset connection/selection on mode switch (different transport)
+    if (conn) { conn.close?.(); conn = null; }
+    selectedPath = null; droppedFile = null;
+    document.querySelectorAll('.fwrow').forEach((r) => r.classList.remove('sel'));
+    setStatus('Not connected'); refreshFlashEnabled();
+  }));
+
+  // ---- row selection ----
+  document.querySelectorAll<HTMLElement>('.fwrow').forEach((row) => row.addEventListener('click', () => {
+    row.parentElement!.querySelectorAll('.fwrow').forEach((r) => r.classList.remove('sel'));
+    row.classList.add('sel');
+    selectedPath = row.dataset.path || null; droppedFile = null;
+    refreshFlashEnabled();
+  }));
+
+  // ---- drag & drop ----
+  const drop = $('#drop'), fileInput = $('#file') as HTMLInputElement;
+  drop.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', () => { if (fileInput.files?.[0]) pickFile(fileInput.files[0]); });
+  ['dragover', 'dragenter'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', (e) => { const f = (e as DragEvent).dataTransfer?.files?.[0]; if (f) pickFile(f); });
+  function pickFile(f: File) {
+    droppedFile = f; selectedPath = null;
+    document.querySelectorAll('.fwrow').forEach((r) => r.classList.remove('sel'));
+    log(`File selected: ${f.name} (${f.size} bytes)`);
+    refreshFlashEnabled();
+  }
+
+  // ---- connect ----
+  connectBtn.addEventListener('click', async () => {
+    try {
+      if (mode === 'dfu') {
+        conn = await STM32Dfu.connect();
+        setStatus('● ' + conn.deviceLabel(), 'ok');
+      } else {
+        conn = await Px4Updater.connect();
+        setStatus('● serial port connected', 'ok');
+      }
+      log('Connected.', 'ok');
+    } catch (e: any) { setStatus('connect failed', 'err'); log(String(e?.message || e), 'err'); conn = null; }
+    refreshFlashEnabled();
+  });
+
+  // ---- load firmware bytes (same-origin path or dropped file) ----
+  async function loadBytes(): Promise<{ text?: string; buf?: ArrayBuffer; name: string }> {
+    if (droppedFile) {
+      const name = droppedFile.name;
+      if (name.endsWith('.hex') || name.endsWith('.apj')) return { text: await droppedFile.text(), name };
+      return { buf: await droppedFile.arrayBuffer(), name };
+    }
+    const res = await fetch(selectedPath!);
+    if (!res.ok) throw new Error(`fetch ${selectedPath} → ${res.status}`);
+    const name = selectedPath!.split('/').pop() || '';
+    if (name.endsWith('.hex') || name.endsWith('.apj')) return { text: await res.text(), name };
+    return { buf: await res.arrayBuffer(), name };
+  }
+
+  // ---- flash ----
+  flashBtn.addEventListener('click', async () => {
+    flashBtn.disabled = true;
+    try {
+      const src = await loadBytes();
+      log(`Loaded ${src.name}`, 'ok');
+      if (mode === 'dfu') {
+        const text = src.text ?? new TextDecoder().decode(new Uint8Array(src.buf!));
+        const hex = parseIntelHex(text);
+        log(`HEX 0x${hex.minAddress.toString(16)}–0x${hex.maxAddress.toString(16)}, ${hex.totalBytes} bytes`);
+        await (conn as InstanceType<typeof STM32Dfu>).flash(hex, log, progress);
+      } else {
+        const img = src.name.endsWith('.apj') ? await parseApj(src.text!) : parseBin(src.buf ?? new TextEncoder().encode(src.text!).buffer);
+        log(`App image ${img.bytes.length} bytes`);
+        await (conn as InstanceType<typeof Px4Updater>).flash(img.bytes, log, progress);
+      }
+      progress(1, 1);
+      log('✓ Done. Device rebooting.', 'ok');
+    } catch (e: any) { log('✗ ' + String(e?.message || e), 'err'); }
+    flashBtn.disabled = false;
+  });
+</script>

@@ -1,0 +1,2 @@
+# Firmware images must be stored byte-exact (no EOL/encoding conversion).
+public/firmware/** binary

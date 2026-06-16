@@ -45,7 +45,16 @@ const firmwareItem = z.object({
   date: z.string().optional(),
   size: z.string().optional(),
   sha256: z.string().optional(),
-  notes: z.string().optional()
+  notes: z.string().optional(),
+  // Web Update tool routing. `method` selects the flashing engine:
+  //   'dfu'       — STM32 ROM bootloader over WebUSB (full boot+app .hex, BOOT0)
+  //   'ardupilot' — ArduPilot/PX4 bootloader over Web Serial (app .apj/.bin)
+  //   'novax-fc'  — custom FC bootloader over Web Serial (REBOOT_BL + SYNC/ERASE/PROGRAM/CRC)
+  // `webPath` is a same-origin path under public/ the browser loads (release URLs
+  // are CORS-blocked, so the flashable image is mirrored locally). When absent the
+  // asset is download-only and not offered in the Update tool.
+  method: z.enum(['dfu', 'ardupilot', 'novax-fc']).optional(),
+  webPath: z.string().optional()
 });
 
 const configParam = z.object({
