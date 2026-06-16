@@ -274,9 +274,15 @@ img { display: block; max-width: 100%; height: auto; }
   background: var(--paper); border-radius: var(--radius); padding: 24px;
   display: grid; place-items: center;
 }
-.panel-image a { display: block; width: 100%; max-width: 920px; }
-.panel-image img { width: 100%; max-width: 920px; height: auto; object-fit: contain; mix-blend-mode: multiply; }
-/* Stack multiple pinout/diagram images vertically, each at its natural size. */
+/* Diagram/pinout images fit a consistent box so portrait and landscape sources
+   render at a comparable size: cap width AND height, never upscale past natural. */
+.panel-image a { display: block; max-width: min(920px, 100%); }
+.panel-image img {
+  width: auto; height: auto;
+  max-width: min(920px, 100%); max-height: 440px;
+  margin: 0 auto; object-fit: contain; mix-blend-mode: multiply;
+}
+/* Stack multiple pinout/diagram images vertically. */
 .panel-images { display: flex; flex-direction: column; gap: 16px; }
 .zoom-hint {
   margin-top: 12px; text-align: center;
