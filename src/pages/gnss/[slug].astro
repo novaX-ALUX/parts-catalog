@@ -96,13 +96,22 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
                   <tr><th>Parameter</th><th>Value</th><th>Description</th></tr>
                 </thead>
                 <tbody>
-                  {d.configParams.map((p) => (
-                    <tr>
-                      <td><code>{p.name}</code></td>
-                      <td><code>{p.value}</code></td>
-                      <td>{p.note ?? ''}</td>
-                    </tr>
-                  ))}
+                  {d.configParams.map((p, i) => {
+                    const prev = i > 0 ? d.configParams![i - 1].section : undefined;
+                    const showSection = p.section && p.section !== prev;
+                    return (
+                      <Fragment>
+                        {showSection && (
+                          <tr class="cfg-section"><td colspan="3">{p.section}</td></tr>
+                        )}
+                        <tr>
+                          <td><code>{p.name}</code></td>
+                          <td><code>{p.value}</code></td>
+                          <td>{p.note ?? ''}</td>
+                        </tr>
+                      </Fragment>
+                    );
+                  })}
                 </tbody>
               </table>
             )}

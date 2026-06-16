@@ -51,7 +51,9 @@ const firmwareItem = z.object({
 const configParam = z.object({
   name: z.string(),
   value: z.string(),
-  note: z.string().optional()
+  note: z.string().optional(),
+  // Optional group heading; rows sharing a section render under one sub-header.
+  section: z.string().optional()
 });
 
 const detailSchema = baseSchema.extend({

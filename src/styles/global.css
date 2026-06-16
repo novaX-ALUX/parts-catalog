@@ -298,6 +298,11 @@ img { display: block; max-width: 100%; height: auto; }
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 13px; color: var(--ink, #222);
 }
+.cfg-table tr.cfg-section td {
+  background: #f0f2f5; font-weight: 600; color: var(--ink, #222);
+  font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase;
+  padding-top: 14px; padding-bottom: 10px;
+}
 .cfg-steps { white-space: pre-line; }
 
 /* Configuration diagrams labelled Figure 1 / Figure 2 */

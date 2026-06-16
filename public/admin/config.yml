@@ -60,6 +60,7 @@ _base_fields: &base_fields
       - { label: Parameter, name: name, widget: string }
       - { label: Value, name: value, widget: string }
       - { label: Description, name: note, widget: string, required: false }
+      - { label: Section, name: section, widget: string, required: false, hint: "같은 Section 값끼리 표에서 그룹 소제목으로 묶임 (예: Position offset)" }
   - { label: Gallery, name: gallery, widget: list, required: false, field: { label: Image, name: image, widget: image }, hint: "Gallery 탭 이미지들" }
 
 collections:
