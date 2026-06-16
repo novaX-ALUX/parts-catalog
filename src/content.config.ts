@@ -56,14 +56,6 @@ const configParam = z.object({
   section: z.string().optional()
 });
 
-// Small key/value table shown in the Pinout tab above the pinout image
-// (e.g. I/O port summary, physical & environmental conditions). Each row is an
-// array of cells rendered left-to-right as label / value / label / value …
-const pinoutSpecGroup = z.object({
-  title: z.string(),
-  rows: z.array(z.array(z.string()))
-});
-
 const detailSchema = baseSchema.extend({
   description: z.string().optional(),
   pinoutImage: z.string().optional(),
@@ -71,8 +63,6 @@ const detailSchema = baseSchema.extend({
   // When present this takes priority over the single `pinoutImage`.
   pinoutImages: z.array(z.string()).optional(),
   pinoutNotes: z.string().optional(),
-  // Key/value tables rendered in the Pinout tab above the pinout image.
-  pinoutSpecs: z.array(pinoutSpecGroup).optional(),
   firmwareNotes: z.string().optional(),
   firmware: z.array(firmwareItem).optional(),
   configNotes: z.string().optional(),

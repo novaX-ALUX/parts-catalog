@@ -3,19 +3,8 @@ name: AP-RTK dual
 tagline: Dual-Antenna High-Precision RTK GNSS
 image: /images/products/gnss_X_RTK2.png
 pictureKey: gnss_X_RTK2
-# pinoutImage: PNG 저장 후 이 줄 주석 해제 → /images/products/gnss_AP-RTK-dual_pinout.png
+pinoutImage: /images/products/gnss_AP-RTK-dual_pinout.png
 pinoutNotes: '① UART (5V · RX · TX · GND) · ② CAN (5V · CAN_H · CAN_L · GND).'
-pinoutSpecs:
-  - title: "I/O Ports"
-    rows:
-      - ["Antenna", "2", "UART", "1"]
-      - ["CAN", "1", "USB", "1 (C-type)"]
-  - title: "Physical & Environmental"
-    rows:
-      - ["Size", "49.2 × 37.1 × 16.3 mm"]
-      - ["Weight", "36 g"]
-      - ["Operating Temperature", "−20 ℃ ~ +85 ℃"]
-      - ["Operating Voltage", "4.7 – 5.2 V"]
 order: 20
 specs:
   - { key: MCU, value: "STM32F4, ARM Cortex-M4, 180 MHz" }
