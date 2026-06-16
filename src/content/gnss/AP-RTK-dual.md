@@ -43,8 +43,8 @@ firmware:
     notes: "ArduPilot firmware package for upload via the USB-C bootloader (e.g. Mission Planner custom firmware)."
 firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases'
 configImages:
-  - /images/products/gnss_AP-RTK-dual_antenna-setup.png
-  - /images/products/gnss_AP-RTK-dual_offset-convention.svg
+  - { src: /images/products/gnss_AP-RTK-dual_antenna-setup.png, caption: "Antenna placement & wiring — Master (ANT1) front, Slave (ANT2) rear, ≥ 500 mm apart" }
+  - { src: /images/products/gnss_AP-RTK-dual_offset-convention.svg, caption: "Moving-baseline offset sign convention (X / Y / Z)" }
 configParams:
   - { name: CAN_P1_DRIVER, value: "1", note: "Enable the autopilot (H7E) CAN1 port (reboot required after change)" }
   - { name: CAN_D1_PROTOCOL, value: "1", note: "DroneCAN protocol on the CAN1 driver" }
@@ -58,11 +58,11 @@ configParams:
   - { name: AHRS_EKF_TYPE, value: "3", note: "Heading works only when AHRS uses EKF3" }
   - { name: EK3_ENABLE, value: "1", note: "Enable EKF3" }
 configNotes: |
-  Recommended layout (top diagram): ANT1 Master at the front, ANT2 Slave at the rear, both on the airframe centerline at equal height, with the baseline parallel to the flight direction (heading). The example below uses a 500 mm (0.50 m) separation. Parameter names follow ArduPilot 4.6+ (GPS1_…); the equivalent pre-4.6 names are noted in each row.
+  Recommended layout (Figure 1): ANT1 Master at the front, ANT2 Slave at the rear, both on the airframe centerline at equal height, with the baseline parallel to the flight direction (heading). The example below uses a 500 mm (0.50 m) separation. Parameter names follow ArduPilot 4.6+ (GPS1_…); the equivalent pre-4.6 names are noted in each row.
 
-  1. Wiring — Connect the module's CAN port to the autopilot (H7E) CAN1 port with the supplied cable. The module is powered from the same connector (4.7–5.2 V).
-  2. Antenna mounting — Mount ANT1 (Master) toward the nose and ANT2 (Slave) toward the tail on the centerline. Keep at least 500 mm between antennas at equal height with a clear, unobstructed sky view (avoid windows and obstructions). A longer baseline gives a more accurate heading.
-  3. Offset parameters — Offsets run from the Slave to the Master antenna in body frame: +X = Master in front, +Y = Master to the right, +Z = Master below the Slave (see the sign-convention diagram). For the recommended layout: GPS1_MB_OFS_X = 0.50, GPS1_MB_OFS_Y = 0, GPS1_MB_OFS_Z = 0. Set GPS1_MB_OFS_X to the separation you actually measured (in meters), then reboot the autopilot.
+  1. Wiring — Connect the module's CAN port to the autopilot (H7E) CAN1 port with the supplied cable, as shown in Figure 1. The module is powered from the same connector (4.7–5.2 V).
+  2. Antenna mounting — Following Figure 1, mount ANT1 (Master) toward the nose and ANT2 (Slave) toward the tail on the centerline. Keep at least 500 mm between antennas at equal height with a clear, unobstructed sky view (avoid windows and obstructions). A longer baseline gives a more accurate heading.
+  3. Offset parameters — Offsets run from the Slave to the Master antenna in body frame: +X = Master in front, +Y = Master to the right, +Z = Master below the Slave (see Figure 2 for the sign convention). For the recommended layout: GPS1_MB_OFS_X = 0.50, GPS1_MB_OFS_Y = 0, GPS1_MB_OFS_Z = 0. Set GPS1_MB_OFS_X to the separation you actually measured (in meters), then reboot the autopilot.
   4. Heading check — In Mission Planner's flight data screen watch the gpsyaw value: rotate the airframe and confirm the reported heading follows. The onboard RM3100 compass is detected automatically over DroneCAN and serves as fallback (EK3_SRC1_YAW = 3).
   5. RTK corrections — Inject RTCM corrections from an RTK base station or an NTRIP (CORS) service via the ground station. Wait for the GPS status to reach RTK Fixed for centimeter-level positioning.
   6. Antenna position offset (optional) — If ANT1 is far from the vehicle's center of gravity, set GPS1_POS_X/Y/Z (pre-4.6: GPS_POS1_X/Y/Z) to the ANT1 position relative to the CG for best position accuracy.

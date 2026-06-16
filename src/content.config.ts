@@ -65,8 +65,12 @@ const detailSchema = baseSchema.extend({
   firmware: z.array(firmwareItem).optional(),
   configNotes: z.string().optional(),
   // Configuration tab extras: diagrams shown above the notes and a
-  // parameter table (e.g. ArduPilot setup parameters).
-  configImages: z.array(z.string()).optional(),
+  // parameter table (e.g. ArduPilot setup parameters). Each image may be a
+  // bare path, or an object with a caption (rendered as "Figure N — caption").
+  configImages: z.array(z.union([
+    z.string(),
+    z.object({ src: z.string(), caption: z.string().optional() })
+  ])).optional(),
   configParams: z.array(configParam).optional(),
   gallery: z.array(z.string()).optional()
 });

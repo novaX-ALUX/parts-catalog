@@ -43,7 +43,14 @@ _base_fields: &base_fields
       - { label: SHA-256, name: sha256, widget: string, required: false }
       - { label: Notes, name: notes, widget: string, required: false }
   - { label: Configuration Notes, name: configNotes, widget: text, required: false, hint: "GNSS — Configuration 탭 단계별 안내 (줄바꿈 유지됨)" }
-  - { label: Config Images, name: configImages, widget: list, required: false, field: { label: Image, name: image, widget: image }, hint: "Configuration 탭 상단 다이어그램 (안테나 배치도 등)" }
+  - label: Config Images
+    name: configImages
+    widget: list
+    required: false
+    hint: "Configuration 탭 다이어그램. 등록 순서대로 Figure 1, Figure 2... 로 표시되고 캡션이 함께 나옴"
+    fields:
+      - { label: Image, name: src, widget: image }
+      - { label: Caption, name: caption, widget: string, required: false }
   - label: Config Parameters
     name: configParams
     widget: list

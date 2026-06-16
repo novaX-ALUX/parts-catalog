@@ -300,6 +300,14 @@ img { display: block; max-width: 100%; height: auto; }
 }
 .cfg-steps { white-space: pre-line; }
 
+/* Configuration diagrams labelled Figure 1 / Figure 2 */
+.config-figure { margin: 0; }
+.config-figure figcaption {
+  margin-top: 8px; text-align: center;
+  color: var(--ink-3, #555); font-size: 12.5px;
+}
+.config-figure figcaption strong { color: var(--ink, #222); font-weight: 600; }
+
 .gallery-grid {
   display: grid; gap: 16px;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));

@@ -78,9 +78,16 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
           <div class="tab-panel" data-panel="config">
             {(d.configImages && d.configImages.length > 0) && (
               <div class="panel-images" style="margin-bottom: 24px;">
-                {d.configImages.map((src) => (
-                  <div class="panel-image"><img src={`${base}${src}`} alt={`${d.name} configuration`} /></div>
-                ))}
+                {d.configImages.map((img, i) => {
+                  const src = typeof img === 'string' ? img : img.src;
+                  const caption = typeof img === 'string' ? undefined : img.caption;
+                  return (
+                    <figure class="config-figure">
+                      <div class="panel-image"><img src={`${base}${src}`} alt={`${d.name} configuration figure ${i + 1}`} /></div>
+                      <figcaption><strong>Figure {i + 1}</strong>{caption ? ` — ${caption}` : ''}</figcaption>
+                    </figure>
+                  );
+                })}
               </div>
             )}
             {(d.configParams && d.configParams.length > 0) && (
