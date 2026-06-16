@@ -35,21 +35,29 @@ class SerialIO {
   private reader: ReadableStreamDefaultReader<Uint8Array>;
   private writer: WritableStreamDefaultWriter<Uint8Array>;
   private buf: number[] = [];
+  private closed = false;
   constructor(private port: SerialPort) {
     this.reader = port.readable!.getReader();
     this.writer = port.writable!.getWriter();
+    this.pump(); // continuous background read so no bytes are lost across timeouts
+  }
+  private async pump() {
+    try {
+      for (;;) {
+        const { value, done } = await this.reader.read();
+        if (done) break;
+        if (value) for (let i = 0; i < value.length; i++) this.buf.push(value[i]);
+      }
+    } catch { /* cancelled / disconnected */ }
+    this.closed = true;
   }
   async write(bytes: Uint8Array) { await this.writer.write(bytes); }
   async read(n: number, timeoutMs: number): Promise<Uint8Array> {
     const deadline = Date.now() + timeoutMs;
     while (this.buf.length < n) {
+      if (this.closed) throw new Error('시리얼 포트가 닫혔습니다');
       if (Date.now() > deadline) throw new Error('시리얼 응답 타임아웃');
-      const { value, done } = await Promise.race([
-        this.reader.read(),
-        sleep(Math.max(1, deadline - Date.now())).then(() => ({ value: undefined, done: false } as any)),
-      ]);
-      if (done) throw new Error('시리얼 포트가 닫혔습니다');
-      if (value) for (const b of value) this.buf.push(b);
+      await sleep(4);
     }
     return new Uint8Array(this.buf.splice(0, n));
   }
@@ -71,9 +79,20 @@ export class Px4Updater {
 
   static async connect(baudRate = 115200): Promise<Px4Updater> {
     if (!Px4Updater.available()) throw new Error('이 브라우저는 Web Serial을 지원하지 않습니다 (Chrome/Edge 데스크탑 필요).');
-    const port = await (navigator as any).serial.requestPort();
+    // Optional VID/PID filter narrows the picker. Fill in once novaX USB IDs are known.
+    const filters: any[] = [];
+    const port = await (navigator as any).serial.requestPort(filters.length ? { filters } : undefined);
     await port.open({ baudRate });
     return new Px4Updater(port);
+  }
+
+  /** Silently reconnect to an already-authorized serial port (no picker). null if none. */
+  static async autoConnect(baudRate = 115200): Promise<Px4Updater | null> {
+    if (!Px4Updater.available()) return null;
+    const ports = await (navigator as any).serial.getPorts();
+    if (!ports.length) return null;
+    await ports[0].open({ baudRate });
+    return new Px4Updater(ports[0]);
   }
 
   private async getSync(timeoutMs = 1000) {

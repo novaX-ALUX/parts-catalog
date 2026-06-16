@@ -31,10 +31,22 @@ export class STM32Dfu {
     return typeof navigator !== 'undefined' && !!(navigator as any).usb;
   }
 
-  /** Prompt the browser device picker and open the DFU interface. */
+  /** Prompt the browser device picker (filtered to 0483:DF11) and open it. */
   static async connect(): Promise<STM32Dfu> {
     if (!STM32Dfu.available()) throw new DfuError('이 브라우저는 WebUSB를 지원하지 않습니다 (Chrome/Edge 데스크탑 필요).');
     const dev = await (navigator as any).usb.requestDevice({ filters: [{ vendorId: STM_VID, productId: STM_PID }] });
+    return STM32Dfu.open(dev);
+  }
+
+  /** Silently reconnect to an already-authorized DFU device (no picker). null if none. */
+  static async autoConnect(): Promise<STM32Dfu | null> {
+    if (!STM32Dfu.available()) return null;
+    const devs = await (navigator as any).usb.getDevices();
+    const dev = devs.find((d: any) => d.vendorId === STM_VID && d.productId === STM_PID);
+    return dev ? STM32Dfu.open(dev) : null;
+  }
+
+  private static async open(dev: USBDevice): Promise<STM32Dfu> {
     const self = new STM32Dfu(dev);
     await dev.open();
     if (dev.configuration === null) await dev.selectConfiguration(1);

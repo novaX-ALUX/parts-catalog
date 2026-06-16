@@ -150,6 +150,22 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   const setStatus = (t: string, cls = '') => { statusEl.textContent = t; statusEl.className = 'chip ' + cls; };
   const refreshFlashEnabled = () => { flashBtn.disabled = !(conn && (selectedPath || droppedFile)); };
 
+  // Browsers cannot silently auto-pick a port on first use (security), but a device the
+  // user has authorized before can be reopened with no picker. Try that for the active mode.
+  async function autoDetect() {
+    if (conn) return;
+    try {
+      const c = mode === 'dfu' ? await STM32Dfu.autoConnect() : await Px4Updater.autoConnect();
+      if (c) {
+        conn = c;
+        setStatus('● auto-detected · ' + (mode === 'dfu' ? (c as any).deviceLabel() : 'serial port'), 'ok');
+        log('Auto-reconnected to a previously authorized device.', 'ok');
+        refreshFlashEnabled();
+      }
+    } catch { /* no authorized device / open failed — fall back to manual Connect */ }
+  }
+  autoDetect();
+
   // ---- mode toggle ----
   document.querySelectorAll<HTMLButtonElement>('.seg button').forEach((b) => b.addEventListener('click', () => {
     document.querySelectorAll('.seg button').forEach((x) => x.classList.remove('on'));
@@ -167,6 +183,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
     selectedPath = null; droppedFile = null;
     document.querySelectorAll('.fwrow').forEach((r) => r.classList.remove('sel'));
     setStatus('Not connected'); refreshFlashEnabled();
+    autoDetect();
   }));
 
   // ---- row selection ----
