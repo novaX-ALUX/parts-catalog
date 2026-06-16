@@ -54,6 +54,26 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
           {id:'gallery', label:'Gallery'}
         ]}>
           <div class="tab-panel active" data-panel="pinout">
+            {(d.pinoutSpecs && d.pinoutSpecs.length > 0) && (
+              <div class="pinout-specs">
+                {d.pinoutSpecs.map((grp) => (
+                  <div class="io-spec">
+                    <div class="io-spec-head">{grp.title}</div>
+                    <table class="io-spec-table">
+                      <tbody>
+                        {grp.rows.map((row) => (
+                          <tr>
+                            {row.map((cell, ci) => (
+                              <td class={ci % 2 === 0 ? 'k' : 'v'}>{cell}</td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ))}
+              </div>
+            )}
             {pinoutImgs.length > 0 ? (
               <div class="panel-images">
                 {pinoutImgs.map((src) => (

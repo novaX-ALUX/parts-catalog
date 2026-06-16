@@ -284,6 +284,22 @@ img { display: block; max-width: 100%; height: auto; }
 }
 .panel-notes { margin-top: 24px; }
 
+/* Pinout tab: I/O port & physical/environmental summary tables (above the pinout image) */
+.pinout-specs { display: flex; flex-direction: column; gap: 28px; margin-bottom: 28px; }
+.io-spec-head {
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-4, #888); font-weight: 600; margin-bottom: 12px;
+}
+.io-spec-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.io-spec-table td {
+  border: 1px solid var(--line, #e2e2e2); padding: 12px 14px; text-align: center;
+}
+.io-spec-table td.k {
+  background: #edeef0; color: var(--ink-3, #555);
+  font-weight: 600; white-space: nowrap; width: 1%;
+}
+.io-spec-table td.v { color: var(--ink, #222); font-variant-numeric: tabular-nums; }
+
 /* Configuration tab: parameter table + step text with preserved line breaks */
 .cfg-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .cfg-table th, .cfg-table td {
