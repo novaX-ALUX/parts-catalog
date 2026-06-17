@@ -23,10 +23,6 @@ export class STM32Dfu {
   private dev: USBDevice;
   private iface = 0;
   private sectors: Sector[] = [];
-  // wTransferSize from the device's DFU functional descriptor. DfuSe computes the
-  // write address as base + (blockNum-2)*wTransferSize, so the chunk size MUST equal
-  // it — otherwise writes land at the wrong address (errTARGET past flash end). Default 2048.
-  private xfer = 2048;
 
   private constructor(dev: USBDevice) { this.dev = dev; }
 
@@ -60,7 +56,6 @@ export class STM32Dfu {
     await dev.claimInterface(self.iface);
     await dev.selectAlternateInterface(self.iface, 0);
     self.sectors = parseMemoryLayout(ifc.alternates[0].interfaceName || '');
-    self.xfer = (await readTransferSize(dev)) || 2048;
     await self.clearIfError();
     return self;
   }
@@ -120,29 +115,41 @@ export class STM32Dfu {
     log(`Erase ${eraseStarts.length} sector(s) over 0x${hex.minAddress.toString(16)}–0x${hex.maxAddress.toString(16)} …`);
     for (let i = 0; i < eraseStarts.length; i++) {
       await this.dfuseCmd(0x41, eraseStarts[i]);
-      log(`  erased ${i + 1}/${eraseStarts.length} (0x${eraseStarts[i].toString(16)})`);
       progress(i + 1, eraseStarts.length);
     }
     log('Erase done.');
 
-    log(`Write ${hex.totalBytes} bytes in ${this.xfer}-byte blocks …`);
+    // Write WRITE_XFER bytes per block, setting the address pointer before each block
+    // (wBlockNum stays 2). This keeps every control-OUT transfer at WRITE_XFER bytes —
+    // 1024 is proven to work on the target, whereas the device's 2048 wTransferSize is
+    // rejected by this WebUSB/WinUSB stack ("transfer error"). Address is explicit, so
+    // it stays correct without relying on the device's block-stride math.
+    const WRITE_XFER = 1024;
+    log(`Write ${hex.totalBytes} bytes …`);
     let written = 0;
     for (const seg of hex.segments) {
-      await this.dfuseCmd(0x21, seg.address); // set address pointer
-      let block = 2;
-      for (let off = 0; off < seg.data.length; off += this.xfer) {
-        const chunk = seg.data.subarray(off, Math.min(off + this.xfer, seg.data.length));
-        await this.dnload(block, chunk);
-        const st = await this.getStatus(); // commit; bStatus catches errTARGET immediately
-        if (st.status !== 0) throw new DfuError(`쓰기 실패 @0x${(seg.address + off).toString(16)} (status ${st.status})`);
-        if (st.poll) await sleep(st.poll); // wait the device's stated program time before next block
-        block++;
+      for (let off = 0; off < seg.data.length; off += WRITE_XFER) {
+        const addr = seg.address + off;
+        const chunk = seg.data.subarray(off, Math.min(off + WRITE_XFER, seg.data.length));
+        await this.setAddress(addr);
+        await this.dnload(2, new Uint8Array(chunk)); // clean standalone buffer
+        const st = await this.getStatus();
+        if (st.status !== 0) throw new DfuError(`쓰기 실패 @0x${addr.toString(16)} (status ${st.status})`);
+        if (st.poll) await sleep(st.poll);
         written += chunk.length;
         progress(written, hex.totalBytes);
       }
     }
     log('Program complete. Leaving DFU …');
     await this.leave(hex.minAddress);
+  }
+
+  /** DfuSe Set Address Pointer (0x21) with a single status poll. */
+  private async setAddress(addr: number) {
+    await this.dnload(0, new Uint8Array([0x21, addr & 0xff, (addr >>> 8) & 0xff, (addr >>> 16) & 0xff, (addr >>> 24) & 0xff]));
+    const st = await this.getStatus();
+    if (st.status !== 0) throw new DfuError(`주소 설정 실패 @0x${addr.toString(16)} (status ${st.status})`);
+    if (st.poll) await sleep(st.poll);
   }
 
   /** Leave DFU: Set Address to image base → zero-length DNLOAD → GETSTATUS (device resets). */
@@ -155,22 +162,6 @@ export class STM32Dfu {
   }
 
   async close() { try { await this.dev.close(); } catch { /* ignore */ } }
-}
-
-/** Read wTransferSize from the DFU functional descriptor (bDescriptorType 0x21). 0 if not found. */
-async function readTransferSize(dev: USBDevice): Promise<number> {
-  try {
-    const r = await dev.controlTransferIn(
-      { requestType: 'standard', recipient: 'device', request: 6 /* GET_DESCRIPTOR */, value: 0x0200 /* CONFIG 0 */, index: 0 }, 4096);
-    const d = new Uint8Array(r.data!.buffer);
-    for (let i = 0; i + 1 < d.length;) {
-      const len = d[i], type = d[i + 1];
-      if (len === 0) break;
-      if (type === 0x21 && i + 7 <= d.length) return d[i + 5] | (d[i + 6] << 8);
-      i += len;
-    }
-  } catch { /* descriptor read failed — caller uses the 2048 default */ }
-  return 0;
 }
 
 /** Parse a DfuSe interface name e.g. "@Internal Flash /0x08000000/04*016Kg,01*064Kg,07*128Kg". */
