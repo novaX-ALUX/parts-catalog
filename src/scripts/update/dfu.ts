@@ -19,6 +19,15 @@ interface Sector { start: number; size: number; }
 
 export class DfuError extends Error {}
 
+/** True for USB-level transfer failures: WebUSB throws a DOMException "NetworkError:
+ *  A transfer error has occurred", or DNLOAD returns a non-ok (stall/babble) status.
+ *  These drive the adaptive chunk-size fallback in flash(). */
+function isXferError(e: any): boolean {
+  const name = e?.name ?? '';
+  const msg = String(e?.message ?? e ?? '');
+  return name === 'NetworkError' || /transfer error|stall|babble|DNLOAD/i.test(msg);
+}
+
 export class STM32Dfu {
   private dev: USBDevice;
   private iface = 0;
@@ -84,6 +93,16 @@ export class STM32Dfu {
         await this.dev.controlTransferOut({ requestType: 'class', recipient: 'interface', request: CLRSTATUS, value: 0, index: this.iface });
       }
     } catch { /* ignore */ }
+  }
+
+  /** Best-effort: clear a latched error and ABORT back to idle after a failed transfer. */
+  private async recover() {
+    try {
+      const st = await this.getStatus();
+      if (st.state === 10) await this.dev.controlTransferOut({ requestType: 'class', recipient: 'interface', request: CLRSTATUS, value: 0, index: this.iface });
+    } catch { /* ignore */ }
+    try { await this.dev.controlTransferOut({ requestType: 'class', recipient: 'interface', request: ABORT, value: 0, index: this.iface }); } catch { /* ignore */ }
+    try { await this.getStatus(); } catch { /* ignore */ }
   }
 
   /** DfuSe special command (Set Address 0x21 / Erase page 0x41). */
