@@ -154,8 +154,6 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
 
   const log = (m: string, cls = '') => { const d = document.createElement('div'); if (cls) d.className = cls; d.textContent = m; logEl.appendChild(d); logEl.scrollTop = 1e9; };
   const progress = (done: number, total: number) => { barEl.style.width = total ? `${Math.round((done / total) * 100)}%` : '0'; };
-  // Clear log button — wipe the log output and reset the progress bar.
-  $('#clearlog').addEventListener('click', () => { logEl.innerHTML = ''; barEl.style.width = '0'; });
   const setStatus = (t: string, cls = '') => { statusEl.textContent = t; statusEl.className = 'chip ' + cls; };
   const refreshFlashEnabled = () => { flashBtn.disabled = !(conn && (selectedPath || droppedFile)); };
 
@@ -184,6 +182,10 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
     } catch { /* ignore */ }
   }
   log('Web Updater build ' + BUILD, 'pend');
+  // Snapshot the original log (intro line + build stamp). "Clear log" restores THIS
+  // state — it returns to the initial view up to the build number, not a blank log.
+  const INITIAL_LOG = logEl.innerHTML;
+  $('#clearlog').addEventListener('click', () => { logEl.innerHTML = INITIAL_LOG; barEl.style.width = '0'; });
   autoDetect();
 
   // ---- mode toggle ----
