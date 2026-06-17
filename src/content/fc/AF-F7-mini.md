@@ -29,12 +29,23 @@ specs:
 description: |
   AF-F7 mini is an F7-class flight controller powered by the STM32F765 running at 216 MHz. Dual IMUs (ICM-20689 primary, ICM-20602 / BMI055 secondary), an IST8310 magnetometer and an MS5611 barometer deliver redundant attitude, heading and altitude sensing. 8 PWM outputs, 4 UARTs, 3 I²C ports and 2 CAN buses cover mid-range UAV payload stacks running ArduPilot or PX4.
 firmware:
-  - kind: "ArduPilot (Copter)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.1.4/AF-F7_mini_v0.1.4.zip
-    version: "0.1.4"
-    date: "2026-06-04"
-    size: "4.0 MB"
-    sha256: "b042be8e695c2467c9938c9e265561069a5a25d52da603f47dcffbfafd283d0e"
-    notes: "ZIP — arducopter_with_bl.hex (full flash), arducopter.apj (Mission Planner upload), bootloader. Build 92b0cd788e."
+  - kind: "ArduPilot (.apj package)"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.2.0/AF-F7_mini-v0.2.0.apj
+    version: "0.2.0"
+    date: "2026-06-17"
+    size: "1.4 MB"
+    sha256: "3975579a72ba5aced810ef5add1498143237479af231134f3c15ce8e2770d3a1"
+    notes: "ArduPilot Copter app. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater → Firmware Update."
+    method: ardupilot
+    webPath: /firmware/AF-F7_mini-v0.2.0.apj
+  - kind: "Bootloader + App (merged HEX · DFU / SWD)"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.2.0/AF-F7_mini-v0.2.0_with_bl.hex
+    version: "0.2.0"
+    date: "2026-06-17"
+    size: "4.6 MB"
+    sha256: "f3d841e76d8a7e2c3a8afb467939ab25141856b80dd535f60b704a9d6e7a5cc1"
+    notes: "Bootloader + application combined image based at 0x08000000. Flash via the catalog Web Updater → DFU Recovery (hold BOOT0) or SWD/ST-Link for a blank/bricked board."
+    method: dfu
+    webPath: /firmware/AF-F7_mini-v0.2.0_with_bl.hex
 firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases'
 ---
