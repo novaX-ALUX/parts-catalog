@@ -98,13 +98,11 @@ export class Px4Updater {
     return new Px4Updater(port);
   }
 
-  /** Silently reconnect to an already-authorized serial port (no picker). null if none. */
-  static async autoConnect(baudRate = 115200): Promise<Px4Updater | null> {
-    if (!Px4Updater.available()) return null;
-    const ports = await (navigator as any).serial.getPorts();
-    if (!ports.length) return null;
-    await ports[0].open({ baudRate });
-    return new Px4Updater(ports[0]);
+  /** Is there a port the user has previously authorized? (Does NOT open it — opening
+   *  blindly would seize an arbitrary COM port and falsely claim a verified connection.) */
+  static async hasGrantedPort(): Promise<boolean> {
+    if (!Px4Updater.available()) return false;
+    try { return (await (navigator as any).serial.getPorts()).length > 0; } catch { return false; }
   }
 
   private async getSync(timeoutMs = 1000) {

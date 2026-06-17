@@ -143,7 +143,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-06-17k · natural-sorted lists + AP-RTK removed from web update';
+  const BUILD = '2026-06-17l · serial: no blind auto-open (honest detect), Connect required';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -163,15 +163,25 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   // user has authorized before can be reopened with no picker. Try that for the active mode.
   async function autoDetect() {
     if (conn) return;
+    if (mode === 'dfu') {
+      // WebUSB: a granted DFU device can be reopened without a picker (no exclusive COM seized).
+      try {
+        const c = await STM32Dfu.autoConnect();
+        if (c) {
+          conn = c;
+          setStatus('● ' + (c as any).deviceLabel(), 'ok');
+          log('Reconnected to a previously authorized DFU device.', 'ok');
+          refreshFlashEnabled();
+        }
+      } catch { /* none granted — use Connect */ }
+      return;
+    }
+    // Serial: do NOT silently open a COM port. Opening blindly seizes whatever port was
+    // granted first (maybe not even this board) and would falsely report a verified link —
+    // it also locks the COM so nothing else (CLI, this probe) can use it. Just hint.
     try {
-      const c = mode === 'dfu' ? await STM32Dfu.autoConnect() : await Px4Updater.autoConnect();
-      if (c) {
-        conn = c;
-        setStatus('● auto-detected · ' + (mode === 'dfu' ? (c as any).deviceLabel() : 'serial port'), 'ok');
-        log('Auto-reconnected to a previously authorized device.', 'ok');
-        refreshFlashEnabled();
-      }
-    } catch { /* no authorized device / open failed — fall back to manual Connect */ }
+      if (await Px4Updater.hasGrantedPort()) setStatus('Not connected · authorized port available — click Connect');
+    } catch { /* ignore */ }
   }
   log('Web Updater build ' + BUILD, 'pend');
   autoDetect();
