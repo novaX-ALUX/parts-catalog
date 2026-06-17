@@ -95,6 +95,19 @@ export class STM32Dfu {
     } catch { /* ignore */ }
   }
 
+  /** Poll GETSTATUS until the device leaves dfuDNBUSY (operation truly complete); throw on
+   *  error. Critical: a command's first GETSTATUS returns dfuDNBUSY+poll — if we send the
+   *  next transfer before the device returns to idle it stalls ("transfer error"). */
+  private async pollIdle() {
+    for (let i = 0; i < 5000; i++) {
+      const st = await this.getStatus();
+      if (st.status !== 0) throw new DfuError(`device status ${st.status} (state ${st.state})`);
+      if (st.state !== 4 /* dfuDNBUSY */) return;
+      await sleep(st.poll > 5 ? 5 : (st.poll || 1));
+    }
+    throw new DfuError('status poll timeout');
+  }
+
   /** Best-effort: clear a latched error and ABORT back to idle after a failed transfer. */
   private async recover() {
     try {
@@ -111,10 +124,7 @@ export class STM32Dfu {
       ? new Uint8Array([cmd])
       : new Uint8Array([cmd, addr & 0xff, (addr >>> 8) & 0xff, (addr >>> 16) & 0xff, (addr >>> 24) & 0xff]);
     await this.dnload(0, payload);
-    let st = await this.getStatus();        // -> dfuDNBUSY, with poll timeout
-    await sleep(st.poll);
-    st = await this.getStatus();            // -> dfuDNLOAD_IDLE
-    if (st.status !== 0) throw new DfuError(`DfuSe 명령 실패 (cmd 0x${cmd.toString(16)}, status ${st.status})`);
+    await this.pollIdle(); // wait until the command (erase / set-address) truly completes
   }
 
   private sectorsInRange(start: number, end: number): number[] {
@@ -154,9 +164,7 @@ export class STM32Dfu {
         try {
           await this.setAddress(addr);
           await this.dnload(2, chunk);
-          const st = await this.getStatus();
-          if (st.status !== 0) throw new DfuError(`쓰기 실패 @0x${addr.toString(16)} (status ${st.status})`);
-          if (st.poll) await sleep(st.poll);
+          await this.pollIdle(); // wait for this block's program to finish before the next
           off += size; written += size;
           progress(300 + Math.round((written / hex.totalBytes) * 700), 1000); // write = 30–100%
         } catch (e) {
@@ -178,9 +186,7 @@ export class STM32Dfu {
   /** DfuSe Set Address Pointer (0x21) with a single status poll. */
   private async setAddress(addr: number) {
     await this.dnload(0, new Uint8Array([0x21, addr & 0xff, (addr >>> 8) & 0xff, (addr >>> 16) & 0xff, (addr >>> 24) & 0xff]));
-    const st = await this.getStatus();
-    if (st.status !== 0) throw new DfuError(`주소 설정 실패 @0x${addr.toString(16)} (status ${st.status})`);
-    if (st.poll) await sleep(st.poll);
+    await this.pollIdle(); // MUST wait for idle before the next write, else it stalls (transfer error)
   }
 
   /** Leave DFU: Set Address to image base → zero-length DNLOAD → GETSTATUS (device resets). */
