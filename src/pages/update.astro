@@ -1,6 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
+import { statSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
@@ -12,12 +14,19 @@ const all = [
   ...await getCollection('motor'),
   ...await getCollection('camera'),
 ];
-type Row = { product: string; version: string; kind: string; method: string; path: string; file: string };
+type Row = { product: string; version: string; kind: string; method: string; path: string; file: string; size: string };
+// File size in KB, read from the public/ asset at build time.
+function kbOf(webPath: string): string {
+  try {
+    const p = fileURLToPath(new URL('../../public' + webPath, import.meta.url));
+    return Math.round(statSync(p).size / 1024).toLocaleString('en-US') + ' KB';
+  } catch { return ''; }
+}
 const rows: Row[] = [];
 for (const e of all) {
   for (const fw of e.data.firmware ?? []) {
     if (fw.method && fw.webPath) {
-      rows.push({ product: e.data.name, version: fw.version, kind: fw.kind, method: fw.method, path: base + fw.webPath, file: fw.webPath.split('/').pop() || '' });
+      rows.push({ product: e.data.name, version: fw.version, kind: fw.kind, method: fw.method, path: base + fw.webPath, file: fw.webPath.split('/').pop() || '', size: kbOf(fw.webPath) });
     }
   }
 }
@@ -69,7 +78,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
               <tr class="fwrow" data-method={r.method} data-path={r.path} data-name={`${r.product} ${r.version}`}>
                 <td><span class="rad" data-radio></span></td>
                 <td class="pname">{r.product}</td><td>{r.version}</td>
-                <td><code>{r.file}</code> <span class="mtag">{r.method}</span></td>
+                <td><code>{r.file}</code> <span class="mtag">{r.method}</span>{r.size && <span class="fsize">{r.size}</span>}</td>
               </tr>
             ))}
           </tbody>
@@ -79,7 +88,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
               <tr class="fwrow" data-method={r.method} data-path={r.path} data-name={`${r.product} ${r.version}`}>
                 <td><span class="rad" data-radio></span></td>
                 <td class="pname">{r.product}</td><td>{r.version}</td>
-                <td><code>{r.file}</code> <span class="mtag">{r.method}</span></td>
+                <td><code>{r.file}</code> <span class="mtag">{r.method}</span>{r.size && <span class="fsize">{r.size}</span>}</td>
               </tr>
             ))}
           </tbody>
@@ -135,6 +144,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   .log .bar { height: 8px; border-radius: 5px; background: #2a2d33; overflow: hidden; margin-bottom: 10px; }
   .log .bar i { display: block; height: 100%; width: 0; background: var(--blue, #1a73e8); transition: width .15s; }
   .log .ok { color: #5fd08a; } .log .pend { color: #6f7888; } .log .err { color: #ef6f6f; }
+  .fsize { margin-left: 8px; color: var(--ink-4, #888); font-size: 12px; white-space: nowrap; }
 </style>
 
 <script>
