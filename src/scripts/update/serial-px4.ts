@@ -195,22 +195,43 @@ export class Px4Updater {
     await sleep(500);
   }
 
-  /** After the device resets, close and re-open the same granted port (it re-enumerates). */
+  /** After the device resets, re-acquire the bootloader port. The bootloader may
+   *  re-enumerate as the SAME USB device (same SerialPort re-opens) OR a DIFFERENT one
+   *  (a separate granted port). Mirrors the CLI find_bl: try the same port, then any other
+   *  already-granted port, retrying until one opens AND answers GET_SYNC. */
   private async reacquire(log: Log, baudRate = 115200) {
     await this.io.release();
     try { await this.port.close(); } catch { /**/ }
     log('포트 재열거 대기 …');
-    const end = Date.now() + 12000;
-    while (Date.now() < end) {
-      await sleep(400);
-      try {
-        await this.port.open({ baudRate });
-        this.io = new SerialIO(this.port);
-        log('포트 재연결됨');
-        return;
-      } catch { /* device not back yet */ }
+    // The ArduPilot bootloader's serial window is SHORT (a few seconds) before it jumps
+    // back to the app, so re-grab as fast as possible: a 'connect' event fires the instant
+    // the device re-enumerates; also poll tightly (120ms) as a fallback.
+    let appeared: SerialPort | null = null;
+    const onConnect = (e: any) => { appeared = appeared || e.target || e.port || null; };
+    try { (navigator as any).serial.addEventListener('connect', onConnect); } catch { /**/ }
+    const end = Date.now() + 15000;
+    try {
+      while (Date.now() < end) {
+        const candidates: SerialPort[] = [];
+        if (appeared) candidates.push(appeared);
+        candidates.push(this.port);
+        try {
+          for (const p of await (navigator as any).serial.getPorts()) if (!candidates.includes(p)) candidates.push(p);
+        } catch { /* getPorts unavailable */ }
+        for (const p of candidates) {
+          try {
+            await p.open({ baudRate });
+            this.port = p; this.io = new SerialIO(p);
+            if (await this.trySync()) { log('부트로더 재연결 OK'); return; }
+            await this.io.release(); try { await p.close(); } catch { /**/ }
+          } catch { /* not ready / wrong port */ }
+        }
+        await sleep(120);
+      }
+    } finally {
+      try { (navigator as any).serial.removeEventListener('connect', onConnect); } catch { /**/ }
     }
-    throw new Error('리부팅 후 포트 재연결 실패 — 브라우저에서 Connect를 다시 눌러주세요.');
+    throw new Error('부트로더 창을 못 잡음(짧음) — Connect를 다시 눌러 부트로더를 선택하거나, DFU Recovery / CLI tools/serial_update.py 를 쓰세요.');
   }
 
   /** Full flow: reboot→bootloader if needed → identify → erase → program → verify → reboot. */
