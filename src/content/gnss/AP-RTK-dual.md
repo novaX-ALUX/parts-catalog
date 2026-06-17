@@ -42,9 +42,7 @@ firmware:
     date: "2026-06-04"
     size: "157 KB"
     sha256: "886c19a1bb251f0168bca72744c26f743261d3fcb6262488513226e785df4ac3"
-    notes: "ArduPilot firmware package for upload via the USB-C bootloader (e.g. Mission Planner custom firmware)."
-    method: ardupilot
-    webPath: /firmware/AP-RTK_dual-v0.1.0.apj
+    notes: "ArduPilot firmware package — upload via Mission Planner over the USB-C bootloader, or update over DroneCAN (OTA above). Not flashable from the catalog Web Updater (this is a DroneCAN peripheral, not a USB-serial/DFU device)."
   - kind: "Bootloader + App (merged HEX · SWD)"
     file: https://github.com/novaX-ALUX/flight_controller/releases/download/AP-RTK_dual-v0.1.0/AP-RTK_dual-v0.1.0_with_bl.hex
     version: "0.1.0"

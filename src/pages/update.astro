@@ -21,6 +21,11 @@ for (const e of all) {
     }
   }
 }
+// Sort alphabetically, then numerically (natural order): AF-F4 < AF-F7 < AF-H7 < AF-H7E.
+rows.sort((a, b) =>
+  a.product.localeCompare(b.product, 'en', { numeric: true, sensitivity: 'base' })
+  || a.version.localeCompare(b.version, 'en', { numeric: true })
+);
 const fwRows = rows.filter((r) => r.method !== 'dfu');
 const dfuRows = rows.filter((r) => r.method === 'dfu');
 ---
@@ -138,7 +143,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-06-17j · serial fast reacquire (connect-event, bootloader ~1.3s on same COM)';
+  const BUILD = '2026-06-17k · natural-sorted lists + AP-RTK removed from web update';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
