@@ -2,9 +2,13 @@
 // Updates the application only (bootloader preserved); no BOOT0, standard USB
 // CDC serial (no Zadig). Protocol = PX4 serial bootloader (sync/erase/prog/crc/reboot).
 //
-// The PX4 CRC and the MAVLink reboot-to-bootloader frame were verified on real hardware
-// via the CLI twin (serial_update.py). ⚠ Web Serial port re-enumeration after the reboot
-// still needs in-browser verification.
+// Verified on real hardware against the CLI twin (serial_update.py): the PX4 CRC, the
+// MAVLink reboot-to-bootloader frame, and the post-reboot re-enumeration (the bootloader
+// comes back on the SAME USB VID/PID/serial, so the browser reopens it without a re-pick).
+// ⚠ CRITICAL ORDER: a freshly-entered bootloader REJECTS CHIP_ERASE with INVALID (0x13)
+// until the device-info handshake — specifically GET_DEVICE INFO_BL_REV — has completed.
+// Proven: erase WITHOUT BL_REV stayed INVALID through +3.5s of retries; WITH BL_REV it
+// succeeded at +1.37s. So identify() MUST query INFO_BL_REV before erase().
 
 import type { Log, Progress } from './dfu';
 
@@ -12,7 +16,7 @@ const P = {
   INSYNC: 0x12, EOC: 0x20, OK: 0x10, FAILED: 0x11, INVALID: 0x13,
   GET_SYNC: 0x21, GET_DEVICE: 0x22, CHIP_ERASE: 0x23, PROG_MULTI: 0x27,
   GET_CRC: 0x29, REBOOT: 0x30,
-  INFO_BOARD_ID: 2, INFO_FLASH_SIZE: 4,
+  INFO_BL_REV: 1, INFO_BOARD_ID: 2, INFO_FLASH_SIZE: 4,
   PROG_MULTI_MAX: 252,
 };
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -63,6 +67,9 @@ class SerialIO {
     } catch { /* cancelled / disconnected */ }
     this.closed = true;
   }
+  /** Discard any buffered RX bytes — mirrors pyserial reset_input_buffer() before a sync,
+   *  so a stray/duplicate response can never desync the next command. */
+  drain() { this.buf.length = 0; }
   async write(bytes: Uint8Array) { await this.writer.write(bytes); }
   async read(n: number, timeoutMs: number): Promise<Uint8Array> {
     const deadline = Date.now() + timeoutMs;
@@ -83,6 +90,7 @@ export class Px4Updater {
   private io: SerialIO;
   private boardId = 0;
   private flashSize = 0;
+  private blRev = 0;
   private constructor(private port: SerialPort) { this.io = new SerialIO(port); }
 
   static available(): boolean {
@@ -119,6 +127,7 @@ export class Px4Updater {
     const end = Date.now() + totalMs;
     log('부트로더 대기 중 … (필요 시 보드 전원 재인가)');
     while (Date.now() < end) {
+      this.io.drain(); // clear stale bytes before each sync attempt (CLI reset_input_buffer parity)
       try { await this.cmd([P.GET_SYNC, P.EOC], 400); log('부트로더 sync OK'); return; }
       catch { await sleep(200); }
     }
@@ -135,12 +144,23 @@ export class Px4Updater {
   async identify(log: Log) {
     this.boardId = await this.getInfo(P.INFO_BOARD_ID);
     this.flashSize = await this.getInfo(P.INFO_FLASH_SIZE);
-    log(`Board ID ${this.boardId}, flash ${(this.flashSize / 1024) | 0} KB`);
+    // INFO_BL_REV is REQUIRED before erase: a fresh bootloader rejects CHIP_ERASE with
+    // INVALID until this device-info handshake completes (verified on hardware).
+    this.blRev = await this.getInfo(P.INFO_BL_REV);
+    log(`Board ID ${this.boardId}, flash ${(this.flashSize / 1024) | 0} KB, BL rev ${this.blRev}`);
   }
 
   async erase(log: Log) {
     log('Erase app region … (수 초 소요)');
-    await this.cmd([P.CHIP_ERASE, P.EOC], 20000);
+    try {
+      await this.cmd([P.CHIP_ERASE, P.EOC], 20000);
+    } catch (e) {
+      // Defense-in-depth: if the bootloader still rejects erase (INVALID), redo the
+      // device-info handshake (re-queries INFO_BL_REV) and retry once.
+      log('Erase 거부됨 — 핸드셰이크 재시도 …');
+      await this.identify(log);
+      await this.cmd([P.CHIP_ERASE, P.EOC], 20000);
+    }
     log('Erase done.');
   }
 
@@ -183,6 +203,7 @@ export class Px4Updater {
 
   /** Quick check: is the device already in the PX4 bootloader (responds to GET_SYNC)? */
   private async trySync(): Promise<boolean> {
+    this.io.drain(); // clear any stale bytes first (mirrors CLI reset_input_buffer)
     try { await this.cmd([P.GET_SYNC, P.EOC], 500); return true; } catch { return false; }
   }
 
