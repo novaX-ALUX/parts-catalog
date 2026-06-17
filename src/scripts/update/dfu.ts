@@ -115,31 +115,43 @@ export class STM32Dfu {
     log(`Erase ${eraseStarts.length} sector(s) over 0x${hex.minAddress.toString(16)}–0x${hex.maxAddress.toString(16)} …`);
     for (let i = 0; i < eraseStarts.length; i++) {
       await this.dfuseCmd(0x41, eraseStarts[i]);
-      progress(i + 1, eraseStarts.length);
+      progress(Math.round(((i + 1) / eraseStarts.length) * 300), 1000); // erase = first 0–30%
     }
     log('Erase done.');
 
-    // Write WRITE_XFER bytes per block, setting the address pointer before each block
-    // (wBlockNum stays 2). This keeps every control-OUT transfer at WRITE_XFER bytes —
-    // 1024 is proven to work on the target, whereas the device's 2048 wTransferSize is
-    // rejected by this WebUSB/WinUSB stack ("transfer error"). Address is explicit, so
-    // it stays correct without relying on the device's block-stride math.
-    const WRITE_XFER = 1024;
+    // Each block sets the address pointer explicitly (wBlockNum stays 2), so the chunk
+    // size is free — addressing never depends on the device's wTransferSize stride.
+    // Start at 1024 B and, on any USB transfer error, recover + halve the chunk and retry
+    // the SAME offset: self-tunes to whatever this WebUSB/WinUSB stack actually accepts.
+    let cap = 1024;
     log(`Write ${hex.totalBytes} bytes …`);
     let written = 0;
     for (const seg of hex.segments) {
-      for (let off = 0; off < seg.data.length; off += WRITE_XFER) {
+      let off = 0;
+      while (off < seg.data.length) {
+        const size = Math.min(cap, seg.data.length - off);
         const addr = seg.address + off;
-        const chunk = seg.data.subarray(off, Math.min(off + WRITE_XFER, seg.data.length));
-        await this.setAddress(addr);
-        await this.dnload(2, new Uint8Array(chunk)); // clean standalone buffer
-        const st = await this.getStatus();
-        if (st.status !== 0) throw new DfuError(`쓰기 실패 @0x${addr.toString(16)} (status ${st.status})`);
-        if (st.poll) await sleep(st.poll);
-        written += chunk.length;
-        progress(written, hex.totalBytes);
+        const chunk = new Uint8Array(seg.data.subarray(off, off + size)); // clean standalone buffer
+        try {
+          await this.setAddress(addr);
+          await this.dnload(2, chunk);
+          const st = await this.getStatus();
+          if (st.status !== 0) throw new DfuError(`쓰기 실패 @0x${addr.toString(16)} (status ${st.status})`);
+          if (st.poll) await sleep(st.poll);
+          off += size; written += size;
+          progress(300 + Math.round((written / hex.totalBytes) * 700), 1000); // write = 30–100%
+        } catch (e) {
+          if (isXferError(e) && cap > 64) {
+            cap = cap >> 1;
+            log(`전송 오류 — 청크 ${cap}B로 줄여 재시도 …`);
+            await this.recover();
+            continue; // retry the same offset with the smaller cap
+          }
+          throw e;
+        }
       }
     }
+    log(`(used ${cap}B chunks)`);
     log('Program complete. Leaving DFU …');
     await this.leave(hex.minAddress);
   }

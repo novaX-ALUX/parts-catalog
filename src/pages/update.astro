@@ -137,7 +137,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-06-17e · serial PX4-CRC + reboot-to-bootloader';
+  const BUILD = '2026-06-17f · DFU adaptive chunk + unified progress';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
