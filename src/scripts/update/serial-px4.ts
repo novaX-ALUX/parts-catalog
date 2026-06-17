@@ -2,8 +2,9 @@
 // Updates the application only (bootloader preserved); no BOOT0, standard USB
 // CDC serial (no Zadig). Protocol = PX4 serial bootloader (sync/erase/prog/crc/reboot).
 //
-// ⚠ BETA: implemented to the documented PX4 protocol. The reboot-to-bootloader
-// trigger and CRC-verify need verification on real hardware before relied upon.
+// The PX4 CRC and the MAVLink reboot-to-bootloader frame were verified on real hardware
+// via the CLI twin (serial_update.py). ⚠ Web Serial port re-enumeration after the reboot
+// still needs in-browser verification.
 
 import type { Log, Progress } from './dfu';
 
@@ -16,7 +17,18 @@ const P = {
 };
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-// standard CRC-32 (zlib/PX4), used to verify the programmed image.
+// MAVLink1 COMMAND_LONG: MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN(246) param1=3 (reboot to
+// bootloader), target_system=1. Exact frame captured from pymavlink — proven on hardware.
+const REBOOT_BL_MAVLINK = new Uint8Array([
+  0xfe, 0x21, 0x00, 0xff, 0x00, 0x4c,                          // STX,len=33,seq,sys=255,comp,msgid=76
+  0x00, 0x00, 0x40, 0x40,                                      // param1 = 3.0
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // param2..7
+  0xf6, 0x00, 0x01, 0x00, 0x00,                                // cmd=246, tsys=1, tcomp=0, conf=0
+  0x26, 0xd2,                                                  // X.25 checksum
+]);
+
+// PX4 bootloader CRC-32: poly 0xedb88320, init=0, NO final XOR. Verified against the device
+// on real hardware (zlib's init 0xFFFFFFFF + final XOR mismatches).
 const CRC_TABLE = (() => {
   const t = new Uint32Array(256);
   for (let n = 0; n < 256; n++) {
@@ -26,7 +38,7 @@ const CRC_TABLE = (() => {
   }
   return t;
 })();
-function crc32(bytes: Uint8Array, crc = 0xffffffff): number {
+function crc32(bytes: Uint8Array, crc = 0): number {
   for (let i = 0; i < bytes.length; i++) crc = CRC_TABLE[(crc ^ bytes[i]) & 0xff] ^ (crc >>> 8);
   return crc >>> 0;
 }
@@ -171,13 +183,49 @@ export class Px4Updater {
     try { await this.port.close(); } catch { /**/ }
   }
 
-  /** Full flow: wait → identify → erase → program → verify → reboot. */
+  /** Quick check: is the device already in the PX4 bootloader (responds to GET_SYNC)? */
+  private async trySync(): Promise<boolean> {
+    try { await this.cmd([P.GET_SYNC, P.EOC], 500); return true; } catch { return false; }
+  }
+
+  /** Reboot the running ArduPilot app into its bootloader via a MAVLink reboot command. */
+  private async rebootToBootloader(log: Log) {
+    log('앱 모드 → 부트로더로 리부팅 (MAVLink REBOOT_SHUTDOWN) …');
+    try { await this.io.write(REBOOT_BL_MAVLINK); } catch { /* port may drop immediately */ }
+    await sleep(500);
+  }
+
+  /** After the device resets, close and re-open the same granted port (it re-enumerates). */
+  private async reacquire(log: Log, baudRate = 115200) {
+    await this.io.release();
+    try { await this.port.close(); } catch { /**/ }
+    log('포트 재열거 대기 …');
+    const end = Date.now() + 12000;
+    while (Date.now() < end) {
+      await sleep(400);
+      try {
+        await this.port.open({ baudRate });
+        this.io = new SerialIO(this.port);
+        log('포트 재연결됨');
+        return;
+      } catch { /* device not back yet */ }
+    }
+    throw new Error('리부팅 후 포트 재연결 실패 — 브라우저에서 Connect를 다시 눌러주세요.');
+  }
+
+  /** Full flow: reboot→bootloader if needed → identify → erase → program → verify → reboot. */
   async flash(image: Uint8Array, log: Log, progress: Progress) {
-    await this.waitForBootloader(log);
+    if (await this.trySync()) {
+      log('이미 부트로더 모드');
+    } else {
+      await this.rebootToBootloader(log);
+      await this.reacquire(log);
+      await this.waitForBootloader(log);
+    }
     await this.identify(log);
     await this.erase(log);
     const programmed = await this.program(image, log, progress);
-    await this.verify(programmed, log);
+    if (!(await this.verify(programmed, log))) throw new Error('CRC 검증 실패 — 플래시 불일치');
     await this.reboot(log);
   }
 }
