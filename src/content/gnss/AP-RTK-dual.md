@@ -51,9 +51,7 @@ firmware:
     date: "2026-06-04"
     size: "608 KB"
     sha256: "1ed5a9af0044ba585978ddb4cde3eabe7f45b78504d61313967ad5463ad96f7a"
-    notes: "Bootloader + application combined image based at 0x08000000. Flash once via SWD/ST-Link (e.g. STM32CubeProgrammer) for factory bring-up or recovery on a blank MCU — no separate bootloader step. For routine updates use the DroneCAN OTA or .apj methods above."
-    method: dfu
-    webPath: /firmware/AP-RTK_dual-v0.1.0_with_bl.hex
+    notes: "Bootloader + application combined image based at 0x08000000. SWD/ST-Link only (e.g. STM32CubeProgrammer) for factory bring-up or recovery on a blank MCU — this DroneCAN peripheral has no USB DFU, so it is not offered in the Web Updater. For routine updates use the DroneCAN OTA or .apj methods above."
 firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases'
 configImages:
   - { src: /images/products/gnss_AP-RTK-dual_antenna-setup.png, caption: "Antenna placement & wiring — Master (ANT1) front, Slave (ANT2) rear, ≥ 500 mm apart" }
