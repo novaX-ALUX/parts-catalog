@@ -85,6 +85,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
 
       <div class="actions">
         <button id="flash" class="btn btn-primary" disabled>⚡ Update firmware</button>
+        <button id="clearlog" class="btn btn-line" type="button" title="Clear the log output">🧹 Clear log</button>
         <span class="hint" id="flowhint">reboot to bootloader → erase → program → verify → boot</span>
       </div>
 
@@ -137,7 +138,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-06-17g · DFU adaptive chunk fix (isXferError/recover)';
+  const BUILD = '2026-06-17h · Clear-log button + DFU adaptive chunk';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -148,6 +149,8 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
 
   const log = (m: string, cls = '') => { const d = document.createElement('div'); if (cls) d.className = cls; d.textContent = m; logEl.appendChild(d); logEl.scrollTop = 1e9; };
   const progress = (done: number, total: number) => { barEl.style.width = total ? `${Math.round((done / total) * 100)}%` : '0'; };
+  // Clear log button — wipe the log output and reset the progress bar.
+  $('#clearlog').addEventListener('click', () => { logEl.innerHTML = ''; barEl.style.width = '0'; });
   const setStatus = (t: string, cls = '') => { statusEl.textContent = t; statusEl.className = 'chip ' + cls; };
   const refreshFlashEnabled = () => { flashBtn.disabled = !(conn && (selectedPath || droppedFile)); };
 
