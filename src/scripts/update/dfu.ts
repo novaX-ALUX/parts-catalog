@@ -64,9 +64,44 @@ export class STM32Dfu {
     self.iface = ifc.interfaceNumber;
     await dev.claimInterface(self.iface);
     await dev.selectAlternateInterface(self.iface, 0);
-    self.sectors = parseMemoryLayout(ifc.alternates[0].interfaceName || '');
+    self.sectors = await STM32Dfu.resolveLayout(dev, ifc);
     await self.clearIfError();
     return self;
+  }
+
+  /** Read a USB STRING descriptor by index via a raw control transfer (langid 0x0409 en-US).
+   *  Mirrors flash_dfu.py's get_string(): WebUSB's `alternate.interfaceName` comes back EMPTY
+   *  for some bootloaders (verified on the STM32F405 ROM DFU — the descriptor is present at
+   *  index 4 but Chrome surfaces it as ''), so we fetch it directly. */
+  private static async readString(dev: USBDevice, index: number): Promise<string> {
+    if (!index) return '';
+    try {
+      const r = await dev.controlTransferIn(
+        { requestType: 'standard', recipient: 'device', request: 6 /* GET_DESCRIPTOR */,
+          value: (0x03 << 8) | index, index: 0x0409 }, 255);
+      if (r.status !== 'ok' || !r.data || r.data.byteLength < 2) return '';
+      const b = new Uint8Array(r.data.buffer);
+      let s = '';
+      for (let i = 2; i + 1 < b[0]; i += 2) s += String.fromCharCode(b[i] | (b[i + 1] << 8));
+      return s;
+    } catch { return ''; }
+  }
+
+  /** Resolve the DfuSe Internal-Flash sector map. Prefer WebUSB's alt-0 interfaceName, but
+   *  when it is empty (STM32F405 ROM DFU) scan raw string descriptors for the "@Internal Flash
+   *  /0x08000000/…" line. Restoring the real layout keeps the chip-capacity / cross-family
+   *  guards working instead of falsely reporting "0 KB flash". */
+  private static async resolveLayout(dev: USBDevice, ifc: any): Promise<Sector[]> {
+    let layout = parseMemoryLayout(ifc.alternates[0].interfaceName || '');
+    if (layout.length) return layout;
+    for (let idx = 1; idx <= 8; idx++) {
+      const s = await STM32Dfu.readString(dev, idx);
+      if (/\/0x08000000\//.test(s)) {
+        layout = parseMemoryLayout(s);
+        if (layout.length) return layout;
+      }
+    }
+    return layout; // still empty -> sectorsInRange()'s F4 fallback + capacity warning apply
   }
 
   deviceLabel(): string {
