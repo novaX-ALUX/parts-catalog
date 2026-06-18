@@ -102,7 +102,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
 
       <div class="actions">
         <button id="flash" class="btn btn-primary" disabled>⚡ Update firmware</button>
-        <button id="clearlog" class="btn btn-line" type="button" title="Clear the log output">🧹 Clear log</button>
+        <button id="reloadpage" class="btn btn-line" type="button" title="Reload the page (cache-bust) and re-detect the USB device — also clears the log">🔄 Reload</button>
         <span class="hint" id="flowhint">reboot to bootloader → erase → program → verify → boot</span>
       </div>
 
@@ -156,7 +156,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-06-17p · serial guard: refuse wrong board_id BEFORE erase (+ all-English log)';
+  const BUILD = '2026-06-17q · Reload button (cache-bust + USB re-detect, keeps mode)';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -197,11 +197,15 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
     } catch { /* ignore */ }
   }
   log('Web Updater build ' + BUILD, 'pend');
-  // Snapshot the original log (intro line + build stamp). "Clear log" restores THIS
-  // state — it returns to the initial view up to the build number, not a blank log.
-  const INITIAL_LOG = logEl.innerHTML;
-  $('#clearlog').addEventListener('click', () => { logEl.innerHTML = INITIAL_LOG; barEl.style.width = '0'; });
   autoDetect();
+
+  // "Reload" button: hard-refresh the page (cache-busting query) instead of just clearing
+  // the log. A fresh load releases the exclusively-held COM/USB port, re-detects the device,
+  // and picks up the latest deployed build. The current mode is carried in the URL so the
+  // reload lands back in FW or DFU and re-detects on the right transport.
+  $('#reloadpage').addEventListener('click', () => {
+    location.replace(location.pathname + '?mode=' + mode + '&r=' + Date.now());
+  });
 
   // ---- mode toggle ----
   document.querySelectorAll<HTMLButtonElement>('.seg button').forEach((b) => b.addEventListener('click', () => {
@@ -222,6 +226,12 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
     setStatus('Not connected'); refreshFlashEnabled();
     autoDetect();
   }));
+
+  // After a Reload, restore the saved mode (carried in ?mode=…) so USB re-detects on the
+  // right transport — WebSerial for FW, WebUSB for DFU.
+  if (new URLSearchParams(location.search).get('mode') === 'dfu') {
+    (document.querySelector('.seg button[data-mode="dfu"]') as HTMLButtonElement)?.click();
+  }
 
   // ---- row selection ----
   document.querySelectorAll<HTMLElement>('.fwrow').forEach((row) => row.addEventListener('click', () => {
