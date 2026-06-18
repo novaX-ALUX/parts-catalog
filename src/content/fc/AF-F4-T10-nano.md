@@ -22,22 +22,22 @@ description: |
   AF-F4 T10 nano is the AF-F4 nano (STM32F405) with the CADDX gimbal mount enabled in firmware (ArduPilot MNT_TYPE 13). Same hardware and board ID as AF-F4 nano, so an existing AF-F4 nano accepts this firmware over the normal .apj updater. Feature set mirrors the curated novaX build with the CADDX camera-mount backend added.
 firmware:
   - kind: "ArduPilot (.apj package)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F4_T10_nano-v0.3.0/AF-F4_T10_nano-v0.3.0.apj
-    version: "0.3.0"
-    date: "2026-06-17"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F4_T10_nano-v0.3.1/AF-F4_T10_nano-v0.3.1.apj
+    version: "0.3.1"
+    date: "2026-06-18"
     size: "752 KB"
-    sha256: "94de430d83ec9e6d2131433b68353be8df720284481b256f07ab001333eec4f9"
+    sha256: "704de05f4ca7b3b917267a74160c243ae397b3db2a3146803a5aa5f333f6ccdd"
     notes: "ArduPilot Copter app with CADDX gimbal (MNT_TYPE 13). Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater → Firmware Update."
     method: ardupilot
-    webPath: /firmware/AF-F4_T10_nano-v0.3.0.apj
+    webPath: /firmware/AF-F4_T10_nano-v0.3.1.apj
   - kind: "Bootloader + App (merged HEX · DFU / SWD)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F4_T10_nano-v0.3.0/AF-F4_T10_nano-v0.3.0_with_bl.hex
-    version: "0.3.0"
-    date: "2026-06-17"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F4_T10_nano-v0.3.1/AF-F4_T10_nano-v0.3.1_with_bl.hex
+    version: "0.3.1"
+    date: "2026-06-18"
     size: "2.3 MB"
-    sha256: "485e39252b697c22b596c6e0b8a3da3038b51459a241f7746be7c533627f948e"
+    sha256: "b199b9879fd1c6f60723ead565751f63f9531d7175fbc2a860111d380b38d86f"
     notes: "Bootloader + application combined image based at 0x08000000. Flash via the catalog Web Updater → DFU Recovery (hold BOOT0) or SWD/ST-Link for a blank/bricked board."
     method: dfu
-    webPath: /firmware/AF-F4_T10_nano-v0.3.0_with_bl.hex
+    webPath: /firmware/AF-F4_T10_nano-v0.3.1_with_bl.hex
 firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases'
 ---

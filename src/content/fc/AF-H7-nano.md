@@ -7,23 +7,23 @@ pinoutImage: /images/products/fc_H743_nano_pinout.png
 order: 20
 firmware:
   - kind: "ArduPilot (.apj package)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.2.0/AF-H7_nano-v0.2.0.apj
-    version: "0.2.0"
-    date: "2026-06-17"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.2.1/AF-H7_nano-v0.2.1.apj
+    version: "0.2.1"
+    date: "2026-06-18"
     size: "1.3 MB"
-    sha256: "e3d9a11e26a609a9cbe1feb4f9c1d9e15f5a485bb0a91da2174f83ca6ef3b961"
+    sha256: "8aa3b1fd8364fd323f4d3566e1655626dd2545d4be86a477b68708d643cca5a3"
     notes: "ArduPilot Copter app. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater → Firmware Update."
     method: ardupilot
-    webPath: /firmware/AF-H7_nano-v0.2.0.apj
+    webPath: /firmware/AF-H7_nano-v0.2.1.apj
   - kind: "Bootloader + App (merged HEX · DFU / SWD)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.2.0/AF-H7_nano-v0.2.0_with_bl.hex
-    version: "0.2.0"
-    date: "2026-06-17"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.2.1/AF-H7_nano-v0.2.1_with_bl.hex
+    version: "0.2.1"
+    date: "2026-06-18"
     size: "5.2 MB"
-    sha256: "9d36e544a854a5b1458d6d06e2fba299b7fd8d9ec4ed762127885802ba2ceb00"
+    sha256: "baac331fb10bd299b96106d484378ed78f29911f69936ade1f711ebb921a3024"
     notes: "Bootloader + application combined image based at 0x08000000. Flash via the catalog Web Updater → DFU Recovery (hold BOOT0) or SWD/ST-Link for a blank/bricked board."
     method: dfu
-    webPath: /firmware/AF-H7_nano-v0.2.0_with_bl.hex
+    webPath: /firmware/AF-H7_nano-v0.2.1_with_bl.hex
 specs:
   - { key: MCU, value: "STM32H743VIH6, 480 MHz (1MB RAM, 2MB Flash)" }
   - { key: IMU, value: "2× ICM-42688-P" }
