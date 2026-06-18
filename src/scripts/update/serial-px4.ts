@@ -255,7 +255,7 @@ export class Px4Updater {
     } finally {
       try { (navigator as any).serial.removeEventListener('connect', onConnect); } catch { /**/ }
     }
-    throw new Error('Missed the brief bootloader window — click Connect again to select the bootloader, or use DFU Recovery / CLI tools/serial_update.py.');
+    throw new Error('Bootloader did not re-enumerate. This board intermittently fails USB re-enumeration after a soft reboot (a firmware/Windows USB quirk, not the browser — the host cannot force a re-scan). Fix: unplug & replug the USB once, then click Connect. For an update that avoids the soft reboot entirely, use DFU Recovery (hold BOOT0).');
   }
 
   /** Full flow: reboot→bootloader if needed → identify → GUARD (capacity + board_id) → erase →
