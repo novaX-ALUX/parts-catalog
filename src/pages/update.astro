@@ -156,7 +156,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-06-17n · DFU chip guard: detect family from flash layout, block wrong chip';
+  const BUILD = '2026-06-17o · serial Connect: one-click (no picker if granted), clearer status';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -193,7 +193,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
     // granted first (maybe not even this board) and would falsely report a verified link —
     // it also locks the COM so nothing else (CLI, this probe) can use it. Just hint.
     try {
-      if (await Px4Updater.hasGrantedPort()) setStatus('Not connected · authorized port available — click Connect');
+      if (await Px4Updater.hasGrantedPort()) setStatus('🔌 USB port detected — click Connect', 'ok');
     } catch { /* ignore */ }
   }
   log('Web Updater build ' + BUILD, 'pend');

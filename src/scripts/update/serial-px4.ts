@@ -99,8 +99,13 @@ export class Px4Updater {
 
   static async connect(baudRate = 115200): Promise<Px4Updater> {
     if (!Px4Updater.available()) throw new Error('이 브라우저는 Web Serial을 지원하지 않습니다 (Chrome/Edge 데스크탑 필요).');
-    // Optional VID/PID filter narrows the picker. Fill in once novaX USB IDs are known.
-    const filters: any[] = [];
+    // An already-authorized port can be opened with no picker — try that first so a single
+    // Connect click connects instantly (no dialog). Fall back to the picker otherwise.
+    try {
+      const granted = await (navigator as any).serial.getPorts();
+      if (granted.length) { await granted[0].open({ baudRate }); return new Px4Updater(granted[0]); }
+    } catch { /* not openable (already open / gone) — fall through to picker */ }
+    const filters: any[] = []; // Optional VID/PID filter narrows the picker once novaX IDs are known.
     const port = await (navigator as any).serial.requestPort(filters.length ? { filters } : undefined);
     await port.open({ baudRate });
     return new Px4Updater(port);
