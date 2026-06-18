@@ -1,2 +1,6 @@
+# Default: normalize text files to LF in the repo and working tree
+# (prevents CRLF noise when files are touched from Windows).
+* text=auto eol=lf
+
 # Firmware images must be stored byte-exact (no EOL/encoding conversion).
 public/firmware/** binary
