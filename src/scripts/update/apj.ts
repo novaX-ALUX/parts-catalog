@@ -15,7 +15,7 @@ async function inflate(data: Uint8Array): Promise<Uint8Array> {
 
 export async function parseApj(text: string): Promise<AppImage> {
   const j = JSON.parse(text);
-  if (typeof j.image !== 'string') throw new Error('.apj 형식 오류: image 필드 없음');
+  if (typeof j.image !== 'string') throw new Error('.apj format error: missing image field');
   const compressed = Uint8Array.from(atob(j.image), (c) => c.charCodeAt(0));
   const bytes = await inflate(compressed);
   return { boardId: j.board_id, bytes };

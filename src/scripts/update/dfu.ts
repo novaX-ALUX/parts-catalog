@@ -41,7 +41,7 @@ export class STM32Dfu {
 
   /** Prompt the browser device picker (filtered to 0483:DF11) and open it. */
   static async connect(): Promise<STM32Dfu> {
-    if (!STM32Dfu.available()) throw new DfuError('이 브라우저는 WebUSB를 지원하지 않습니다 (Chrome/Edge 데스크탑 필요).');
+    if (!STM32Dfu.available()) throw new DfuError('This browser does not support WebUSB (desktop Chrome/Edge required).');
     const dev = await (navigator as any).usb.requestDevice({ filters: [{ vendorId: STM_VID, productId: STM_PID }] });
     return STM32Dfu.open(dev);
   }
@@ -110,7 +110,7 @@ export class STM32Dfu {
       { requestType: 'class', recipient: 'interface', request: DNLOAD, value: wValue, index: this.iface },
       data as any
     );
-    if (r.status !== 'ok') throw new DfuError(`DNLOAD 실패: ${r.status}`);
+    if (r.status !== 'ok') throw new DfuError(`DNLOAD failed: ${r.status}`);
   }
   private async getStatus(): Promise<{ status: number; poll: number; state: number }> {
     const r = await this.dev.controlTransferIn(
@@ -202,7 +202,7 @@ export class STM32Dfu {
         } catch (e) {
           if (isXferError(e) && cap > 64) {
             cap = cap >> 1;
-            log(`전송 오류 — 청크 ${cap}B로 줄여 재시도 …`);
+            log(`Transfer error — retrying with smaller ${cap}B chunks …`);
             await this.recover();
             continue; // retry the same offset with the smaller cap
           }

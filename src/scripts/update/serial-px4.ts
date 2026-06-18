@@ -74,8 +74,8 @@ class SerialIO {
   async read(n: number, timeoutMs: number): Promise<Uint8Array> {
     const deadline = Date.now() + timeoutMs;
     while (this.buf.length < n) {
-      if (this.closed) throw new Error('시리얼 포트가 닫혔습니다');
-      if (Date.now() > deadline) throw new Error('시리얼 응답 타임아웃');
+      if (this.closed) throw new Error('Serial port closed');
+      if (Date.now() > deadline) throw new Error('Serial response timeout');
       await sleep(4);
     }
     return new Uint8Array(this.buf.splice(0, n));
@@ -98,7 +98,7 @@ export class Px4Updater {
   }
 
   static async connect(baudRate = 115200): Promise<Px4Updater> {
-    if (!Px4Updater.available()) throw new Error('이 브라우저는 Web Serial을 지원하지 않습니다 (Chrome/Edge 데스크탑 필요).');
+    if (!Px4Updater.available()) throw new Error('This browser does not support Web Serial (desktop Chrome/Edge required).');
     // An already-authorized port can be opened with no picker — try that first so a single
     // Connect click connects instantly (no dialog). Fall back to the picker otherwise.
     try {
@@ -120,7 +120,7 @@ export class Px4Updater {
 
   private async getSync(timeoutMs = 1000) {
     const r = await this.io.read(2, timeoutMs);
-    if (r[0] !== P.INSYNC || r[1] !== P.OK) throw new Error(`sync 실패 (0x${r[0].toString(16)} 0x${r[1].toString(16)})`);
+    if (r[0] !== P.INSYNC || r[1] !== P.OK) throw new Error(`sync failed (0x${r[0].toString(16)} 0x${r[1].toString(16)})`);
   }
   private async cmd(bytes: number[], timeoutMs = 1000) {
     await this.io.write(new Uint8Array(bytes));
@@ -130,13 +130,13 @@ export class Px4Updater {
   /** Poll GET_SYNC until the bootloader answers (user may need to power-cycle). */
   async waitForBootloader(log: Log, totalMs = 8000) {
     const end = Date.now() + totalMs;
-    log('부트로더 대기 중 … (필요 시 보드 전원 재인가)');
+    log('Waiting for bootloader … (power-cycle the board if needed)');
     while (Date.now() < end) {
       this.io.drain(); // clear stale bytes before each sync attempt (CLI reset_input_buffer parity)
-      try { await this.cmd([P.GET_SYNC, P.EOC], 400); log('부트로더 sync OK'); return; }
+      try { await this.cmd([P.GET_SYNC, P.EOC], 400); log('Bootloader sync OK'); return; }
       catch { await sleep(200); }
     }
-    throw new Error('부트로더 응답 없음 — 전원 재인가 후 다시 시도하세요.');
+    throw new Error('No bootloader response — power-cycle the board and retry.');
   }
 
   private async getInfo(param: number): Promise<number> {
@@ -156,13 +156,13 @@ export class Px4Updater {
   }
 
   async erase(log: Log) {
-    log('Erase app region … (수 초 소요)');
+    log('Erase app region … (takes a few seconds)');
     try {
       await this.cmd([P.CHIP_ERASE, P.EOC], 20000);
     } catch (e) {
       // Defense-in-depth: if the bootloader still rejects erase (INVALID), redo the
       // device-info handshake (re-queries INFO_BL_REV) and retry once.
-      log('Erase 거부됨 — 핸드셰이크 재시도 …');
+      log('Erase rejected — retrying handshake …');
       await this.identify(log);
       await this.cmd([P.CHIP_ERASE, P.EOC], 20000);
     }
@@ -183,7 +183,7 @@ export class Px4Updater {
 
   /** Verify via device CRC over the whole app flash padded with 0xFF. Returns match. */
   async verify(programmed: Uint8Array, log: Log): Promise<boolean> {
-    if (!this.flashSize) { log('flash size 미상 — CRC 검증 건너뜀'); return true; }
+    if (!this.flashSize) { log('flash size unknown — skipping CRC verify'); return true; }
     const full = new Uint8Array(this.flashSize).fill(0xff);
     full.set(programmed.subarray(0, Math.min(programmed.length, this.flashSize)));
     const local = crc32(full);
@@ -192,7 +192,7 @@ export class Px4Updater {
     await this.getSync();
     const dev = (v[0] | (v[1] << 8) | (v[2] << 16) | (v[3] << 24)) >>> 0;
     const ok = dev === local;
-    log(ok ? `CRC 검증 OK (0x${dev.toString(16)})` : `CRC 불일치: device 0x${dev.toString(16)} vs local 0x${local.toString(16)}`);
+    log(ok ? `CRC verify OK (0x${dev.toString(16)})` : `CRC mismatch: device 0x${dev.toString(16)} vs local 0x${local.toString(16)}`);
     return ok;
   }
 
@@ -214,7 +214,7 @@ export class Px4Updater {
 
   /** Reboot the running ArduPilot app into its bootloader via a MAVLink reboot command. */
   private async rebootToBootloader(log: Log) {
-    log('앱 모드 → 부트로더로 리부팅 (MAVLink REBOOT_SHUTDOWN) …');
+    log('App mode → rebooting to bootloader (MAVLink REBOOT_SHUTDOWN) …');
     try { await this.io.write(REBOOT_BL_MAVLINK); } catch { /* port may drop immediately */ }
     await sleep(500);
   }
@@ -226,7 +226,7 @@ export class Px4Updater {
   private async reacquire(log: Log, baudRate = 115200) {
     await this.io.release();
     try { await this.port.close(); } catch { /**/ }
-    log('포트 재열거 대기 …');
+    log('Waiting for port to re-enumerate …');
     // The ArduPilot bootloader's serial window is SHORT (a few seconds) before it jumps
     // back to the app, so re-grab as fast as possible: a 'connect' event fires the instant
     // the device re-enumerates; also poll tightly (120ms) as a fallback.
@@ -246,7 +246,7 @@ export class Px4Updater {
           try {
             await p.open({ baudRate });
             this.port = p; this.io = new SerialIO(p);
-            if (await this.trySync()) { log('부트로더 재연결 OK'); return; }
+            if (await this.trySync()) { log('Bootloader reconnected OK'); return; }
             await this.io.release(); try { await p.close(); } catch { /**/ }
           } catch { /* not ready / wrong port */ }
         }
@@ -255,22 +255,34 @@ export class Px4Updater {
     } finally {
       try { (navigator as any).serial.removeEventListener('connect', onConnect); } catch { /**/ }
     }
-    throw new Error('부트로더 창을 못 잡음(짧음) — Connect를 다시 눌러 부트로더를 선택하거나, DFU Recovery / CLI tools/serial_update.py 를 쓰세요.');
+    throw new Error('Missed the brief bootloader window — click Connect again to select the bootloader, or use DFU Recovery / CLI tools/serial_update.py.');
   }
 
-  /** Full flow: reboot→bootloader if needed → identify → erase → program → verify → reboot. */
-  async flash(image: Uint8Array, log: Log, progress: Progress) {
+  /** Full flow: reboot→bootloader if needed → identify → GUARD (capacity + board_id) → erase →
+   *  program → verify → reboot. The guards run BEFORE erase so a wrong/oversized image is rejected
+   *  without wiping the board (it reboots back into the still-intact app). */
+  async flash(image: Uint8Array, log: Log, progress: Progress, expectedBoardId?: number) {
     if (await this.trySync()) {
-      log('이미 부트로더 모드');
+      log('Already in bootloader mode');
     } else {
       await this.rebootToBootloader(log);
       await this.reacquire(log);
       await this.waitForBootloader(log);
     }
     await this.identify(log);
+    // ---- Compatibility guards — MUST run BEFORE erase, or a wrong pick wipes the board ----
+    // (capacity catches oversized .bin/.apj; board_id is the ArduPilot-native wrong-firmware check.)
+    if (this.flashSize && image.length > this.flashSize) {
+      await this.reboot(log); // leave bootloader → boot the still-intact app
+      throw new Error(`Image too large — flash aborted, nothing erased. Firmware is ${(image.length / 1024) | 0} KB but this chip has only ${(this.flashSize / 1024) | 0} KB flash. Wrong firmware for this board.`);
+    }
+    if (expectedBoardId && this.boardId !== expectedBoardId) {
+      await this.reboot(log); // leave bootloader → boot the still-intact app
+      throw new Error(`Wrong firmware — flash aborted, nothing erased. This image is for board ID ${expectedBoardId}, but the connected board is ID ${this.boardId}. Select the firmware that matches this board.`);
+    }
     await this.erase(log);
     const programmed = await this.program(image, log, progress);
-    if (!(await this.verify(programmed, log))) throw new Error('CRC 검증 실패 — 플래시 불일치');
+    if (!(await this.verify(programmed, log))) throw new Error('CRC verify failed — flash mismatch');
     await this.reboot(log);
   }
 }

@@ -156,7 +156,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-06-17o · serial Connect: one-click (no picker if granted), clearer status';
+  const BUILD = '2026-06-17p · serial guard: refuse wrong board_id BEFORE erase (+ all-English log)';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -183,7 +183,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
         if (c) {
           conn = c;
           setStatus('● ' + (c as any).chipLabel(), 'ok');
-          log('Reconnected to a previously authorized DFU device. 감지된 칩: ' + (c as any).chipLabel(), 'ok');
+          log('Reconnected to a previously authorized DFU device. Detected chip: ' + (c as any).chipLabel(), 'ok');
           refreshFlashEnabled();
         }
       } catch { /* none granted — use Connect */ }
@@ -253,7 +253,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
       if (mode === 'dfu') {
         conn = await STM32Dfu.connect();
         setStatus('● ' + conn.chipLabel(), 'ok');
-        log('Connected. 감지된 칩: ' + conn.chipLabel(), 'ok');
+        log('Connected. Detected chip: ' + conn.chipLabel(), 'ok');
       } else {
         conn = await Px4Updater.connect();
         setStatus('● serial port connected', 'ok');
@@ -289,26 +289,27 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
         log(`HEX 0x${hex.minAddress.toString(16)}–0x${hex.maxAddress.toString(16)}, ${hex.totalBytes} bytes`);
         // ---- chip guard: stop a wrong-chip flash before erasing anything ----
         const info = (conn as InstanceType<typeof STM32Dfu>).flashInfo();
-        log(`연결된 칩: ${(conn as InstanceType<typeof STM32Dfu>).chipLabel()}`);
+        log(`Connected chip: ${(conn as InstanceType<typeof STM32Dfu>).chipLabel()}`);
         // A) capacity: the image must fit the device's flash (blocks bigger-chip firmware).
         if (hex.maxAddress > info.base + info.totalSize) {
-          throw new Error(`칩 불일치 — 플래시 중단. 이 펌웨어는 0x${hex.maxAddress.toString(16)}까지 쓰는데, 연결된 칩 플래시는 ${(info.totalSize / 1024) | 0}KB(0x${(info.base + info.totalSize).toString(16)}까지)입니다. 더 큰 칩용 펌웨어입니다.`);
+          throw new Error(`Chip mismatch — flash aborted. This firmware writes up to 0x${hex.maxAddress.toString(16)}, but the connected chip's flash is only ${(info.totalSize / 1024) | 0} KB (up to 0x${(info.base + info.totalSize).toString(16)}). It is firmware for a larger chip.`);
         }
         // B) family: a catalog firmware knows its target family — block cross-family flashes.
         if (selectedFamily && info.family !== 'unknown' && selectedFamily !== info.family) {
-          throw new Error(`칩 불일치 — 플래시 중단. 선택한 펌웨어는 STM32${selectedFamily}-class(${selectedName})인데, 연결된 보드는 STM32${info.family}-class입니다. 잘못된 보드입니다.`);
+          throw new Error(`Chip mismatch — flash aborted. The selected firmware is for STM32${selectedFamily}-class (${selectedName}), but the connected board is STM32${info.family}-class. Wrong board.`);
         }
         if (selectedFamily && info.family === 'unknown') {
-          log('⚠ 칩 패밀리 자동판별 실패 — 용량 검사만 통과. 보드를 직접 확인하세요.', 'pend');
+          log('⚠ Could not auto-detect chip family — capacity check only. Verify the board yourself.', 'pend');
         }
         if (droppedFile) {
-          log('드래그한 파일 — 카탈로그 칩 매칭 생략(용량만 검사). 올바른 보드인지 직접 확인하세요.', 'pend');
+          log('Dropped file — catalog chip match skipped (capacity check only). Verify this is the right board.', 'pend');
         }
         await (conn as InstanceType<typeof STM32Dfu>).flash(hex, log, progress);
       } else {
         const img = src.name.endsWith('.apj') ? await parseApj(src.text!) : parseBin(src.buf ?? new TextEncoder().encode(src.text!).buffer);
-        log(`App image ${img.bytes.length} bytes`);
-        await (conn as InstanceType<typeof Px4Updater>).flash(img.bytes, log, progress);
+        log(`App image ${img.bytes.length} bytes${img.boardId ? ` (board ID ${img.boardId})` : ''}`);
+        if (!img.boardId && selectedName) log('⚠ This .bin has no board ID — only the capacity check applies. Verify the board yourself.', 'pend');
+        await (conn as InstanceType<typeof Px4Updater>).flash(img.bytes, log, progress, img.boardId);
       }
       progress(1, 1);
       log('✓ Done. Device rebooting.', 'ok');
