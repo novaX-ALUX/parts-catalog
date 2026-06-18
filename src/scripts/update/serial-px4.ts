@@ -271,14 +271,15 @@ export class Px4Updater {
     }
     await this.identify(log);
     // ---- Compatibility guards — MUST run BEFORE erase, or a wrong pick wipes the board ----
-    // (capacity catches oversized .bin/.apj; board_id is the ArduPilot-native wrong-firmware check.)
+    // board_id is the ArduPilot-native discriminator, so it's the PRIMARY check; the capacity
+    // check is only a fallback for a .bin (which carries no board_id).
+    if (expectedBoardId && this.boardId !== expectedBoardId) {
+      await this.reboot(log); // leave bootloader → boot the still-intact app
+      throw new Error(`Wrong firmware — flash aborted, nothing erased. This firmware is for board ID ${expectedBoardId}, but the connected board is ID ${this.boardId}. Select the firmware that matches this board.`);
+    }
     if (this.flashSize && image.length > this.flashSize) {
       await this.reboot(log); // leave bootloader → boot the still-intact app
       throw new Error(`Image too large — flash aborted, nothing erased. Firmware is ${(image.length / 1024) | 0} KB but this chip has only ${(this.flashSize / 1024) | 0} KB flash. Wrong firmware for this board.`);
-    }
-    if (expectedBoardId && this.boardId !== expectedBoardId) {
-      await this.reboot(log); // leave bootloader → boot the still-intact app
-      throw new Error(`Wrong firmware — flash aborted, nothing erased. This image is for board ID ${expectedBoardId}, but the connected board is ID ${this.boardId}. Select the firmware that matches this board.`);
     }
     await this.erase(log);
     const programmed = await this.program(image, log, progress);
