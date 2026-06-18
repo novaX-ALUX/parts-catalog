@@ -73,6 +73,38 @@ export class STM32Dfu {
     return `${this.dev.manufacturerName ?? 'STM32'} ${this.dev.productName ?? 'BOOTLOADER'} (0483:DF11)`;
   }
 
+  /** Internal-flash geometry from the DfuSe descriptor (alt 0): base address + total size. */
+  flashInfo(): { base: number; totalSize: number; family: 'F4' | 'F7' | 'H7' | 'unknown' } {
+    const base = this.sectors.length ? this.sectors[0].start : 0x08000000;
+    const totalSize = this.sectors.reduce((a, s) => a + s.size, 0);
+    return { base, totalSize, family: this.classifyFamily() };
+  }
+
+  /** Classify the STM32 family from the flash SECTOR SIGNATURE — the only chip identity the
+   *  ROM DFU bootloader exposes. (DBGMCU_IDCODE is NOT readable over DfuSe: Set Address to
+   *  0xE0042000 stalls with a Pipe error — verified on hardware. Only the 4 declared regions
+   *  — Internal Flash / Option Bytes / OTP / Device Feature — are accessible.)
+   *   F4 (F405): 16K boot sectors + 64K + 128K  ·  F7 (F765): 32K boot + 128K + 256K
+   *   H7 (H743/H753): uniform 128K sectors. */
+  private classifyFamily(): 'F4' | 'F7' | 'H7' | 'unknown' {
+    const sizes = this.sectors.map((s) => s.size);
+    if (!sizes.length) return 'unknown';
+    const K = 1024;
+    const min = Math.min(...sizes), max = Math.max(...sizes);
+    if (min === 16 * K) return 'F4';
+    if (min === 32 * K || max === 256 * K) return 'F7';
+    if (sizes.every((s) => s === 128 * K)) return 'H7';
+    return 'unknown';
+  }
+
+  /** Human label like CubeProgrammer's device line — derived from the descriptor layout
+   *  (NOT a silicon-ID read, which the DFU bootloader forbids). */
+  chipLabel(): string {
+    const { totalSize, family } = this.flashInfo();
+    const name = family === 'unknown' ? 'STM32 (unrecognized layout)' : `STM32${family}-class`;
+    return `${name} · ${(totalSize / 1024) | 0} KB flash`;
+  }
+
   private async dnload(wValue: number, data?: BufferSource) {
     const r = await this.dev.controlTransferOut(
       { requestType: 'class', recipient: 'interface', request: DNLOAD, value: wValue, index: this.iface },

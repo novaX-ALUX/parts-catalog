@@ -14,7 +14,7 @@ const all = [
   ...await getCollection('motor'),
   ...await getCollection('camera'),
 ];
-type Row = { product: string; version: string; kind: string; method: string; path: string; file: string; size: string };
+type Row = { product: string; version: string; kind: string; method: string; path: string; file: string; size: string; family: string; mcu: string };
 // File size in KB, read from the public/ asset at build time.
 function kbOf(webPath: string): string {
   try {
@@ -24,9 +24,12 @@ function kbOf(webPath: string): string {
 }
 const rows: Row[] = [];
 for (const e of all) {
+  // The DFU chip guard needs each board's MCU family (F4/F7/H7), read from its specs.
+  const mcu = e.data.specs?.find((s) => s.key === 'MCU')?.value || '';
+  const family = /H7/i.test(mcu) ? 'H7' : /F7/i.test(mcu) ? 'F7' : /F4/i.test(mcu) ? 'F4' : '';
   for (const fw of e.data.firmware ?? []) {
     if (fw.method && fw.webPath) {
-      rows.push({ product: e.data.name, version: fw.version, kind: fw.kind, method: fw.method, path: base + fw.webPath, file: fw.webPath.split('/').pop() || '', size: kbOf(fw.webPath) });
+      rows.push({ product: e.data.name, version: fw.version, kind: fw.kind, method: fw.method, path: base + fw.webPath, file: fw.webPath.split('/').pop() || '', size: kbOf(fw.webPath), family, mcu });
     }
   }
 }
@@ -75,7 +78,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
           <tbody data-list="fw">
             {fwRows.length === 0 && <tr><td colspan="4" class="empty">No web-flashable app firmware yet.</td></tr>}
             {fwRows.map((r, i) => (
-              <tr class="fwrow" data-method={r.method} data-path={r.path} data-name={`${r.product} ${r.version}`}>
+              <tr class="fwrow" data-method={r.method} data-path={r.path} data-name={`${r.product} ${r.version}`} data-family={r.family} data-mcu={r.mcu}>
                 <td><span class="rad" data-radio></span></td>
                 <td class="pname">{r.product}</td><td>{r.version}</td>
                 <td><code>{r.file}</code> <span class="mtag">{r.method}</span>{r.size && <span class="fsize">{r.size}</span>}</td>
@@ -85,7 +88,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
           <tbody data-list="dfu" hidden>
             {dfuRows.length === 0 && <tr><td colspan="4" class="empty">No web-flashable recovery image yet.</td></tr>}
             {dfuRows.map((r) => (
-              <tr class="fwrow" data-method={r.method} data-path={r.path} data-name={`${r.product} ${r.version}`}>
+              <tr class="fwrow" data-method={r.method} data-path={r.path} data-name={`${r.product} ${r.version}`} data-family={r.family} data-mcu={r.mcu}>
                 <td><span class="rad" data-radio></span></td>
                 <td class="pname">{r.product}</td><td>{r.version}</td>
                 <td><code>{r.file}</code> <span class="mtag">{r.method}</span>{r.size && <span class="fsize">{r.size}</span>}</td>
@@ -153,7 +156,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-06-17m · serial fix: query INFO_BL_REV before erase (fresh-BL erase unlock)';
+  const BUILD = '2026-06-17n · DFU chip guard: detect family from flash layout, block wrong chip';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -161,6 +164,8 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   let conn: any = null;
   let selectedPath: string | null = null;
   let droppedFile: File | null = null;
+  let selectedFamily: string | null = null; // F4/F7/H7 of the picked catalog firmware (DFU guard)
+  let selectedName: string | null = null;
 
   const log = (m: string, cls = '') => { const d = document.createElement('div'); if (cls) d.className = cls; d.textContent = m; logEl.appendChild(d); logEl.scrollTop = 1e9; };
   const progress = (done: number, total: number) => { barEl.style.width = total ? `${Math.round((done / total) * 100)}%` : '0'; };
@@ -177,8 +182,8 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
         const c = await STM32Dfu.autoConnect();
         if (c) {
           conn = c;
-          setStatus('● ' + (c as any).deviceLabel(), 'ok');
-          log('Reconnected to a previously authorized DFU device.', 'ok');
+          setStatus('● ' + (c as any).chipLabel(), 'ok');
+          log('Reconnected to a previously authorized DFU device. 감지된 칩: ' + (c as any).chipLabel(), 'ok');
           refreshFlashEnabled();
         }
       } catch { /* none granted — use Connect */ }
@@ -223,6 +228,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
     row.parentElement!.querySelectorAll('.fwrow').forEach((r) => r.classList.remove('sel'));
     row.classList.add('sel');
     selectedPath = row.dataset.path || null; droppedFile = null;
+    selectedFamily = row.dataset.family || null; selectedName = row.dataset.name || null;
     refreshFlashEnabled();
   }));
 
@@ -235,6 +241,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   drop.addEventListener('drop', (e) => { const f = (e as DragEvent).dataTransfer?.files?.[0]; if (f) pickFile(f); });
   function pickFile(f: File) {
     droppedFile = f; selectedPath = null;
+    selectedFamily = null; selectedName = null; // dropped file → no catalog family to match against
     document.querySelectorAll('.fwrow').forEach((r) => r.classList.remove('sel'));
     log(`File selected: ${f.name} (${f.size} bytes)`);
     refreshFlashEnabled();
@@ -245,12 +252,13 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
     try {
       if (mode === 'dfu') {
         conn = await STM32Dfu.connect();
-        setStatus('● ' + conn.deviceLabel(), 'ok');
+        setStatus('● ' + conn.chipLabel(), 'ok');
+        log('Connected. 감지된 칩: ' + conn.chipLabel(), 'ok');
       } else {
         conn = await Px4Updater.connect();
         setStatus('● serial port connected', 'ok');
+        log('Connected.', 'ok');
       }
-      log('Connected.', 'ok');
     } catch (e: any) { setStatus('connect failed', 'err'); log(String(e?.message || e), 'err'); conn = null; }
     refreshFlashEnabled();
   });
@@ -279,6 +287,23 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
         const text = src.text ?? new TextDecoder().decode(new Uint8Array(src.buf!));
         const hex = parseIntelHex(text);
         log(`HEX 0x${hex.minAddress.toString(16)}–0x${hex.maxAddress.toString(16)}, ${hex.totalBytes} bytes`);
+        // ---- chip guard: stop a wrong-chip flash before erasing anything ----
+        const info = (conn as InstanceType<typeof STM32Dfu>).flashInfo();
+        log(`연결된 칩: ${(conn as InstanceType<typeof STM32Dfu>).chipLabel()}`);
+        // A) capacity: the image must fit the device's flash (blocks bigger-chip firmware).
+        if (hex.maxAddress > info.base + info.totalSize) {
+          throw new Error(`칩 불일치 — 플래시 중단. 이 펌웨어는 0x${hex.maxAddress.toString(16)}까지 쓰는데, 연결된 칩 플래시는 ${(info.totalSize / 1024) | 0}KB(0x${(info.base + info.totalSize).toString(16)}까지)입니다. 더 큰 칩용 펌웨어입니다.`);
+        }
+        // B) family: a catalog firmware knows its target family — block cross-family flashes.
+        if (selectedFamily && info.family !== 'unknown' && selectedFamily !== info.family) {
+          throw new Error(`칩 불일치 — 플래시 중단. 선택한 펌웨어는 STM32${selectedFamily}-class(${selectedName})인데, 연결된 보드는 STM32${info.family}-class입니다. 잘못된 보드입니다.`);
+        }
+        if (selectedFamily && info.family === 'unknown') {
+          log('⚠ 칩 패밀리 자동판별 실패 — 용량 검사만 통과. 보드를 직접 확인하세요.', 'pend');
+        }
+        if (droppedFile) {
+          log('드래그한 파일 — 카탈로그 칩 매칭 생략(용량만 검사). 올바른 보드인지 직접 확인하세요.', 'pend');
+        }
         await (conn as InstanceType<typeof STM32Dfu>).flash(hex, log, progress);
       } else {
         const img = src.name.endsWith('.apj') ? await parseApj(src.text!) : parseBin(src.buf ?? new TextEncoder().encode(src.text!).buffer);
