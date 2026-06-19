@@ -242,10 +242,14 @@ export class Px4Updater {
   async enterRomDfu(log: Log) {
     log('App mode → entering ROM DFU (MAVLink param4=99 magic) …');
     try { await this.io.write(ENTER_DFU_MAVLINK); } catch { /* port drops as USB resets */ }
-    await sleep(300);
+    // Release/close the host serial port IMMEDIATELY — before the board resets (~tens of ms
+    // later). If the browser keeps COM open while the device drops and the ST ROM DFU
+    // re-enumerates, Windows intermittently fails the new device's descriptor read
+    // (the "0000:0002 / device descriptor request failed" symptom). Closing first avoids it.
     await this.io.release();
     try { await this.port.close(); } catch { /**/ }
-    log('DFU command sent — board should re-appear as STM32 DFU (0483:DF11). Switch to DFU Recovery to flash.');
+    await sleep(200);
+    log('DFU command sent — board should re-appear as STM32 DFU (0483:DF11).');
   }
 
   /** After the device resets, re-acquire the bootloader port. The bootloader may

@@ -157,7 +157,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-06-19 · Software DFU button (app→param4=99→ROM DFU); F405 layout fallback for DFU chip detect';
+  const BUILD = '2026-06-19b · close serial before reset (fix 0000:0002 re-enum); single Enter DFU btn';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
