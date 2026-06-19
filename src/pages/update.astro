@@ -53,7 +53,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
       </div>
 
       <p class="mode-note" data-note="fw">Normal update over USB — device stays running, no jumper. Switch to <b>DFU Recovery</b> only if the board is blank or won't boot.</p>
-      <p class="mode-note" data-note="dfu" hidden>Low-level recovery: re-flashes bootloader + app. Hold <b>BOOT0</b> and plug in USB, then connect. Windows needs a one-time WinUSB driver (Zadig).</p>
+      <p class="mode-note" data-note="dfu" hidden>Re-flashes bootloader + app. If the board still runs, just click <b>🛠 Enter DFU (no BOOT0)</b> — it puts the board into DFU over USB for you. (No button? boards without BOOT0 use this.) Only hold <b>BOOT0</b> if the board is blank/bricked. Windows needs a one-time WinUSB driver (Zadig).</p>
 
       <div class="banner" data-banner="fw">
         <div class="step"><b>① Connect</b>Just plug in USB-C. No BOOT0 jumper.</div>
@@ -61,14 +61,14 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
         <div class="step good"><b>③ Driver</b>None — standard USB serial (CDC).</div>
       </div>
       <div class="banner" data-banner="dfu" hidden>
-        <div class="step"><b>① Enter DFU</b>Hold BOOT0 and plug in USB, then release.</div>
+        <div class="step"><b>① Enter DFU</b>Board still runs? Click 🛠 Enter DFU (no BOOT0). Blank board? Hold BOOT0 + plug in USB.</div>
         <div class="step"><b>② Browser</b>Chrome or Edge (desktop). Uses WebUSB.</div>
         <div class="step warn"><b>③ Windows</b>One-time WinUSB driver via Zadig.</div>
       </div>
 
       <div class="row-connect">
         <button id="connect" class="btn btn-line">🔌 Connect</button>
-        <button id="softdfu" class="btn btn-line" title="버튼 없는 보드: 앱에서 소프트웨어로 ROM DFU 진입 (펌웨어 ≥ v0.2.2 / T10 v0.3.2)">🛠 Software DFU</button>
+        <button id="softdfu" class="btn btn-line" hidden title="BOOT0 버튼 없는 보드: 실행 중인 앱에 명령을 보내 소프트웨어로 ROM DFU 진입 (펌웨어 ≥ v0.2.2 / T10 v0.3.2)">🛠 Enter DFU (no BOOT0)</button>
         <span id="status" class="chip">Not connected</span>
       </div>
 
@@ -228,7 +228,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
     $('#flowhint').textContent = mode === 'dfu' ? 'erase → write → verify → leave DFU' : 'reboot to bootloader → erase → program → verify → boot';
     $('#flash').textContent = mode === 'dfu' ? '⚡ Flash (DFU)' : '⚡ Update firmware';
     ($('[data-droptypes]') as HTMLElement).textContent = mode === 'dfu' ? '.hex' : '.apj / .bin';
-    ($('#softdfu') as HTMLElement).hidden = (mode !== 'fw'); // software-DFU entry is a serial(app) action
+    ($('#softdfu') as HTMLElement).hidden = (mode !== 'dfu'); // shown in DFU Recovery: software entry to ROM DFU (no BOOT0)
     // reset connection/selection on mode switch (different transport)
     if (conn) { conn.close?.(); conn = null; }
     selectedPath = null; droppedFile = null;
@@ -242,16 +242,26 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   // user switches to DFU Recovery (WebUSB) to flash. Requires firmware whose bootloader has
   // ENABLE_DFU_BOOT (novaX ≥ v0.2.2 / T10 ≥ v0.3.2). ----
   $('#softdfu').addEventListener('click', async () => {
-    if (mode !== 'fw') return;
-    if (!conn) { setStatus('Connect first (Firmware Update)', 'err'); return; }
+    if (mode !== 'dfu') return;
     try {
-      log('Software DFU: sending boot-to-DFU magic (param4=99) over serial …', 'pend');
-      await (conn as InstanceType<typeof Px4Updater>).enterRomDfu(log);
-      conn = null; refreshFlashEnabled();
-      log('→ Now click "DFU Recovery", then Connect, pick the *_with_bl.hex, and Flash.', 'ok');
-      setStatus('Entered DFU — switch to DFU Recovery to flash', 'ok');
+      setStatus('Software DFU: select the running board (Web Serial) …', 'pend');
+      log('Software DFU: connecting to the running app over Web Serial …', 'pend');
+      const px4 = await Px4Updater.connect();                  // pick the board's COM port (app)
+      log('Sending boot-to-DFU magic (param4=99) …', 'pend');
+      await px4.enterRomDfu(log);                              // app drops USB & resets into ROM DFU
+      log('Waiting for the board to re-appear as STM32 DFU (0483:DF11) …', 'pend');
+      let c: any = null;
+      for (let i = 0; i < 20 && !c; i++) { await new Promise((r) => setTimeout(r, 400)); try { c = await STM32Dfu.autoConnect(); } catch { /* not granted yet */ } }
+      if (c) {
+        conn = c; setStatus('● ' + c.chipLabel(), 'ok');
+        log('DFU device connected (' + c.chipLabel() + '). Pick the *_with_bl.hex and click Flash.', 'ok');
+      } else {
+        conn = null; setStatus('Board in DFU — click Connect to authorize WebUSB', 'ok');
+        log('Board is in DFU. Click Connect once (first time grants the WebUSB device), then Flash.', 'ok');
+      }
+      refreshFlashEnabled();
     } catch (e: any) {
-      log('Software DFU failed: ' + (e?.message || e) + ' (needs firmware ≥ v0.2.2 / T10 v0.3.2)', 'err');
+      log('Software DFU failed: ' + (e?.message || e) + ' — board needs firmware whose bootloader has DFU (novaX ≥ v0.2.2 / T10 v0.3.2).', 'err');
       setStatus('Software DFU failed', 'err');
     }
   });
