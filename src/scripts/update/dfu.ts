@@ -207,8 +207,15 @@ export class STM32Dfu {
 
   /** Erase → program → verify-by-leave for the parsed HEX image. */
   async flash(hex: ParsedHex, log: Log, progress: Progress) {
-    const eraseStarts = this.sectorsInRange(hex.minAddress, hex.maxAddress);
-    log(`Erase ${eraseStarts.length} sector(s) over 0x${hex.minAddress.toString(16)}–0x${hex.maxAddress.toString(16)} …`);
+    // Full-chip erase: wipe EVERY internal-flash sector, not just the ones this image
+    // covers, so any leftover firmware/parameters in the sectors above the new image are
+    // removed. DFU Recovery always flashes a full bootloader+app (_with_bl.hex), so a clean
+    // whole-chip wipe is correct. (The DfuSe ROM bootloader has no single mass-erase command,
+    // so we erase every sector in the layout; 0x08000000–0xffffffff selects them all.)
+    const eraseStarts = this.sectorsInRange(0x08000000, 0xffffffff);
+    const last = this.sectors[this.sectors.length - 1];
+    const end = last.start + last.size;
+    log(`Erase ${eraseStarts.length} sector(s) — full chip 0x${(0x08000000).toString(16)}–0x${end.toString(16)} …`);
     for (let i = 0; i < eraseStarts.length; i++) {
       await this.dfuseCmd(0x41, eraseStarts[i]);
       progress(Math.round(((i + 1) / eraseStarts.length) * 300), 1000); // erase = first 0–30%
