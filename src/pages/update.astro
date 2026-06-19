@@ -68,6 +68,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
 
       <div class="row-connect">
         <button id="connect" class="btn btn-line">🔌 Connect</button>
+        <button id="softdfu" class="btn btn-line" title="버튼 없는 보드: 앱에서 소프트웨어로 ROM DFU 진입 (펌웨어 ≥ v0.2.2 / T10 v0.3.2)">🛠 Software DFU</button>
         <span id="status" class="chip">Not connected</span>
       </div>
 
@@ -156,7 +157,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-06-17t · clearer re-enumeration-fail message (replug / use DFU); reboot USB quirk is firmware-level';
+  const BUILD = '2026-06-19 · Software DFU button (app→param4=99→ROM DFU); F405 layout fallback for DFU chip detect';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -227,6 +228,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
     $('#flowhint').textContent = mode === 'dfu' ? 'erase → write → verify → leave DFU' : 'reboot to bootloader → erase → program → verify → boot';
     $('#flash').textContent = mode === 'dfu' ? '⚡ Flash (DFU)' : '⚡ Update firmware';
     ($('[data-droptypes]') as HTMLElement).textContent = mode === 'dfu' ? '.hex' : '.apj / .bin';
+    ($('#softdfu') as HTMLElement).hidden = (mode !== 'fw'); // software-DFU entry is a serial(app) action
     // reset connection/selection on mode switch (different transport)
     if (conn) { conn.close?.(); conn = null; }
     selectedPath = null; droppedFile = null;
@@ -234,6 +236,25 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
     setStatus('Not connected'); refreshFlashEnabled();
     autoDetect();
   }));
+
+  // ---- Software DFU (no BOOT0 button): from the running app (Web Serial), send the
+  // ArduPilot boot-to-DFU magic; the board resets into the ST ROM DFU (0483:DF11). Then the
+  // user switches to DFU Recovery (WebUSB) to flash. Requires firmware whose bootloader has
+  // ENABLE_DFU_BOOT (novaX ≥ v0.2.2 / T10 ≥ v0.3.2). ----
+  $('#softdfu').addEventListener('click', async () => {
+    if (mode !== 'fw') return;
+    if (!conn) { setStatus('Connect first (Firmware Update)', 'err'); return; }
+    try {
+      log('Software DFU: sending boot-to-DFU magic (param4=99) over serial …', 'pend');
+      await (conn as InstanceType<typeof Px4Updater>).enterRomDfu(log);
+      conn = null; refreshFlashEnabled();
+      log('→ Now click "DFU Recovery", then Connect, pick the *_with_bl.hex, and Flash.', 'ok');
+      setStatus('Entered DFU — switch to DFU Recovery to flash', 'ok');
+    } catch (e: any) {
+      log('Software DFU failed: ' + (e?.message || e) + ' (needs firmware ≥ v0.2.2 / T10 v0.3.2)', 'err');
+      setStatus('Software DFU failed', 'err');
+    }
+  });
 
   // After a Reload, restore the saved mode (carried in ?mode=…) so USB re-detects on the
   // right transport — WebSerial for FW, WebUSB for DFU.

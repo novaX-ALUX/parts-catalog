@@ -31,6 +31,22 @@ const REBOOT_BL_MAVLINK = new Uint8Array([
   0x26, 0xd2,                                                  // X.25 checksum
 ]);
 
+// MAVLink1 COMMAND_LONG: MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN(246) with the ArduPilot
+// "boot to DFU" magic (param1=42, param2=24, param3=71, param4=99) → hal.util->boot_to_dfu():
+// the app drops USB and resets, the (DFU-enabled) bootloader jumps to the ST ROM DFU
+// (0483:DF11). Frame generated with pymavlink (same encoder as REBOOT_BL_MAVLINK above).
+// NOTE: requires firmware whose bootloader has ENABLE_DFU_BOOT (novaX ≥ v0.2.2 / T10 ≥ v0.3.2).
+const ENTER_DFU_MAVLINK = new Uint8Array([
+  0xfe, 0x21, 0x00, 0xff, 0x00, 0x4c,                          // STX,len=33,seq,sys=255,comp,msgid=76
+  0x00, 0x00, 0x28, 0x42,                                      // param1 = 42.0
+  0x00, 0x00, 0xc0, 0x41,                                      // param2 = 24.0
+  0x00, 0x00, 0x8e, 0x42,                                      // param3 = 71.0
+  0x00, 0x00, 0xc6, 0x42,                                      // param4 = 99.0
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                          // param5..7 = 0
+  0xf6, 0x00, 0x01, 0x00, 0x00,                                // cmd=246, tsys=1, tcomp=0, conf=0
+  0x98, 0x06,                                                  // X.25 checksum
+]);
+
 // PX4 bootloader CRC-32: poly 0xedb88320, init=0, NO final XOR. Verified against the device
 // on real hardware (zlib's init 0xFFFFFFFF + final XOR mismatches).
 const CRC_TABLE = (() => {
@@ -217,6 +233,19 @@ export class Px4Updater {
     log('App mode → rebooting to bootloader (MAVLink REBOOT_SHUTDOWN) …');
     try { await this.io.write(REBOOT_BL_MAVLINK); } catch { /* port may drop immediately */ }
     await sleep(500);
+  }
+
+  /** Send the ArduPilot "boot to DFU" magic over the open serial port, then release it.
+   *  The running app drops USB and resets; the (ENABLE_DFU_BOOT) bootloader then jumps to
+   *  the ST ROM DFU (0483:DF11), which the caller flashes over WebUSB (see dfu.ts).
+   *  Requires firmware whose bootloader has ENABLE_DFU_BOOT (novaX ≥ v0.2.2 / T10 ≥ v0.3.2). */
+  async enterRomDfu(log: Log) {
+    log('App mode → entering ROM DFU (MAVLink param4=99 magic) …');
+    try { await this.io.write(ENTER_DFU_MAVLINK); } catch { /* port drops as USB resets */ }
+    await sleep(300);
+    await this.io.release();
+    try { await this.port.close(); } catch { /**/ }
+    log('DFU command sent — board should re-appear as STM32 DFU (0483:DF11). Switch to DFU Recovery to flash.');
   }
 
   /** After the device resets, re-acquire the bootloader port. The bootloader may
