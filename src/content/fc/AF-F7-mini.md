@@ -30,22 +30,22 @@ description: |
   AF-F7 mini is an F7-class flight controller powered by the STM32F765 running at 216 MHz. Dual IMUs (ICM-20689 primary, ICM-20602 / BMI055 secondary), an IST8310 magnetometer and an MS5611 barometer deliver redundant attitude, heading and altitude sensing. 8 PWM outputs, 4 UARTs, 3 I²C ports and 2 CAN buses cover mid-range UAV payload stacks running ArduPilot or PX4.
 firmware:
   - kind: "ArduPilot (.apj package)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.2.1/AF-F7_mini-v0.2.1.apj
-    version: "0.2.1"
-    date: "2026-06-18"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.2.2/AF-F7_mini-v0.2.2.apj
+    version: "0.2.2"
+    date: "2026-06-19"
     size: "1.4 MB"
-    sha256: "8f9eec841c1e9b6f446a8701d914642aca9bff7ec7528380803b8ae4ceb282d9"
+    sha256: "93c5e78206f6ac495192aad95f918ac4ef2078efce358ccd7218b59f7f93be45"
     notes: "ArduPilot Copter app. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater → Firmware Update."
     method: ardupilot
-    webPath: /firmware/AF-F7_mini-v0.2.1.apj
+    webPath: /firmware/AF-F7_mini-v0.2.2.apj
   - kind: "Bootloader + App (merged HEX · DFU / SWD)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.2.1/AF-F7_mini-v0.2.1_with_bl.hex
-    version: "0.2.1"
-    date: "2026-06-18"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.2.2/AF-F7_mini-v0.2.2_with_bl.hex
+    version: "0.2.2"
+    date: "2026-06-19"
     size: "4.6 MB"
-    sha256: "06523198b53c2f588a8d93971a293fa4bb65ea4f632e86b9d1ea0d93b39c86ff"
+    sha256: "acd131dd4887752c9f93d7098d0a897113229d7f304984e3f1f86342ece3e96b"
     notes: "Bootloader + application combined image based at 0x08000000. Flash via the catalog Web Updater → DFU Recovery (hold BOOT0) or SWD/ST-Link for a blank/bricked board."
     method: dfu
-    webPath: /firmware/AF-F7_mini-v0.2.1_with_bl.hex
+    webPath: /firmware/AF-F7_mini-v0.2.2_with_bl.hex
 firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases'
 ---
