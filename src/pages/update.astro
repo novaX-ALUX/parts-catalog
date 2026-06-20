@@ -38,8 +38,14 @@ rows.sort((a, b) =>
   a.product.localeCompare(b.product, 'en', { numeric: true, sensitivity: 'base' })
   || a.version.localeCompare(b.version, 'en', { numeric: true })
 );
-const fwRows = rows.filter((r) => r.method !== 'dfu');
-const dfuRows = rows.filter((r) => r.method === 'dfu');
+// Only AF-F4 is exposed on the Update tab for now: it is the only family whose
+// full web flow (incl. software DFU) is verified. H7/F7 web update is hidden
+// until their DFU path works (their firmware files are kept, just not listed).
+const fwRows = rows.filter((r) => r.method !== 'dfu' && r.family === 'F4');
+// Software/USB DFU is only verified on F4. On H7 the software boot-to-DFU path
+// (param4=99 -> ST ROM) leaves USB dark and bricks the board until SWD recovery
+// (silicon-level, see HANDOFF), so only F4 recovery images are offered here.
+const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
 ---
 <Layout title="Firmware Update — novaX Catalog" activeCategory="update">
   <section class="detail-body">
@@ -53,7 +59,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
       </div>
 
       <p class="mode-note" data-note="fw">Normal update over USB — device stays running, no jumper. Switch to <b>DFU Recovery</b> only if the board is blank or won't boot.</p>
-      <p class="mode-note" data-note="dfu" hidden>Re-flashes bootloader + app. If the board still runs, just click <b>🛠 Enter DFU</b> — it puts the board into DFU over USB for you. Only hold <b>BOOT0</b> if the board is blank/bricked. Windows needs a one-time WinUSB driver (Zadig).</p>
+      <p class="mode-note" data-note="dfu" hidden><b>AF-F4 only.</b> Pick an AF-F4 recovery image, then click <b>🛠 Enter DFU</b> — it puts the board into DFU over USB for you. Software DFU is not available for H7/F7 boards (use the <b>Firmware Update</b> tab for those). Windows needs a one-time WinUSB driver (Zadig).</p>
 
       <div class="banner" data-banner="fw">
         <div class="step"><b>① Connect</b>Just plug in USB-C. No BOOT0 jumper.</div>
@@ -157,7 +163,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-06-19b · close serial before reset (fix 0000:0002 re-enum); single Enter DFU btn';
+  const BUILD = '2026-06-20 · software DFU restricted to AF-F4 (H7/F7 soft-DFU bricks; ROM-jump goes dark)';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -228,7 +234,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
     $('#flowhint').textContent = mode === 'dfu' ? 'erase → write → verify → leave DFU' : 'reboot to bootloader → erase → program → verify → boot';
     $('#flash').textContent = mode === 'dfu' ? '⚡ Flash (DFU)' : '⚡ Update firmware';
     ($('[data-droptypes]') as HTMLElement).textContent = mode === 'dfu' ? '.hex' : '.apj / .bin';
-    ($('#softdfu') as HTMLElement).hidden = (mode !== 'dfu'); // shown in DFU Recovery: software entry to ROM DFU (no BOOT0)
+    ($('#softdfu') as HTMLElement).hidden = true; // software DFU entry is shown only after an F4 recovery image is picked (F4-only; H7 soft-DFU bricks)
     connectBtn.hidden = (mode === 'dfu'); // DFU Recovery uses the single "Enter DFU (no BOOT0)" button (it connects too)
     // reset connection/selection on mode switch (different transport)
     if (conn) { conn.close?.(); conn = null; }
@@ -244,6 +250,12 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   // ENABLE_DFU_BOOT (novaX ≥ v0.2.2 / T10 ≥ v0.3.2). ----
   $('#softdfu').addEventListener('click', async () => {
     if (mode !== 'dfu') return;
+    // F4-only guard: the software boot-to-DFU magic bricks H7 (USB dark + ROM stuck).
+    if (selectedFamily !== 'F4') {
+      log('Software DFU (Enter DFU) is only supported on AF-F4 boards — pick an AF-F4 recovery image first. On H7/F7 the software path does not enter DFU and can brick the board.', 'err');
+      setStatus('Software DFU: AF-F4 only', 'err');
+      return;
+    }
     try {
       // 0) Already in DFU (e.g. BOOT0, or a previous run) and authorized? Use it directly —
       //    no serial step, no extra dialog. Keeps the old BOOT0 workflow working too.
@@ -287,6 +299,8 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
     row.classList.add('sel');
     selectedPath = row.dataset.path || null; droppedFile = null;
     selectedFamily = row.dataset.family || null; selectedName = row.dataset.name || null;
+    // Software DFU (Enter DFU) is F4-only — reveal the button only for an F4 pick.
+    ($('#softdfu') as HTMLElement).hidden = !(mode === 'dfu' && selectedFamily === 'F4');
     refreshFlashEnabled();
   }));
 
@@ -300,6 +314,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu');
   function pickFile(f: File) {
     droppedFile = f; selectedPath = null;
     selectedFamily = null; selectedName = null; // dropped file → no catalog family to match against
+    ($('#softdfu') as HTMLElement).hidden = true; // unknown family for a dropped file → no software DFU button
     document.querySelectorAll('.fwrow').forEach((r) => r.classList.remove('sel'));
     log(`File selected: ${f.name} (${f.size} bytes)`);
     refreshFlashEnabled();
