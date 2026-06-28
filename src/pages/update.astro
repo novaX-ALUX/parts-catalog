@@ -163,7 +163,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-06-20 · software DFU restricted to AF-F4 (H7/F7 soft-DFU bricks; ROM-jump goes dark)';
+  const BUILD = '2026-06-28 · AF-F4_T10_nano v0.3.4 (SD-card logging restored: FATFS re-enabled)';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
