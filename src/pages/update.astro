@@ -74,7 +74,8 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
 
       <div class="row-connect">
         <button id="connect" class="btn btn-line">🔌 Connect</button>
-        <button id="softdfu" class="btn btn-line" hidden title="실행 중인 보드를 소프트웨어로 ROM DFU에 진입시키고 WebUSB로 연결 (펌웨어 ≥ v0.2.2 / T10 v0.3.2)">🛠 Enter DFU</button>
+        <button id="softdfu" class="btn btn-line" hidden title="실행 중인 보드를 소프트웨어로 ROM DFU에 진입시킴 (펌웨어 ≥ v0.2.2 / T10 v0.3.2)">🛠 Enter DFU</button>
+        <button id="dfuconnect" class="btn btn-line" hidden title="보드가 DFU(0483:DF11)에 있을 때 WebUSB 장치 선택 팝업을 새 클릭으로 열어 연결 (브라우저 제스처 요구 우회)">🔌 Connect DFU device</button>
         <span id="status" class="chip">Not connected</span>
       </div>
 
@@ -163,7 +164,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-06-28 · AF-F4_T10_nano v0.3.4 (SD-card logging restored: FATFS re-enabled)';
+  const BUILD = '2026-07-01 · software DFU: split Enter-DFU / Connect-DFU (fixes WebUSB "user gesture" on first-time DFU grant)';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -235,6 +236,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
     $('#flash').textContent = mode === 'dfu' ? '⚡ Flash (DFU)' : '⚡ Update firmware';
     ($('[data-droptypes]') as HTMLElement).textContent = mode === 'dfu' ? '.hex' : '.apj / .bin';
     ($('#softdfu') as HTMLElement).hidden = true; // software DFU entry is shown only after an F4 recovery image is picked (F4-only; H7 soft-DFU bricks)
+    ($('#dfuconnect') as HTMLElement).hidden = true; // shown only after Enter DFU puts the board in DFU
     connectBtn.hidden = (mode === 'dfu'); // DFU Recovery uses the single "Enter DFU (no BOOT0)" button (it connects too)
     // reset connection/selection on mode switch (different transport)
     if (conn) { conn.close?.(); conn = null; }
@@ -274,16 +276,43 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
         } catch (e: any) {
           log('Serial step skipped (' + (e?.message || e) + ') — board may already be in DFU.', 'pend');
         }
-        // 2) Connect the DFU device over WebUSB: auto if authorized, else show the picker.
+        // 2) Try a silent reconnect (already-authorized device). The WebUSB picker
+        //    (requestDevice) CANNOT run here: the awaits above (serial + re-enum wait)
+        //    consumed the click's user-gesture, so the browser would throw
+        //    "Must be handling a user gesture". Instead reveal "Connect DFU device" so the
+        //    user opens the picker in a FRESH click (see #dfuconnect handler).
         c = await STM32Dfu.autoConnect().catch(() => null);
-        if (!c) c = await STM32Dfu.connect();                  // WebUSB device picker (one-time grant)
+        if (!c) {
+          log('Board should now be in STM32 DFU (0483:DF11). Click "🔌 Connect DFU device" to grant one-time access — the browser device picker needs a fresh click.', 'pend');
+          setStatus('Click "Connect DFU device"', 'pend');
+          ($('#dfuconnect') as HTMLElement).hidden = false;
+          return;
+        }
       }
       conn = c; setStatus('● ' + c.chipLabel(), 'ok');
       log('DFU connected (' + c.chipLabel() + '). Pick the *_with_bl.hex and click Flash (DFU).', 'ok');
       refreshFlashEnabled();
     } catch (e: any) {
-      log('Software DFU failed: ' + (e?.message || e) + ' — board needs firmware whose bootloader has DFU (novaX ≥ v0.2.2 / T10 v0.3.2).', 'err');
+      log('Software DFU failed: ' + (e?.message || e) + ' — if the board never entered DFU, its bootloader may lack ENABLE_DFU_BOOT (novaX ≥ v0.2.2 / T10 v0.3.2); otherwise use BOOT0.', 'err');
       setStatus('Software DFU failed', 'err');
+    }
+  });
+
+  // (a)+(b) — connect the DFU device in a FRESH user-gesture. STM32Dfu.connect() calls
+  // navigator.usb.requestDevice() (the WebUSB device picker) as the FIRST thing in this
+  // handler, so the browser allows it — unlike the #softdfu flow where the re-enumeration
+  // wait consumes the gesture. Revealed by #softdfu once the board is in DFU; also works
+  // directly for a BOOT0 board already sitting in 0483:DF11.
+  $('#dfuconnect').addEventListener('click', async () => {
+    try {
+      const c: any = await STM32Dfu.connect();               // navigator.usb.requestDevice(...) → picker
+      ($('#dfuconnect') as HTMLElement).hidden = true;
+      conn = c; setStatus('● ' + c.chipLabel(), 'ok');
+      log('DFU connected (' + c.chipLabel() + '). Pick the *_with_bl.hex and click Flash (DFU).', 'ok');
+      refreshFlashEnabled();
+    } catch (e: any) {
+      log('DFU connect failed: ' + (e?.message || e), 'err');
+      setStatus('DFU connect failed', 'err');
     }
   });
 
@@ -301,6 +330,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
     selectedFamily = row.dataset.family || null; selectedName = row.dataset.name || null;
     // Software DFU (Enter DFU) is F4-only — reveal the button only for an F4 pick.
     ($('#softdfu') as HTMLElement).hidden = !(mode === 'dfu' && selectedFamily === 'F4');
+    ($('#dfuconnect') as HTMLElement).hidden = true; // reset; #softdfu reveals it when the board is in DFU
     refreshFlashEnabled();
   }));
 
