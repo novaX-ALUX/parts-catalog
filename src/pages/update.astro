@@ -68,8 +68,9 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
       </div>
       <div class="banner" data-banner="dfu" hidden>
         <div class="step"><b>① Enter DFU</b>Board still runs? Click 🛠 Enter DFU — picks COM port, sends DFU command. Blank board? Hold BOOT0 + plug in USB.</div>
-        <div class="step"><b>② Flash</b>Pick the matching <code>_with_bl.hex</code>, then Flash (DFU). Chrome/Edge desktop.</div>
-        <div class="step warn"><b>③ Windows</b>WebUSB needs a one-time WinUSB driver (Zadig) on the DFU device.</div>
+        <div class="step"><b>② Connect DFU</b>Click 🔌 Connect DFU device — pick the STM32 DFU device (0483:DF11) in the browser popup. Already granted? Auto-connects.</div>
+        <div class="step"><b>③ Flash</b>Pick the matching <code>_with_bl.hex</code>, then Flash (DFU). Chrome/Edge desktop.</div>
+        <div class="step warn"><b>④ Windows</b>WebUSB needs a one-time WinUSB driver (Zadig) on the DFU device.</div>
       </div>
 
       <div class="row-connect">
@@ -190,8 +191,8 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
         const c = await STM32Dfu.autoConnect();
         if (c) {
           conn = c;
-          setStatus('● ' + (c as any).chipLabel(), 'ok');
-          log('Reconnected to a previously authorized DFU device. Detected chip: ' + (c as any).chipLabel(), 'ok');
+          setStatus('● ' + (c as any).chipLabel() + ' — pick firmware', 'ok');
+          log('Already in DFU — reconnected to the authorized DFU device (' + (c as any).chipLabel() + '). No Enter DFU / Connect needed: just pick a firmware below and click Flash (DFU).', 'ok');
           refreshFlashEnabled();
         }
       } catch { /* none granted — use Connect */ }
