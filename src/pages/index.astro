@@ -8,7 +8,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 const cats: Record<string, { id: string; data: any }[]> = {};
 for (const c of CATEGORY_ORDER) {
-  const items = await getCollection(c as any);
+  const items = (await getCollection(c as any)).filter((i: any) => !i.data.hidden);
   cats[c] = items.sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999));
 }
 

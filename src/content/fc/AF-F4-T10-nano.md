@@ -5,6 +5,7 @@ image: /images/products/fc_F405_nano.png
 pictureKey: fc_F405_nano
 pinoutImage: /images/products/fc_F405_nano_pinout.png
 order: 11
+hidden: true   # 공개 카탈로그(카드 + /fc/af-f4-t10-nano/ 제품페이지)에서 제외. update 탭 펌웨어 목록은 유지.
 specs:
   - { key: MCU, value: "STM32F405" }
   - { key: IMU, value: "ICM-42688-P" }

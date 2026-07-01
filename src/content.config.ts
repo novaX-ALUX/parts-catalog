@@ -13,6 +13,7 @@ const baseSchema = z.object({
   pictureKey: z.string().optional(),
   datasheet: z.string().optional(),
   order: z.number().default(999),
+  hidden: z.boolean().optional().default(false), // exclude from public catalog card + product page (update tool still lists firmware)
   specs: z.array(specPair)
 });
 

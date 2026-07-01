@@ -8,7 +8,7 @@ import Linkify from '../../components/Linkify.astro';
 import { CATEGORY_LABEL } from '../../content.config';
 
 export async function getStaticPaths() {
-  const items = await getCollection('fc');
+  const items = (await getCollection('fc')).filter((i) => !i.data.hidden);
   return items.map((item) => ({ params: { slug: item.id }, props: { item } }));
 }
 const { item } = Astro.props;
