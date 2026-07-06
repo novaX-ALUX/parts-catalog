@@ -170,7 +170,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-07-03 · DFU firmware-first + guided flow: next button pulses, others disabled (no out-of-order clicks); Connect-DFU shown directly for boards already in DFU';
+  const BUILD = '2026-07-04 · DFU: clear WinUSB/Zadig guidance on connect-fail (blank-board first flash) + "blank board → DFU Recovery" hint on the normal tab';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -342,8 +342,15 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
       log('DFU connected (' + c.chipLabel() + '). Pick the *_with_bl.hex and click Flash (DFU).', 'ok');
       refreshFlashEnabled();
     } catch (e: any) {
-      log('DFU connect failed: ' + (e?.message || e), 'err');
+      const msg = String(e?.message || e);
+      log('DFU connect failed: ' + msg, 'err');
       setStatus('DFU connect failed', 'err');
+      // #1 cause on Windows: the STM32 DFU device is not bound to WinUSB, so Chrome cannot
+      // claim it. Give the operator the exact one-time fix instead of a cryptic error.
+      if (/claim|access|denied|InvalidState|SecurityError|Unable|protected|blocklist/i.test(msg))
+        log('→ Windows driver: this DFU device needs WinUSB. Run Zadig ONCE — pick "STM32 BOOTLOADER" (0483:DF11) → WinUSB → Install/Replace Driver → then click 🔌 Connect DFU device again. One-time per PC/USB port.', 'pend');
+      else if (/No device|NotFound|selected/i.test(msg))
+        log('→ No STM32 DFU (0483:DF11) offered. Blank/new board? Hold BOOT0 + replug to enter DFU. Already in DFU but not listed? Windows needs the WinUSB driver (Zadig, as above).', 'pend');
     }
   });
 
@@ -396,7 +403,13 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
         setStatus('● serial port connected', 'ok');
         log('Connected.', 'ok');
       }
-    } catch (e: any) { setStatus('connect failed', 'err'); log(String(e?.message || e), 'err'); conn = null; }
+    } catch (e: any) {
+      setStatus('connect failed', 'err'); conn = null;
+      log(String(e?.message || e), 'err');
+      if (mode !== 'dfu')
+        // A NEW/blank board (or one already in DFU) has no COM port — the normal tab can't see it.
+        log('→ No serial port. A NEW / blank board — or a board already in DFU — has no COM port. Click the 🛠 DFU Recovery tab above, pick the *_with_bl.hex, then 🔌 Connect DFU device.', 'pend');
+    }
     refreshFlashEnabled();
   });
 
