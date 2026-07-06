@@ -59,7 +59,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
       </div>
 
       <p class="mode-note" data-note="fw">Normal update over USB — device stays running, no jumper. Switch to <b>DFU Recovery</b> only if the board is blank or won't boot.</p>
-      <p class="mode-note" data-note="dfu" hidden><b>AF-F4 only.</b> Pick an AF-F4 recovery image, then click <b>🛠 Enter DFU</b> — it puts the board into DFU over USB for you. Software DFU is not available for H7/F7 boards (use the <b>Firmware Update</b> tab for those). Windows needs a one-time WinUSB driver (Zadig).</p>
+      <p class="mode-note" data-note="dfu" hidden><b>AF-F4 only.</b> <b>First pick an AF-F4 recovery image below</b>, then click <b>🛠 Enter DFU</b> (running board) or hold <b>BOOT0</b> + plug in USB (blank board) — it enters DFU over USB. Software DFU is not available for H7/F7 boards (use the <b>Firmware Update</b> tab for those). Windows needs a one-time WinUSB driver (Zadig).</p>
 
       <div class="banner" data-banner="fw">
         <div class="step"><b>① Connect</b>Just plug in USB-C. No BOOT0 jumper.</div>
@@ -67,10 +67,11 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
         <div class="step good"><b>③ Driver</b>None — standard USB serial (CDC).</div>
       </div>
       <div class="banner" data-banner="dfu" hidden>
-        <div class="step"><b>① Enter DFU</b>Board still runs? Click 🛠 Enter DFU — picks COM port, sends DFU command. Blank board? Hold BOOT0 + plug in USB.</div>
-        <div class="step"><b>② Connect DFU</b>Click 🔌 Connect DFU device — pick the STM32 DFU device (0483:DF11) in the browser popup. Already granted? Auto-connects.</div>
-        <div class="step"><b>③ Flash</b>Pick the matching <code>_with_bl.hex</code>, then Flash (DFU). Chrome/Edge desktop.</div>
-        <div class="step warn"><b>④ Windows</b>WebUSB needs a one-time WinUSB driver (Zadig) on the DFU device.</div>
+        <div class="step"><b>① Pick firmware</b>Select the matching <code>_with_bl.hex</code> (AF-F4) below — always first. It reveals the DFU buttons.</div>
+        <div class="step"><b>② Enter DFU</b>Board still runs (shows a COM port)? Click 🛠 Enter DFU (software). <b>Already in DFU</b> (blank board on BOOT0, or entered before)? Skip this → go to ③.</div>
+        <div class="step"><b>③ Connect DFU</b>Click 🔌 Connect DFU device → pick the STM32 DFU device (0483:DF11). <b>Flashed before in this browser?</b> It auto-connects on load — skip.</div>
+        <div class="step"><b>④ Flash</b>Click ⚡ Flash (DFU) — erase → write → verify → leave DFU. Chrome/Edge desktop.</div>
+        <div class="step warn"><b>Windows</b>WebUSB needs a one-time WinUSB driver (Zadig) on the DFU device.</div>
       </div>
 
       <div class="row-connect">
@@ -165,7 +166,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-07-01 · software DFU: split Enter-DFU / Connect-DFU (fixes WebUSB "user gesture" on first-time DFU grant)';
+  const BUILD = '2026-07-03 · DFU firmware-first (① pick fw → ② Enter DFU / BOOT0 → ③ Connect DFU → ④ Flash); Connect-DFU now shown directly for boards already in DFU';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -329,9 +330,12 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
     row.classList.add('sel');
     selectedPath = row.dataset.path || null; droppedFile = null;
     selectedFamily = row.dataset.family || null; selectedName = row.dataset.name || null;
-    // Software DFU (Enter DFU) is F4-only — reveal the button only for an F4 pick.
-    ($('#softdfu') as HTMLElement).hidden = !(mode === 'dfu' && selectedFamily === 'F4');
-    ($('#dfuconnect') as HTMLElement).hidden = true; // reset; #softdfu reveals it when the board is in DFU
+    // F4-only DFU. Reveal BOTH: 🛠 Enter DFU (running board → software DFU) AND 🔌 Connect DFU
+    // device (board ALREADY in DFU — blank board on BOOT0, or a previous run — connects directly
+    // without Enter DFU). Both hidden once we're already connected (auto-reconnect on load).
+    const f4dfu = (mode === 'dfu' && selectedFamily === 'F4');
+    ($('#softdfu') as HTMLElement).hidden = !f4dfu || !!conn;
+    ($('#dfuconnect') as HTMLElement).hidden = !f4dfu || !!conn;
     refreshFlashEnabled();
   }));
 
