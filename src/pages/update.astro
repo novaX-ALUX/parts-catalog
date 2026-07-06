@@ -140,6 +140,10 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
   .btn-line { background: #fff; border: 1px solid #cfcfcf; color: var(--ink); }
   .btn-primary { background: var(--blue, #1a73e8); color: #fff; }
   .btn-primary[disabled] { background: #c7d6f3; cursor: not-allowed; }
+  .btn[disabled], .btn:disabled { opacity: .42; cursor: not-allowed; }
+  .btn.pulse { animation: btnpulse 1.15s ease-in-out infinite; }
+  @keyframes btnpulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(26,115,232,.55); } 50% { box-shadow: 0 0 0 7px rgba(26,115,232,0); } }
+  @media (prefers-reduced-motion: reduce) { .btn.pulse { animation: none; outline: 2px solid var(--blue, #1a73e8); outline-offset: 2px; } }
   .chip { font-size: 12.5px; padding: 5px 11px; border-radius: 20px; border: 1px solid var(--line); color: var(--ink-3); }
   .chip.ok { color: #127a2e; border-color: #bfe3c8; background: #f1faf3; }
   .chip.err { color: #b22; border-color: #f0c4c4; background: #fcf2f2; }
@@ -166,7 +170,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-07-03 · DFU firmware-first (① pick fw → ② Enter DFU / BOOT0 → ③ Connect DFU → ④ Flash); Connect-DFU now shown directly for boards already in DFU';
+  const BUILD = '2026-07-03 · DFU firmware-first + guided flow: next button pulses, others disabled (no out-of-order clicks); Connect-DFU shown directly for boards already in DFU';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -180,7 +184,29 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
   const log = (m: string, cls = '') => { const d = document.createElement('div'); if (cls) d.className = cls; d.textContent = m; logEl.appendChild(d); logEl.scrollTop = 1e9; };
   const progress = (done: number, total: number) => { barEl.style.width = total ? `${Math.round((done / total) * 100)}%` : '0'; };
   const setStatus = (t: string, cls = '') => { statusEl.textContent = t; statusEl.className = 'chip ' + cls; };
-  const refreshFlashEnabled = () => { flashBtn.disabled = !(conn && (selectedPath || droppedFile)); };
+  const refreshFlashEnabled = () => { flashBtn.disabled = !(conn && (selectedPath || droppedFile)); guide(); };
+
+  // ---- next-step guidance: enable + pulse the ONE button to click next; disable/hide the rest
+  // so a step can't be done out of order or by mistake. Runs on every state change. ----
+  function guide() {
+    const soft = $('#softdfu') as HTMLButtonElement;
+    const dconn = $('#dfuconnect') as HTMLButtonElement;
+    [soft, dconn, flashBtn, connectBtn].forEach((b) => b.classList.remove('pulse'));
+    const picked = !!(selectedPath || droppedFile);
+    if (conn && picked) flashBtn.classList.add('pulse');                 // connected + picked → Flash
+    if (mode === 'dfu') {
+      soft.disabled = false; dconn.disabled = false;
+      if (conn) { soft.hidden = true; dconn.hidden = true; }             // connected → only Flash left
+      else if (!picked) { soft.hidden = true; dconn.hidden = true; }     // pick firmware first
+      else {                                                             // picked, not connected → get into DFU
+        const f4 = (selectedFamily === 'F4');                            // Enter DFU (software) is F4-only
+        soft.hidden = !f4; dconn.hidden = false;
+        (f4 ? soft : dconn).classList.add('pulse');
+      }
+    } else if (!conn) {
+      connectBtn.classList.add('pulse');                                 // fw mode → Connect first
+    }
+  }
 
   // Browsers cannot silently auto-pick a port on first use (security), but a device the
   // user has authorized before can be reopened with no picker. Try that for the active mode.
@@ -288,6 +314,9 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
           log('Board should now be in STM32 DFU (0483:DF11). Click "🔌 Connect DFU device" to grant one-time access — the browser device picker needs a fresh click.', 'pend');
           setStatus('Click "Connect DFU device"', 'pend');
           ($('#dfuconnect') as HTMLElement).hidden = false;
+          ($('#softdfu') as HTMLButtonElement).disabled = true;              // entered DFU — retire Enter DFU
+          ($('#softdfu') as HTMLElement).classList.remove('pulse');
+          ($('#dfuconnect') as HTMLElement).classList.add('pulse');         // ← next: Connect DFU device
           return;
         }
       }
