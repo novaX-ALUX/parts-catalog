@@ -56,24 +56,42 @@ pinoutImages:
   - /images/products/cuav-pixhawk6x-connectors.png
 pinoutNotes: ''
 firmware:
-  - kind: "ArduPilot (.apj package)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.2.3/AF-H7E-v0.2.3.apj
-    version: "0.2.3"
-    date: "2026-06-19"
+  - kind: "ArduPilot Copter (.apj package)"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.2.4/AF-H7E-v0.2.4-Copter.apj
+    version: "0.2.4"
+    date: "2026-07-07"
     size: "1.7 MB"
-    sha256: "ef0786777ddacae65d02831e6a407515ade05635f835865d1405a571203b54f3"
-    notes: "ArduPilot Copter app. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater → Firmware Update."
+    sha256: "240b30623835134837adc4a3fd4331d7407487fc87cfac81a4128b70085b5433"
+    notes: "ArduPilot Copter app. Copter and Plane share the same board_id (6202) — select by file name. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater → Firmware Update."
     method: ardupilot
-    webPath: /firmware/AF-H7E-v0.2.3.apj
-  - kind: "Bootloader + App (merged HEX · DFU / SWD)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.2.3/AF-H7E-v0.2.3_with_bl.hex
-    version: "0.2.3"
-    date: "2026-06-19"
+    webPath: /firmware/AF-H7E-v0.2.4-Copter.apj
+  - kind: "ArduPilot Copter — Bootloader + App (merged HEX · DFU / SWD)"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.2.4/AF-H7E-v0.2.4-Copter_with_bl.hex
+    version: "0.2.4"
+    date: "2026-07-07"
     size: "5.4 MB"
-    sha256: "93401c69a0a8c145e934e36eda40e98830a890f7f77b97737896e0730d2e8cc5"
-    notes: "Bootloader + application combined image based at 0x08000000. Flash via the catalog Web Updater → DFU Recovery (hold BOOT0) or SWD/ST-Link for a blank/bricked board."
+    sha256: "185de1b3f7d21846f15b1a8f3e26d26bfe1e78b7dd839ba84afbecd061a52b1e"
+    notes: "Copter bootloader + application combined image based at 0x08000000. Flash via the catalog Web Updater → DFU Recovery (hold BOOT0) or SWD/ST-Link for a blank/bricked board."
     method: dfu
-    webPath: /firmware/AF-H7E-v0.2.3_with_bl.hex
+    webPath: /firmware/AF-H7E-v0.2.4-Copter_with_bl.hex
+  - kind: "ArduPilot Plane (.apj package)"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.2.4/AF-H7E-v0.2.4-Plane.apj
+    version: "0.2.4"
+    date: "2026-07-07"
+    size: "1.7 MB"
+    sha256: "7958ab45568c71d546b49d0475edb8217e64a7f316ea978ca5b5b6b262c7d9a5"
+    notes: "ArduPilot Plane app. Copter and Plane share the same board_id (6202) — select by file name. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater → Firmware Update."
+    method: ardupilot
+    webPath: /firmware/AF-H7E-v0.2.4-Plane.apj
+  - kind: "ArduPilot Plane — Bootloader + App (merged HEX · DFU / SWD)"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/v0.2.4/AF-H7E-v0.2.4-Plane_with_bl.hex
+    version: "0.2.4"
+    date: "2026-07-07"
+    size: "5.4 MB"
+    sha256: "78771a0ea34d26cac523d41cccd4541fe62bc35bcedbec0fb335b7334cd41399"
+    notes: "Plane bootloader + application combined image based at 0x08000000. Flash via the catalog Web Updater → DFU Recovery (hold BOOT0) or SWD/ST-Link for a blank/bricked board."
+    method: dfu
+    webPath: /firmware/AF-H7E-v0.2.4-Plane_with_bl.hex
 firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases'
 configNotes: ''
 ---
