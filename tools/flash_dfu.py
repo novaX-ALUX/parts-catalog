@@ -155,7 +155,28 @@ def do_leave(dev, intf, lo):
         pass
 
 # ---------- main ----------
+def read_transfer_size(dev, default=2048):
+    # wTransferSize from the DFU functional descriptor (F4 ROM=2048, H7 ROM=1024).
+    # A DNLOAD larger than the device's wTransferSize is rejected (DFU status 2 on write).
+    try:
+        for i in dev.get_active_configuration():
+            extra = bytes(i.extra_descriptors) if getattr(i, 'extra_descriptors', None) else b''
+            p = 0
+            while p + 8 < len(extra):
+                blen, btype = extra[p], extra[p + 1]
+                if blen == 0:
+                    break
+                if btype == 0x21 and blen >= 9:      # DFU functional descriptor
+                    wts = extra[p + 5] | (extra[p + 6] << 8)
+                    if wts:
+                        return wts
+                p += blen
+    except Exception:
+        pass
+    return default
+
 def main():
+    global XFER
     be = usb.backend.libusb1.get_backend(find_library=libusb_package.find_library)
     dev = usb.core.find(idVendor=VID, idProduct=PID, backend=be)
     if dev is None:
@@ -167,8 +188,21 @@ def main():
         pass
     usb.util.claim_interface(dev, intf)
     dev.set_interface_altsetting(interface=intf, alternate_setting=0)
+    XFER = read_transfer_size(dev, 2048)   # F4 ROM=2048, H7 ROM=1024
+    print("wTransferSize=%d" % XFER)
+    # Read the DfuSe sector-map string from the active @Internal Flash interface.
+    # The iInterface string index varies by MCU (F4=4, H7=6, ...), so scan the
+    # interface descriptors for the "@Internal Flash" alt-0 entry instead of a
+    # hardcoded index (the old hardcoded 4 silently fell back to F4 on H7 -> wrong
+    # sector map -> erase misses the real sectors -> write fails with DFU status 2).
+    layout = []
     try:
-        layout = parse_layout(usb.util.get_string(dev, 4))
+        for i in dev.get_active_configuration():
+            if i.bAlternateSetting != 0:
+                continue
+            s = usb.util.get_string(dev, i.iInterface)
+            if s and 'Internal Flash' in s:
+                layout = parse_layout(s); break
     except Exception:
         layout = []
     if not layout:

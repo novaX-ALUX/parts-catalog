@@ -38,14 +38,13 @@ rows.sort((a, b) =>
   a.product.localeCompare(b.product, 'en', { numeric: true, sensitivity: 'base' })
   || a.version.localeCompare(b.version, 'en', { numeric: true })
 );
-// Only AF-F4 is exposed on the Update tab for now: it is the only family whose
-// full web flow (incl. software DFU) is verified. H7/F7 web update is hidden
-// until their DFU path works (their firmware files are kept, just not listed).
-const fwRows = rows.filter((r) => r.method !== 'dfu' && r.family === 'F4');
-// Software/USB DFU is only verified on F4. On H7 the software boot-to-DFU path
-// (param4=99 -> ST ROM) leaves USB dark and bricks the board until SWD recovery
-// (silicon-level, see HANDOFF), so only F4 recovery images are offered here.
-const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
+// Families whose full web flow (serial OTA + software DFU + DFU flash) is verified on real
+// hardware. F4 (long-standing) and H7 (AF-H7E, verified 2026-07: buttonless software DFU via
+// param4=99 magic + the bootloader self-heal that auto-boots the app after a DFU flash — no
+// brick, no power cycle). F7 stays hidden until its DFU path is verified.
+const WEB_UPDATE_FAMILIES = ['F4', 'H7'];
+const fwRows = rows.filter((r) => r.method !== 'dfu' && WEB_UPDATE_FAMILIES.includes(r.family));
+const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.includes(r.family));
 ---
 <Layout title="Firmware Update — novaX Catalog" activeCategory="update">
   <section class="detail-body">
@@ -59,7 +58,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
       </div>
 
       <p class="mode-note" data-note="fw">Normal update over USB — device stays running, no jumper. Switch to <b>DFU Recovery</b> only if the board is blank or won't boot.</p>
-      <p class="mode-note" data-note="dfu" hidden><b>AF-F4 only.</b> <b>First pick an AF-F4 recovery image below</b>, then click <b>🛠 Enter DFU</b> (running board) or hold <b>BOOT0</b> + plug in USB (blank board) — it enters DFU over USB. Software DFU is not available for H7/F7 boards (use the <b>Firmware Update</b> tab for those). Windows needs a one-time WinUSB driver (Zadig).</p>
+      <p class="mode-note" data-note="dfu" hidden><b>First pick a recovery image (<code>_with_bl.hex</code>) below</b>, then click <b>🛠 Enter DFU</b> (running board) or hold <b>BOOT0</b> + plug in USB (blank board) — it enters DFU over USB. Software DFU is verified on <b>AF-F4</b> and <b>AF-H7E</b>; for other boards use the <b>Firmware Update</b> tab. Windows needs a one-time WinUSB driver (Zadig).</p>
 
       <div class="banner" data-banner="fw">
         <div class="step"><b>① Connect</b>Just plug in USB-C. No BOOT0 jumper.</div>
@@ -67,16 +66,16 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
         <div class="step good"><b>③ Driver</b>None — standard USB serial (CDC).</div>
       </div>
       <div class="banner" data-banner="dfu" hidden>
-        <div class="step"><b>① Pick firmware</b>Select the matching <code>_with_bl.hex</code> (AF-F4) below — always first. It reveals the DFU buttons.</div>
+        <div class="step"><b>① Pick firmware</b>Select the matching <code>_with_bl.hex</code> below — always first. It reveals the DFU buttons.</div>
         <div class="step"><b>② Enter DFU</b>Board still runs (shows a COM port)? Click 🛠 Enter DFU (software). <b>Already in DFU</b> (blank board on BOOT0, or entered before)? Skip this → go to ③.</div>
         <div class="step"><b>③ Connect DFU</b>Click 🔌 Connect DFU device → pick the STM32 DFU device (0483:DF11). <b>Flashed before in this browser?</b> It auto-connects on load — skip.</div>
-        <div class="step"><b>④ Flash</b>Click ⚡ Flash (DFU) — erase → write → verify → leave DFU. Chrome/Edge desktop.</div>
+        <div class="step"><b>④ Flash</b>Click ⚡ Flash (DFU) — erase → write → verify → leave. On <b>AF-H7E</b> the board self-heals and boots the app automatically (no power cycle). Chrome/Edge desktop.</div>
         <div class="step warn"><b>Windows</b>WebUSB needs a one-time WinUSB driver (Zadig) on the DFU device.</div>
       </div>
 
       <div class="row-connect">
         <button id="connect" class="btn btn-line">🔌 Connect</button>
-        <button id="softdfu" class="btn btn-line" hidden title="실행 중인 보드를 소프트웨어로 ROM DFU에 진입시킴 (펌웨어 ≥ v0.2.2 / T10 v0.3.2)">🛠 Enter DFU</button>
+        <button id="softdfu" class="btn btn-line" hidden title="실행 중인 보드를 소프트웨어로 ROM DFU에 진입시킴 (AF-F4 ≥ v0.2.2 / T10 ≥ v0.3.2 / AF-H7E ≥ v0.2.2)">🛠 Enter DFU</button>
         <button id="dfuconnect" class="btn btn-line" hidden title="보드가 DFU(0483:DF11)에 있을 때 WebUSB 장치 선택 팝업을 새 클릭으로 열어 연결 (브라우저 제스처 요구 우회)">🔌 Connect DFU device</button>
         <span id="status" class="chip">Not connected</span>
       </div>
@@ -170,7 +169,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-07-04 · DFU: clear WinUSB/Zadig guidance on connect-fail (blank-board first flash) + "blank board → DFU Recovery" hint on the normal tab';
+  const BUILD = '2026-07-07 · AF-H7E (STM32H7) enabled: serial OTA + software DFU (param4=99) + DFU flash, with bootloader self-heal auto-boot after DFU';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -199,9 +198,9 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
       if (conn) { soft.hidden = true; dconn.hidden = true; }             // connected → only Flash left
       else if (!picked) { soft.hidden = true; dconn.hidden = true; }     // pick firmware first
       else {                                                             // picked, not connected → get into DFU
-        const f4 = (selectedFamily === 'F4');                            // Enter DFU (software) is F4-only
-        soft.hidden = !f4; dconn.hidden = false;
-        (f4 ? soft : dconn).classList.add('pulse');
+        const swdfu = (selectedFamily === 'F4' || selectedFamily === 'H7'); // software Enter DFU verified on F4 + H7
+        soft.hidden = !swdfu; dconn.hidden = false;
+        (swdfu ? soft : dconn).classList.add('pulse');
       }
     } else if (!conn) {
       connectBtn.classList.add('pulse');                                 // fw mode → Connect first
@@ -280,10 +279,11 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && r.family === 'F4');
   // ENABLE_DFU_BOOT (novaX ≥ v0.2.2 / T10 ≥ v0.3.2). ----
   $('#softdfu').addEventListener('click', async () => {
     if (mode !== 'dfu') return;
-    // F4-only guard: the software boot-to-DFU magic bricks H7 (USB dark + ROM stuck).
-    if (selectedFamily !== 'F4') {
-      log('Software DFU (Enter DFU) is only supported on AF-F4 boards — pick an AF-F4 recovery image first. On H7/F7 the software path does not enter DFU and can brick the board.', 'err');
-      setStatus('Software DFU: AF-F4 only', 'err');
+    // Software boot-to-DFU is verified on F4 and H7 (AF-H7E: param4=99 magic -> ST ROM DFU,
+    // then the self-heal bootloader auto-boots the app after flashing). F7 is not yet verified.
+    if (selectedFamily !== 'F4' && selectedFamily !== 'H7') {
+      log('Software DFU (Enter DFU) is verified on AF-F4 and AF-H7E — pick a matching recovery image first.', 'err');
+      setStatus('Software DFU: F4 / H7 only', 'err');
       return;
     }
     try {
