@@ -169,7 +169,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-07-08 * DFU tab simplified: pick firmware first, then Enter DFU -> Connect DFU -> Flash (AF-H7E self-heals, no power cycle)';
+  const BUILD = '2026-07-08 * DFU erase progress fix: the bar now creeps smoothly during erase (H7 spends most erase time inside one command) then snaps to 30%; erase 0-30% and write 30-100% share one bar';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;

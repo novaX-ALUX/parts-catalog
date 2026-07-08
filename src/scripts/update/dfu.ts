@@ -216,10 +216,26 @@ export class STM32Dfu {
     const last = this.sectors[this.sectors.length - 1];
     const end = last.start + last.size;
     log(`Erase ${eraseStarts.length} sector(s) — full chip 0x${(0x08000000).toString(16)}–0x${end.toString(16)} …`);
-    for (let i = 0; i < eraseStarts.length; i++) {
-      await this.dfuseCmd(0x41, eraseStarts[i]);
-      progress(Math.round(((i + 1) / eraseStarts.length) * 300), 1000); // erase = first 0–30%
+    // Erase and write share ONE progress bar (0–30% erase, 30–100% write). On the STM32H7 ROM
+    // DFU a per-sector step leaves the bar frozen near 0 and then jumping — most of the erase
+    // time is spent inside a single Erase command (bank/bulk erase), so few visible steps fire
+    // (F4 erases per sector and stepped fine). Instead creep the bar smoothly toward ~30% on a
+    // timer across the whole erase phase, then snap to exactly 30% once every sector is done —
+    // so the bar always moves during erase regardless of how the ROM schedules the work.
+    const eraseEstMs = Math.max(3000, eraseStarts.length * 1200);
+    const eraseT0 = Date.now();
+    const eraseTimer = setInterval(() => {
+      const frac = Math.min(0.97, (Date.now() - eraseT0) / eraseEstMs);
+      progress(Math.round(frac * 300), 1000);
+    }, 120);
+    try {
+      for (let i = 0; i < eraseStarts.length; i++) {
+        await this.dfuseCmd(0x41, eraseStarts[i]);
+      }
+    } finally {
+      clearInterval(eraseTimer);
     }
+    progress(300, 1000); // erase complete = 30%
     log('Erase done.');
 
     // Each block sets the address pointer explicitly (wBlockNum stays 2), so the chunk
