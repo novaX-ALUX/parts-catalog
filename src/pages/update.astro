@@ -69,7 +69,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
         <div class="step"><b>① Pick firmware</b>Select the matching <code>_with_bl.hex</code> below — always first. It reveals the DFU buttons.</div>
         <div class="step"><b>② Enter DFU</b>Board still runs (shows a COM port)? Click 🛠 Enter DFU (software). <b>Already in DFU</b> (blank board on BOOT0, or entered before)? Skip this → go to ③.</div>
         <div class="step"><b>③ Connect DFU</b>Click 🔌 Connect DFU device → pick the STM32 DFU device (0483:DF11). <b>Flashed before in this browser?</b> It auto-connects on load — skip.</div>
-        <div class="step"><b>④ Flash</b>Click ⚡ Flash (DFU) — erase → write → verify → leave. On <b>AF-H7E</b> the board self-heals and boots the app automatically (no power cycle). Chrome/Edge desktop.</div>
+        <div class="step"><b>④ Flash</b>Click ⚡ Flash (DFU) — erase → write → verify → leave. <b>AF-H7E via 🛠 Enter DFU (software):</b> the board self-heals and boots the app automatically — no power cycle, no unplug. <b>Blank board entered via BOOT0:</b> release BOOT0 and re-plug USB after flashing. Chrome/Edge desktop.</div>
         <div class="step warn"><b>Windows</b>WebUSB needs a one-time WinUSB driver (Zadig) on the DFU device.</div>
       </div>
 
@@ -169,7 +169,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-07-07 · AF-H7E (STM32H7) enabled: serial OTA + software DFU (param4=99) + DFU flash, with bootloader self-heal auto-boot after DFU';
+  const BUILD = '2026-07-08 · AF-H7E DFU steps clarified: self-heal auto-boot applies to the software Enter-DFU path; a blank board entered via BOOT0 needs one power cycle (release BOOT0 + re-plug) after flashing';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
