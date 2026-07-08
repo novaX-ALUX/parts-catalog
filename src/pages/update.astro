@@ -61,9 +61,9 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
       <p class="mode-note" data-note="dfu" hidden><b>Pick a recovery image (<code>_with_bl.hex</code>) below</b>, then click <b>🛠 Enter DFU</b> to put a running board into USB DFU — buttonless (verified on AF-F4 and AF-H7E). Windows needs a one-time WinUSB driver (Zadig).</p>
 
       <div class="banner" data-banner="fw">
-        <div class="step"><b>① Connect</b>Just plug in USB-C. No BOOT0 jumper.</div>
-        <div class="step"><b>② Browser</b>Chrome or Edge (desktop). Uses Web Serial.</div>
-        <div class="step good"><b>③ Driver</b>None — standard USB serial (CDC).</div>
+        <div class="step"><b>① Pick firmware</b>Plug in USB-C (no jumper, no BOOT0) and select the <code>.apj</code> below.</div>
+        <div class="step"><b>② Update</b>Click ⚡ Update firmware — it connects over Web Serial, reboots to the bootloader, and flashes.</div>
+        <div class="step good"><b>Driver</b>None — standard USB serial (CDC). Chrome/Edge desktop.</div>
       </div>
       <div class="banner" data-banner="dfu" hidden>
         <div class="step"><b>① Pick firmware</b>Select the matching <code>_with_bl.hex</code> below — it enables the buttons.</div>
@@ -168,7 +168,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-07-08 * DFU simplified to Pick -> Enter DFU -> Flash: the Flash button now opens the WebUSB device picker itself (connect-on-flash), so the separate Connect DFU step is gone';
+  const BUILD = '2026-07-08 * both tabs unified to Pick -> action (connect-on-action): Update (normal) and Flash (DFU) open the device picker themselves; the separate Connect / Connect DFU step is gone';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -182,9 +182,9 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   const log = (m: string, cls = '') => { const d = document.createElement('div'); if (cls) d.className = cls; d.textContent = m; logEl.appendChild(d); logEl.scrollTop = 1e9; };
   const progress = (done: number, total: number) => { barEl.style.width = total ? `${Math.round((done / total) * 100)}%` : '0'; };
   const setStatus = (t: string, cls = '') => { statusEl.textContent = t; statusEl.className = 'chip ' + cls; };
-  // In DFU mode the Flash button itself opens the WebUSB device picker (connect-on-flash), so
-  // it is enabled as soon as a firmware is picked — no separate "Connect DFU device" step.
-  const refreshFlashEnabled = () => { flashBtn.disabled = !((selectedPath || droppedFile) && (conn || mode === 'dfu')); guide(); };
+  // Both tabs connect-on-action: the Update/Flash button opens the device picker itself, so it
+  // is enabled as soon as a firmware is picked — no separate Connect / Connect DFU step.
+  const refreshFlashEnabled = () => { flashBtn.disabled = !(selectedPath || droppedFile); guide(); };
 
   // ---- next-step guidance: enable + pulse the ONE button to click next; disable/hide the rest
   // so a step can't be done out of order or by mistake. Runs on every state change. ----
@@ -192,21 +192,20 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
     const soft = $('#softdfu') as HTMLButtonElement;
     const dconn = $('#dfuconnect') as HTMLButtonElement;
     [soft, dconn, flashBtn, connectBtn].forEach((b) => b.classList.remove('pulse'));
-    dconn.hidden = true;                                                 // "Connect DFU" is merged into Flash
+    dconn.hidden = true; connectBtn.hidden = true;                       // Connect buttons merged into the action
     const picked = !!(selectedPath || droppedFile);
-    if (conn && picked) flashBtn.classList.add('pulse');                 // connected + picked → Flash
     if (mode === 'dfu') {
       soft.disabled = false;
-      if (conn) { soft.hidden = true; }                                  // connected → only Flash left
-      else if (!picked) { soft.hidden = true; }                          // pick firmware first
+      if (conn || !picked) { soft.hidden = true; }                       // connected, or pick firmware first
       else {                                                             // picked, not connected
         const swdfu = (selectedFamily === 'F4' || selectedFamily === 'H7'); // software Enter DFU verified on F4 + H7
         soft.hidden = !swdfu;                                            // running board → Enter DFU first
-        // Running board: Enter DFU. Board already in DFU (BOOT0/returning): Flash connects directly.
-        (swdfu ? soft : flashBtn).classList.add('pulse');
+        (swdfu ? soft : flashBtn).classList.add('pulse');                // running: Enter DFU; already in DFU: Flash
       }
-    } else if (!conn) {
-      connectBtn.classList.add('pulse');                                 // fw mode → Connect first
+      if (conn && picked) flashBtn.classList.add('pulse');
+    } else {
+      soft.hidden = true;
+      if (picked) flashBtn.classList.add('pulse');                       // normal: Pick → Update (connects + flashes)
     }
   }
 
@@ -265,9 +264,9 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
     $('#flowhint').textContent = mode === 'dfu' ? 'erase → write → verify → leave DFU' : 'reboot to bootloader → erase → program → verify → boot';
     $('#flash').textContent = mode === 'dfu' ? '⚡ Flash (DFU)' : '⚡ Update firmware';
     ($('[data-droptypes]') as HTMLElement).textContent = mode === 'dfu' ? '.hex' : '.apj / .bin';
-    ($('#softdfu') as HTMLElement).hidden = true; // software DFU entry is shown only after an F4 recovery image is picked (F4-only; H7 soft-DFU bricks)
-    ($('#dfuconnect') as HTMLElement).hidden = true; // shown only after Enter DFU puts the board in DFU
-    connectBtn.hidden = (mode === 'dfu'); // DFU Recovery uses the single "Enter DFU (no BOOT0)" button (it connects too)
+    ($('#softdfu') as HTMLElement).hidden = true; // Enter DFU is revealed by guide() once a DFU recovery image is picked (F4/H7)
+    ($('#dfuconnect') as HTMLElement).hidden = true; // deprecated: "Connect DFU" is merged into the Flash button
+    connectBtn.hidden = true; // both tabs connect-on-action (Update/Flash opens the picker); guide() keeps this hidden
     // reset connection/selection on mode switch (different transport)
     if (conn) { conn.close?.(); conn = null; }
     selectedPath = null; droppedFile = null;
@@ -434,23 +433,30 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   flashBtn.addEventListener('click', async () => {
     flashBtn.disabled = true;
     try {
-      // DFU connect-on-flash: this click is a fresh user gesture, so the WebUSB device picker
-      // (requestDevice) is allowed here — do it BEFORE loadBytes()'s await consumes the gesture.
-      // Removes the separate "Connect DFU device" step: Pick → Enter DFU → Flash (or, for a board
-      // already in DFU, just Pick → Flash).
-      if (mode === 'dfu' && !conn) {
+      // Connect-on-action: this click is a fresh user gesture, so open the device picker HERE
+      // (before loadBytes()'s await consumes it) if not connected — removes the separate Connect /
+      // Connect DFU step for both tabs. Normal → Web Serial; DFU → WebUSB.
+      if (!conn) {
         try {
-          conn = await STM32Dfu.connect();
-          setStatus('● ' + (conn as any).chipLabel(), 'ok');
-          log('DFU connected (' + (conn as any).chipLabel() + ').', 'ok');
+          if (mode === 'dfu') {
+            conn = await STM32Dfu.connect();
+            setStatus('● ' + (conn as any).chipLabel(), 'ok');
+            log('DFU connected (' + (conn as any).chipLabel() + ').', 'ok');
+          } else {
+            conn = await Px4Updater.connect();
+            setStatus('● serial port connected', 'ok');
+            log('Connected.', 'ok');
+          }
         } catch (e: any) {
           const msg = String(e?.message || e);
-          log('DFU connect failed: ' + msg, 'err');
-          setStatus('DFU connect failed', 'err');
-          if (/claim|access|denied|InvalidState|SecurityError|Unable|protected|blocklist/i.test(msg))
-            log('→ Windows: this DFU device needs WinUSB. Run Zadig ONCE — pick "STM32 BOOTLOADER" (0483:DF11) → WinUSB → Install/Replace Driver → then click Flash again.', 'pend');
-          else if (/No device|NotFound|selected/i.test(msg))
-            log('→ No STM32 DFU (0483:DF11) offered. Running board? Click 🛠 Enter DFU first. Blank board with a BOOT0 button? Hold BOOT0 + replug.', 'pend');
+          setStatus('connect failed', 'err'); conn = null;
+          log((mode === 'dfu' ? 'DFU connect' : 'Connect') + ' failed: ' + msg, 'err');
+          if (mode === 'dfu' && /claim|access|denied|InvalidState|SecurityError|Unable|protected|blocklist/i.test(msg))
+            log('→ Windows: this DFU device needs WinUSB. Run Zadig ONCE — "STM32 BOOTLOADER" (0483:DF11) → WinUSB → Install/Replace Driver → then click Flash again.', 'pend');
+          else if (mode === 'dfu' && /No device|NotFound|selected/i.test(msg))
+            log('→ No STM32 DFU (0483:DF11) offered. Running board? Click 🛠 Enter DFU first.', 'pend');
+          else if (mode !== 'dfu')
+            log('→ No serial port. A blank / in-DFU board has no COM port — use the 🛠 DFU Recovery tab.', 'pend');
           flashBtn.disabled = false;
           return;
         }
