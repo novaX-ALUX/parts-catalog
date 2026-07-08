@@ -44,7 +44,7 @@ firmware:
     date: "2026-06-19"
     size: "4.6 MB"
     sha256: "93f5554e80c6a14ad2a3c8245e203ebdeff1eb15a64692a1bae084dfe68006ce"
-    notes: "Bootloader + application combined image based at 0x08000000. Flash via the catalog Web Updater → DFU Recovery (hold BOOT0) or SWD/ST-Link for a blank/bricked board."
+    notes: "Bootloader + application combined image based at 0x08000000. The AF-F7 mini has no BOOT0 button — flash a blank/bricked board via SWD/ST-Link."
     method: dfu
     webPath: /firmware/AF-F7_mini-v0.2.3_with_bl.hex
 firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases'

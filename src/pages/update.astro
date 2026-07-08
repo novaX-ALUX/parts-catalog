@@ -58,7 +58,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
       </div>
 
       <p class="mode-note" data-note="fw">Normal update over USB — device stays running, no jumper. Switch to <b>DFU Recovery</b> only if the board is blank or won't boot.</p>
-      <p class="mode-note" data-note="dfu" hidden><b>First pick a recovery image (<code>_with_bl.hex</code>) below</b>, then click <b>🛠 Enter DFU</b> to put a <b>running</b> board into USB DFU — this is buttonless software DFU (the <b>AF-H7E has no BOOT0 button</b>). Software DFU is verified on <b>AF-F4</b> and <b>AF-H7E</b>; other boards use the <b>Firmware Update</b> tab. A blank / won't-boot board that can no longer run Enter DFU is recovered via <b>SWD/ST-Link</b>. Windows needs a one-time WinUSB driver (Zadig).</p>
+      <p class="mode-note" data-note="dfu" hidden><b>First pick a recovery image (<code>_with_bl.hex</code>) below</b>, then click <b>🛠 Enter DFU</b> — buttonless software DFU that puts a <b>running</b> board into USB DFU (verified on AF-F4 and AF-H7E). If the board is <b>blank / won't boot</b> and can't run Enter DFU: the <b>nano</b> boards have a <b>BOOT0</b> button (hold it while plugging in USB); the <b>AF-H7E</b> and other non-nano boards have <b>no button</b> — recover via <b>SWD/ST-Link</b>. Windows needs a one-time WinUSB driver (Zadig).</p>
 
       <div class="banner" data-banner="fw">
         <div class="step"><b>① Connect</b>Just plug in USB-C. No BOOT0 jumper.</div>
@@ -67,17 +67,10 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
       </div>
       <div class="banner" data-banner="dfu" hidden>
         <div class="step"><b>① Pick firmware</b>Select the matching <code>_with_bl.hex</code> below — always first. It reveals the DFU buttons.</div>
-        <div class="step"><b>② Enter DFU</b>Board still runs (shows a COM port)? Click 🛠 Enter DFU (software, no button). <b>Already in DFU</b> (entered before, or left in DFU)? Skip this → go to ③.</div>
+        <div class="step"><b>② Enter DFU</b>Board still runs (shows a COM port)? Click 🛠 Enter DFU (software, no button). <b>Already in DFU</b> (a nano board held on BOOT0, or entered before)? Skip this → go to ③.</div>
         <div class="step"><b>③ Connect DFU</b>Click 🔌 Connect DFU device → pick the STM32 DFU device (0483:DF11). <b>Flashed before in this browser?</b> It auto-connects on load — skip.</div>
-        <div class="step"><b>④ Flash</b>Click ⚡ Flash (DFU) — erase → write → verify → leave. On <b>AF-H7E</b> the board self-heals and boots the app automatically — no power cycle, no unplug. A blank / won't-boot <b>AF-H7E</b> (no BOOT0 button) is recovered via <b>SWD/ST-Link</b> instead. Chrome/Edge desktop.</div>
+        <div class="step"><b>④ Flash</b>Click ⚡ Flash (DFU) — erase → write → verify → leave. On <b>AF-H7E</b> the board self-heals and boots the app automatically — no power cycle. (A board reached via a <b>nano BOOT0</b> button: release BOOT0 and re-plug after flashing. A non-nano board with no button — AF-H7E, AF-F7 mini — uses <b>SWD/ST-Link</b> when blank.) Chrome/Edge desktop.</div>
         <div class="step warn"><b>Windows</b>WebUSB needs a one-time WinUSB driver (Zadig) on the DFU device.</div>
-      </div>
-
-      <div class="row-connect">
-        <button id="connect" class="btn btn-line">🔌 Connect</button>
-        <button id="softdfu" class="btn btn-line" hidden title="실행 중인 보드를 소프트웨어로 ROM DFU에 진입시킴 (AF-F4 ≥ v0.2.2 / T10 ≥ v0.3.2 / AF-H7E ≥ v0.2.2)">🛠 Enter DFU</button>
-        <button id="dfuconnect" class="btn btn-line" hidden title="보드가 DFU(0483:DF11)에 있을 때 WebUSB 장치 선택 팝업을 새 클릭으로 열어 연결 (브라우저 제스처 요구 우회)">🔌 Connect DFU device</button>
-        <span id="status" class="chip">Not connected</span>
       </div>
 
       <div class="card">
@@ -107,6 +100,13 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
         </table>
         <label class="drop" id="drop">… or drag &amp; drop a firmware file here (<span data-droptypes>.apj / .bin</span>)
           <input type="file" id="file" hidden /></label>
+      </div>
+
+      <div class="row-connect">
+        <button id="connect" class="btn btn-line">🔌 Connect</button>
+        <button id="softdfu" class="btn btn-line" hidden title="실행 중인 보드를 소프트웨어로 ROM DFU에 진입시킴 (AF-F4 ≥ v0.2.2 / T10 ≥ v0.3.2 / AF-H7E ≥ v0.2.2)">🛠 Enter DFU</button>
+        <button id="dfuconnect" class="btn btn-line" hidden title="보드가 DFU(0483:DF11)에 있을 때 WebUSB 장치 선택 팝업을 새 클릭으로 열어 연결 (브라우저 제스처 요구 우회)">🔌 Connect DFU device</button>
+        <span id="status" class="chip">Not connected</span>
       </div>
 
       <div class="actions">
@@ -169,7 +169,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-07-08 * AF-H7E DFU corrected: no BOOT0 button - enter DFU via the software 🛠 Enter DFU on a running board; a blank/non-booting board is recovered via SWD/ST-Link (self-heal auto-boot applies to the software Enter-DFU path)';
+  const BUILD = '2026-07-08 * DFU tab: firmware selection moved above the buttons (step 1). DFU entry — nano boards have a BOOT0 button; AF-H7E and other non-nano boards have none (use software Enter DFU on a running board, SWD/ST-Link when blank).';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
