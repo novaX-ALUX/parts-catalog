@@ -71,7 +71,7 @@ firmware:
     date: "2026-07-07"
     size: "5.7 MB"
     sha256: "ac1a86dd7f33f520bfe597b4aa8e702a3ae883a629e060caeae8eeb249492e22"
-    notes: "Copter bootloader + application combined image based at 0x08000000. Flash via the catalog Web Updater -> DFU Recovery or SWD/ST-Link for a blank board. The v0.2.9 bootloader self-heals after a DFU flash, so the app auto-boots with no power cycle. Copter and Plane share board_id 6202 - select by file name."
+    notes: "Copter bootloader + application combined image based at 0x08000000. Flash a running board via the catalog Web Updater -> DFU Recovery (click Enter DFU, buttonless — the AF-H7E has no BOOT0 button); the v0.2.9 bootloader self-heals so the app auto-boots after the flash with no power cycle. A blank / non-booting board is flashed via SWD/ST-Link. Copter and Plane share board_id 6202 - select by file name."
     method: dfu
     webPath: /firmware/AF-H7E-v0.2.9-Copter_with_bl.hex
   - kind: "ArduPilot Plane (.apj package)"
@@ -89,9 +89,9 @@ firmware:
     date: "2026-07-07"
     size: "5.6 MB"
     sha256: "4fef092ecea4157257e83a68fa76c06173de498ae06421d267d6549f44de25c6"
-    notes: "Plane bootloader + application combined image based at 0x08000000. Flash via the catalog Web Updater -> DFU Recovery or SWD/ST-Link for a blank board. The v0.2.9 bootloader self-heals after a DFU flash, so the app auto-boots with no power cycle. Copter and Plane share board_id 6202 - select by file name."
+    notes: "Plane bootloader + application combined image based at 0x08000000. Flash a running board via the catalog Web Updater -> DFU Recovery (click Enter DFU, buttonless — the AF-H7E has no BOOT0 button); the v0.2.9 bootloader self-heals so the app auto-boots after the flash with no power cycle. A blank / non-booting board is flashed via SWD/ST-Link. Copter and Plane share board_id 6202 - select by file name."
     method: dfu
     webPath: /firmware/AF-H7E-v0.2.9-Plane_with_bl.hex
-firmwareNotes: 'Update over USB-C, no jumper: open the catalog Web Updater, stay on Firmware Update, click Connect, pick the Copter or Plane .apj, then Update firmware. For a blank or non-booting board use DFU Recovery with the matching _with_bl.hex — unlike the BOOT0-button AF-F4 flow, AF-H7E enters DFU by software (click Enter DFU, no button) and the v0.2.9 bootloader self-heals so the app auto-boots after a DFU flash with no power cycle. On Windows the DFU device needs a one-time WinUSB driver (Zadig). All releases: https://github.com/novaX-ALUX/flight_controller/releases'
+firmwareNotes: 'Update over USB-C, no jumper: open the catalog Web Updater, stay on Firmware Update, click Connect, pick the Copter or Plane .apj, then Update firmware. To reflash a running board over USB DFU, use DFU Recovery, click Enter DFU (buttonless software DFU — the AF-H7E has no BOOT0 button), then flash the matching _with_bl.hex; the v0.2.9 bootloader self-heals so the app auto-boots after the flash with no power cycle. A truly blank or non-booting board (Enter DFU cannot run) is recovered via SWD/ST-Link. On Windows the DFU device needs a one-time WinUSB driver (Zadig). All releases: https://github.com/novaX-ALUX/flight_controller/releases'
 configNotes: ''
 ---

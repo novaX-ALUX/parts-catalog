@@ -58,7 +58,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
       </div>
 
       <p class="mode-note" data-note="fw">Normal update over USB — device stays running, no jumper. Switch to <b>DFU Recovery</b> only if the board is blank or won't boot.</p>
-      <p class="mode-note" data-note="dfu" hidden><b>First pick a recovery image (<code>_with_bl.hex</code>) below</b>, then click <b>🛠 Enter DFU</b> (running board) or hold <b>BOOT0</b> + plug in USB (blank board) — it enters DFU over USB. Software DFU is verified on <b>AF-F4</b> and <b>AF-H7E</b>; for other boards use the <b>Firmware Update</b> tab. Windows needs a one-time WinUSB driver (Zadig).</p>
+      <p class="mode-note" data-note="dfu" hidden><b>First pick a recovery image (<code>_with_bl.hex</code>) below</b>, then click <b>🛠 Enter DFU</b> to put a <b>running</b> board into USB DFU — this is buttonless software DFU (the <b>AF-H7E has no BOOT0 button</b>). Software DFU is verified on <b>AF-F4</b> and <b>AF-H7E</b>; other boards use the <b>Firmware Update</b> tab. A blank / won't-boot board that can no longer run Enter DFU is recovered via <b>SWD/ST-Link</b>. Windows needs a one-time WinUSB driver (Zadig).</p>
 
       <div class="banner" data-banner="fw">
         <div class="step"><b>① Connect</b>Just plug in USB-C. No BOOT0 jumper.</div>
@@ -67,9 +67,9 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
       </div>
       <div class="banner" data-banner="dfu" hidden>
         <div class="step"><b>① Pick firmware</b>Select the matching <code>_with_bl.hex</code> below — always first. It reveals the DFU buttons.</div>
-        <div class="step"><b>② Enter DFU</b>Board still runs (shows a COM port)? Click 🛠 Enter DFU (software). <b>Already in DFU</b> (blank board on BOOT0, or entered before)? Skip this → go to ③.</div>
+        <div class="step"><b>② Enter DFU</b>Board still runs (shows a COM port)? Click 🛠 Enter DFU (software, no button). <b>Already in DFU</b> (entered before, or left in DFU)? Skip this → go to ③.</div>
         <div class="step"><b>③ Connect DFU</b>Click 🔌 Connect DFU device → pick the STM32 DFU device (0483:DF11). <b>Flashed before in this browser?</b> It auto-connects on load — skip.</div>
-        <div class="step"><b>④ Flash</b>Click ⚡ Flash (DFU) — erase → write → verify → leave. <b>AF-H7E via 🛠 Enter DFU (software):</b> the board self-heals and boots the app automatically — no power cycle, no unplug. <b>Blank board entered via BOOT0:</b> release BOOT0 and re-plug USB after flashing. Chrome/Edge desktop.</div>
+        <div class="step"><b>④ Flash</b>Click ⚡ Flash (DFU) — erase → write → verify → leave. On <b>AF-H7E</b> the board self-heals and boots the app automatically — no power cycle, no unplug. A blank / won't-boot <b>AF-H7E</b> (no BOOT0 button) is recovered via <b>SWD/ST-Link</b> instead. Chrome/Edge desktop.</div>
         <div class="step warn"><b>Windows</b>WebUSB needs a one-time WinUSB driver (Zadig) on the DFU device.</div>
       </div>
 
@@ -169,7 +169,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-07-08 · AF-H7E DFU steps clarified: self-heal auto-boot applies to the software Enter-DFU path; a blank board entered via BOOT0 needs one power cycle (release BOOT0 + re-plug) after flashing';
+  const BUILD = '2026-07-08 * AF-H7E DFU corrected: no BOOT0 button - enter DFU via the software 🛠 Enter DFU on a running board; a blank/non-booting board is recovered via SWD/ST-Link (self-heal auto-boot applies to the software Enter-DFU path)';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
