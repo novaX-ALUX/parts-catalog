@@ -165,12 +165,16 @@ export class STM32Dfu {
   /** Poll GETSTATUS until the device leaves dfuDNBUSY (operation truly complete); throw on
    *  error. Critical: a command's first GETSTATUS returns dfuDNBUSY+poll — if we send the
    *  next transfer before the device returns to idle it stalls ("transfer error"). */
-  private async pollIdle() {
+  private async pollIdle(longWait = false) {
     for (let i = 0; i < 5000; i++) {
       const st = await this.getStatus();
       if (st.status !== 0) throw new DfuError(`device status ${st.status} (state ${st.state})`);
       if (st.state !== 4 /* dfuDNBUSY */) return;
-      await sleep(st.poll > 5 ? 5 : (st.poll || 1));
+      // Long ops (sector/bank erase): honour the device's bwPollTimeout (33–250 ms) instead of
+      // hammering GETSTATUS every ~1 ms. The H7 ROM keeps dfuDNBUSY for ~15 s during its erase;
+      // thousands of back-to-back WebUSB control transfers saturate WinUSB and make Chrome show
+      // "page unresponsive". Short ops (write chunks / set-address) keep the fast 5 ms poll.
+      await sleep(longWait ? Math.min(Math.max(st.poll || 33, 33), 250) : (st.poll > 5 ? 5 : (st.poll || 1)));
     }
     throw new DfuError('status poll timeout');
   }
@@ -186,12 +190,12 @@ export class STM32Dfu {
   }
 
   /** DfuSe special command (Set Address 0x21 / Erase page 0x41). */
-  private async dfuseCmd(cmd: number, addr?: number) {
+  private async dfuseCmd(cmd: number, addr?: number, longWait = false) {
     const payload = addr === undefined
       ? new Uint8Array([cmd])
       : new Uint8Array([cmd, addr & 0xff, (addr >>> 8) & 0xff, (addr >>> 16) & 0xff, (addr >>> 24) & 0xff]);
     await this.dnload(0, payload);
-    await this.pollIdle(); // wait until the command (erase / set-address) truly completes
+    await this.pollIdle(longWait); // wait until the command (erase / set-address) truly completes
   }
 
   private sectorsInRange(start: number, end: number): number[] {
@@ -230,7 +234,7 @@ export class STM32Dfu {
     }, 120);
     try {
       for (let i = 0; i < eraseStarts.length; i++) {
-        await this.dfuseCmd(0x41, eraseStarts[i]);
+        await this.dfuseCmd(0x41, eraseStarts[i], true); // erase is long — poll gently so the page stays responsive
       }
     } finally {
       clearInterval(eraseTimer);

@@ -168,7 +168,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-07-08 * both tabs unified to Pick -> action (connect-on-action): Update (normal) and Flash (DFU) open the device picker themselves; the separate Connect / Connect DFU step is gone';
+  const BUILD = '2026-07-08 * DFU erase no longer freezes the page: during the long H7 erase, GETSTATUS is polled gently (honor bwPollTimeout, 33-250ms) instead of hammering it every ~1ms, so Chrome will not show page-unresponsive';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
