@@ -34,7 +34,17 @@ def px4_crc(data):
     return state & 0xffffffff
 
 def ports():
-    return [p.device for p in lp.comports() if p.device not in EXCLUDE]
+    # On Linux, glob /dev/ttyACM* directly: pyserial comports() crashes during USB
+    # re-enumeration (sysfs idVendor transiently empty -> int(None,16) TypeError).
+    # On Windows, comports() is the only way to enumerate COM ports; guard it so a
+    # transient enumeration error just yields [] and the find loop retries.
+    import os, glob
+    if os.name == 'posix':
+        return [d for d in sorted(glob.glob('/dev/ttyACM*')) if d not in EXCLUDE]
+    try:
+        return [p.device for p in lp.comports() if p.device not in EXCLUDE]
+    except Exception:
+        return []
 
 class BL:
     def __init__(self, dev):
@@ -118,6 +128,19 @@ def find_bl(log, timeout=20):
 
 def main():
     log = lambda m: (print(m), sys.stdout.flush())
+
+    # AF-F4 T10 firmware integrity gate — verify authenticity BEFORE parsing or
+    # flashing. Refuses any image not signed by the AF-F4 T10 release key.
+    # Host-side check layered on top of the bootloader's board_id + CRC.
+    # Local dev bypass: AFF4T10_SKIP_VERIFY=1.
+    import os
+    if os.environ.get('AFF4T10_SKIP_VERIFY') != '1':
+        from af_f4_t10_fwsig import verify_file
+        log("AF-F4 T10 integrity check on %s ..." % APJ)
+        if not verify_file(APJ, log=log):
+            log("REFUSING TO FLASH: AF-F4 T10 signature verification failed")
+            sys.exit(3)
+
     j, img, extf = load_apj(APJ)
     log("APJ board_id=%s image=%d bytes extf=%d bytes" % (j.get('board_id'), len(img), len(extf)))
 
@@ -132,6 +155,19 @@ def main():
     try:
         bid = bl.info(INFO_BOARD_ID); fsz = bl.info(INFO_FLASH_SIZE); rev = bl.info(INFO_BL_REV)
         log("  BL rev=%d board_id=%d flash=%d" % (rev, bid, fsz))
+
+        # board_id gate — same rule as ArduPilot uploader.py (Mission Planner engine):
+        # refuse firmware built for a different board BEFORE erasing. Bypass: AFF4T10_FORCE=1.
+        fw_bid = j.get('board_id')
+        if fw_bid is not None and fw_bid != bid and os.environ.get('AFF4T10_FORCE') != '1':
+            log("  REFUSED: firmware board_id=%s != device board_id=%d "
+                "— not suitable for this board (no erase, board untouched)" % (fw_bid, bid))
+            bl.reboot(); bl.close(); sys.exit(4)
+        # Dry-run: stop right after the board_id check without erasing/flashing.
+        if os.environ.get('AFF4T10_CHECK_ONLY') == '1':
+            log("  board_id OK (fw=%s == device=%d) — would proceed to flash (check-only, no erase)"
+                % (fw_bid, bid))
+            bl.reboot(); bl.close(); return
         if extf:
             log("  ⚠ this .apj has an external-flash image (%d B) — not handled by this CLI yet" % len(extf))
         t0 = time.time()

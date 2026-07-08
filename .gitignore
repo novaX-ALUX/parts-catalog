@@ -5,3 +5,8 @@ dist/
 .env.production
 .DS_Store
 .omc/
+
+# AF-F4 T10 firmware signing PRIVATE key — must stay offline, never commit.
+tools/keys/af_f4_t10_fw_signing_key.pem
+tools/keys/*signing_key*
+tools/__pycache__/
