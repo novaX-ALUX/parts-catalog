@@ -282,11 +282,11 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   // ENABLE_DFU_BOOT (novaX ≥ v0.2.2 / T10 ≥ v0.3.2). ----
   $('#softdfu').addEventListener('click', async () => {
     if (mode !== 'dfu') return;
-    // Software boot-to-DFU is verified on F4 and H7 (AF-H7E: param4=99 magic -> ST ROM DFU,
-    // then the self-heal bootloader auto-boots the app after flashing). F7 is not yet verified.
-    if (selectedFamily !== 'F4' && selectedFamily !== 'H7') {
+    // Software boot-to-DFU is verified on F4, F7 (AF-F7 Mini, 2026-07-09) and H7 (AF-H7E):
+    // param4=99 magic -> ST ROM DFU (0483:df11), then a full DFU erase+write+leave -> boot.
+    if (selectedFamily !== 'F4' && selectedFamily !== 'F7' && selectedFamily !== 'H7') {
       log('Software DFU (Enter DFU) is verified on AF-F4, AF-F7, and AF-H7E — pick a matching recovery image first.', 'err');
-      setStatus('Software DFU: F4 / H7 only', 'err');
+      setStatus('Software DFU: F4 / F7 / H7 only', 'err');
       return;
     }
     try {
@@ -369,12 +369,12 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
     row.classList.add('sel');
     selectedPath = row.dataset.path || null; droppedFile = null;
     selectedFamily = row.dataset.family || null; selectedName = row.dataset.name || null;
-    // F4-only DFU. Reveal BOTH: 🛠 Enter DFU (running board → software DFU) AND 🔌 Connect DFU
-    // device (board ALREADY in DFU — blank board on BOOT0, or a previous run — connects directly
-    // without Enter DFU). Both hidden once we're already connected (auto-reconnect on load).
-    const f4dfu = (mode === 'dfu' && selectedFamily === 'F4');
-    ($('#softdfu') as HTMLElement).hidden = !f4dfu || !!conn;
-    ($('#dfuconnect') as HTMLElement).hidden = !f4dfu || !!conn;
+    // Software-DFU families (F4/F7/H7). Reveal BOTH: 🛠 Enter DFU (running board → software DFU)
+    // AND 🔌 Connect DFU device (board ALREADY in DFU — blank board on BOOT0, or a previous run —
+    // connects directly without Enter DFU). Both hidden once we're already connected (auto-reconnect).
+    const swdfuFam = (mode === 'dfu' && (selectedFamily === 'F4' || selectedFamily === 'F7' || selectedFamily === 'H7'));
+    ($('#softdfu') as HTMLElement).hidden = !swdfuFam || !!conn;
+    ($('#dfuconnect') as HTMLElement).hidden = !swdfuFam || !!conn;
     refreshFlashEnabled();
   }));
 
