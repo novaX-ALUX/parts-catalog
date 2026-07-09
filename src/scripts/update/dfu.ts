@@ -39,6 +39,17 @@ export class STM32Dfu {
     return typeof navigator !== 'undefined' && !!(navigator as any).usb;
   }
 
+  /** True if the browser already has an AUTHORIZED 0483:DF11 device (a board sitting in DFU).
+   *  Uses getDevices() (no picker, does NOT consume the click's user-gesture), so the caller can
+   *  decide "show the WebUSB picker" vs "enter DFU over serial" and still call requestDevice() after. */
+  static async anyPresent(): Promise<boolean> {
+    if (!STM32Dfu.available()) return false;
+    try {
+      const devs = await (navigator as any).usb.getDevices();
+      return devs.some((d: any) => d.vendorId === STM_VID && d.productId === STM_PID);
+    } catch { return false; }
+  }
+
   /** Prompt the browser device picker (filtered to 0483:DF11) and open it. */
   static async connect(): Promise<STM32Dfu> {
     if (!STM32Dfu.available()) throw new DfuError('This browser does not support WebUSB (desktop Chrome/Edge required).');

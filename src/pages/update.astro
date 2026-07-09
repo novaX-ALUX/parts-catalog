@@ -169,7 +169,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-07-09b * Enter DFU now opens the WebUSB device picker (pick the exact 0483:df11 board — multi-board safe); the connected DFU chip is verified against the selected firmware (wrong board rejected, not silently used).';
+  const BUILD = '2026-07-09c * Enter DFU: if a board is already in DFU it opens the WebUSB picker so you pick the exact 0483:df11 (multi-board safe); a running board goes into DFU over serial (its COM picker chooses the board). The connected DFU chip is verified vs the selected firmware — wrong board is rejected, never silently used.';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -290,13 +290,13 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
       return;
     }
     try {
-      // 0) Show the WebUSB device picker so the USER explicitly selects the STM32 DFU device
-      //    (0483:DF11). Essential with several boards attached — the user picks the intended
-      //    one instead of the tool silently grabbing another board's DFU. This is the FIRST
-      //    await so the click's user-gesture is still valid for requestDevice(). If the board
-      //    is still running (no df11 offered) the picker is empty → cancel → the serial step
-      //    below sends it into DFU.
-      let c: any = await STM32Dfu.connect().catch(() => null);
+      // 0) If a DFU device is already present (board already in DFU — maybe several boards),
+      //    show the WebUSB picker so the USER selects the intended one (never a silent grab of
+      //    another board's DFU). anyPresent()/getDevices() does NOT consume the click gesture,
+      //    so requestDevice() is still allowed after it. If NONE is present the board is still
+      //    running → skip to the serial boot-to-DFU below (its COM picker lets the user pick
+      //    the board), then reconnect to the df11 it lands in.
+      let c: any = (await STM32Dfu.anyPresent()) ? await STM32Dfu.connect().catch(() => null) : null;
       if (!c) {
         // 1) Running board → put it into ROM DFU over Web Serial (best-effort; skipped if the
         //    board is already in DFU / blank, in which case the COM picker is just cancelled).
