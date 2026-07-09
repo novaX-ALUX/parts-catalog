@@ -292,7 +292,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
     try {
       // 0) Already in DFU (e.g. BOOT0, or a previous run) and authorized? Use it directly —
       //    no serial step, no extra dialog. Keeps the old BOOT0 workflow working too.
-      let c: any = await STM32Dfu.autoConnect().catch(() => null);
+      let c: any = await STM32Dfu.autoConnect(selectedFamily).catch(() => null);
       if (!c) {
         // 1) Running board → put it into ROM DFU over Web Serial (best-effort; skipped if the
         //    board is already in DFU / blank, in which case the COM picker is just cancelled).
@@ -312,7 +312,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
         //    consumed the click's user-gesture, so the browser would throw
         //    "Must be handling a user gesture". Instead reveal "Connect DFU device" so the
         //    user opens the picker in a FRESH click (see #dfuconnect handler).
-        c = await STM32Dfu.autoConnect().catch(() => null);
+        c = await STM32Dfu.autoConnect(selectedFamily).catch(() => null);
         if (!c) {
           log('Board is now in STM32 DFU (0483:DF11). Click ⚡ Flash (DFU) — it picks the DFU device and flashes.', 'pend');
           setStatus('In DFU — click Flash (DFU)', 'pend');
@@ -369,6 +369,16 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
     row.classList.add('sel');
     selectedPath = row.dataset.path || null; droppedFile = null;
     selectedFamily = row.dataset.family || null; selectedName = row.dataset.name || null;
+    // If we were auto-reconnected to a DFU device of a DIFFERENT chip (e.g. an F4 sitting in DFU
+    // while the user now picks F7 firmware), release it so we neither flash nor stay "connected"
+    // to the wrong board. The buttons below then re-reveal to connect the intended board.
+    if (mode === 'dfu' && conn && selectedFamily && typeof (conn as any).flashInfo === 'function'
+        && (conn as any).flashInfo().family !== selectedFamily) {
+      const wrongFam = (conn as any).flashInfo().family;
+      try { (conn as any).close?.(); } catch { /* ignore */ }
+      conn = null; setStatus('Not connected', '');
+      log(`Released the STM32${wrongFam} DFU device — you picked STM32${selectedFamily} firmware. Use 🛠 Enter DFU (or 🔌 Connect DFU device) to connect the intended board.`, 'pend');
+    }
     // Software-DFU families (F4/F7/H7). Reveal BOTH: 🛠 Enter DFU (running board → software DFU)
     // AND 🔌 Connect DFU device (board ALREADY in DFU — blank board on BOOT0, or a previous run —
     // connects directly without Enter DFU). Both hidden once we're already connected (auto-reconnect).

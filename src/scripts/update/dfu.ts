@@ -46,12 +46,26 @@ export class STM32Dfu {
     return STM32Dfu.open(dev);
   }
 
-  /** Silently reconnect to an already-authorized DFU device (no picker). null if none. */
-  static async autoConnect(): Promise<STM32Dfu | null> {
+  /** Silently reconnect to an already-authorized DFU device (no picker). null if none.
+   *  When several 0483:DF11 devices are authorized at once (e.g. an F4 AND an F7 both sitting
+   *  in DFU), open each and return the one whose chip family matches `wantFamily`. If a family
+   *  is wanted but none matches, return null — the caller then enters DFU on the INTENDED board
+   *  instead of silently grabbing the wrong one (the old bug: picked F7 firmware, connected F4). */
+  static async autoConnect(wantFamily?: string | null): Promise<STM32Dfu | null> {
     if (!STM32Dfu.available()) return null;
-    const devs = await (navigator as any).usb.getDevices();
-    const dev = devs.find((d: any) => d.vendorId === STM_VID && d.productId === STM_PID);
-    return dev ? STM32Dfu.open(dev) : null;
+    const devs = (await (navigator as any).usb.getDevices())
+      .filter((d: any) => d.vendorId === STM_VID && d.productId === STM_PID);
+    if (!devs.length) return null;
+    if (devs.length === 1 && !wantFamily) return STM32Dfu.open(devs[0]);
+    let fallback: STM32Dfu | null = null;
+    for (const d of devs) {
+      let dfu: STM32Dfu | null = null;
+      try { dfu = await STM32Dfu.open(d); } catch { continue; }
+      if (!wantFamily || dfu.flashInfo().family === wantFamily) return dfu;   // chip match
+      if (!fallback) fallback = dfu; else await dfu.close();
+    }
+    if (wantFamily) { if (fallback) await fallback.close(); return null; }     // wanted chip not present → don't use a wrong board
+    return fallback;
   }
 
   private static async open(dev: USBDevice): Promise<STM32Dfu> {
