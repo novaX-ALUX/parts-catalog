@@ -169,7 +169,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-07-09d * Multi-board: Enter DFU on a RUNNING board now shows the COM-port picker when several ports are authorized (F4+F7) so you choose the board — no more silently grabbing the first one. Single board = still instant. DFU device also picked + chip-verified.';
+  const BUILD = '2026-07-09e * Enter DFU ALWAYS shows the COM-port picker (pick which board goes into DFU — even with one port), then verifies the DFU chip vs the selected firmware. Multi-board safe end to end.';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -303,7 +303,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
         try {
           setStatus('Select the running board (its COM port) …', 'pend');
           log('Connecting to the running app over Web Serial …', 'pend');
-          const px4 = await Px4Updater.connect();
+          const px4 = await Px4Updater.connect(115200, true);   // Enter DFU: ALWAYS show the COM-port picker so the user chooses which board goes into DFU
           log('Sending boot-to-DFU magic (param4=99) …', 'pend');
           await px4.enterRomDfu(log);                          // app drops USB & resets into ROM DFU
           log('Waiting for the board to re-appear as STM32 DFU (0483:DF11) …', 'pend');
