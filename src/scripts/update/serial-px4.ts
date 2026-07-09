@@ -115,11 +115,13 @@ export class Px4Updater {
 
   static async connect(baudRate = 115200): Promise<Px4Updater> {
     if (!Px4Updater.available()) throw new Error('This browser does not support Web Serial (desktop Chrome/Edge required).');
-    // An already-authorized port can be opened with no picker — try that first so a single
-    // Connect click connects instantly (no dialog). Fall back to the picker otherwise.
+    // Auto-open ONLY when exactly ONE port is authorized (unambiguous) so a single Connect click
+    // is instant. With SEVERAL authorized ports (e.g. an F4 AND an F7 both attached) show the
+    // picker so the USER selects the intended board — otherwise we'd silently grab granted[0]
+    // (possibly the wrong board: "Enter DFU went to the wrong board / no COM picker shown").
     try {
       const granted = await (navigator as any).serial.getPorts();
-      if (granted.length) { await granted[0].open({ baudRate }); return new Px4Updater(granted[0]); }
+      if (granted.length === 1) { await granted[0].open({ baudRate }); return new Px4Updater(granted[0]); }
     } catch { /* not openable (already open / gone) — fall through to picker */ }
     const filters: any[] = []; // Optional VID/PID filter narrows the picker once novaX IDs are known.
     const port = await (navigator as any).serial.requestPort(filters.length ? { filters } : undefined);

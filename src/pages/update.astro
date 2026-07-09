@@ -169,7 +169,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-07-09c * Enter DFU: if a board is already in DFU it opens the WebUSB picker so you pick the exact 0483:df11 (multi-board safe); a running board goes into DFU over serial (its COM picker chooses the board). The connected DFU chip is verified vs the selected firmware — wrong board is rejected, never silently used.';
+  const BUILD = '2026-07-09d * Multi-board: Enter DFU on a RUNNING board now shows the COM-port picker when several ports are authorized (F4+F7) so you choose the board — no more silently grabbing the first one. Single board = still instant. DFU device also picked + chip-verified.';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
