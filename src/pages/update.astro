@@ -169,7 +169,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-07-09 * AF-F7 Mini (F7) added: buttonless software DFU verified on hardware (param4=99 -> 0483:df11, full erase+write+leave->boot at board_id 6201). F7 now shows in the firmware/DFU lists + Enter DFU. Windows: one-time WinUSB (Zadig) on the df11 device, same as F4/H7.';
+  const BUILD = '2026-07-09b * Enter DFU now opens the WebUSB device picker (pick the exact 0483:df11 board — multi-board safe); the connected DFU chip is verified against the selected firmware (wrong board rejected, not silently used).';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -290,9 +290,13 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
       return;
     }
     try {
-      // 0) Already in DFU (e.g. BOOT0, or a previous run) and authorized? Use it directly —
-      //    no serial step, no extra dialog. Keeps the old BOOT0 workflow working too.
-      let c: any = await STM32Dfu.autoConnect(selectedFamily).catch(() => null);
+      // 0) Show the WebUSB device picker so the USER explicitly selects the STM32 DFU device
+      //    (0483:DF11). Essential with several boards attached — the user picks the intended
+      //    one instead of the tool silently grabbing another board's DFU. This is the FIRST
+      //    await so the click's user-gesture is still valid for requestDevice(). If the board
+      //    is still running (no df11 offered) the picker is empty → cancel → the serial step
+      //    below sends it into DFU.
+      let c: any = await STM32Dfu.connect().catch(() => null);
       if (!c) {
         // 1) Running board → put it into ROM DFU over Web Serial (best-effort; skipped if the
         //    board is already in DFU / blank, in which case the COM picker is just cancelled).
@@ -323,6 +327,18 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
           return;
         }
       }
+      // Guard: the picked/connected DFU device must match the selected firmware's chip, so
+      // picking the wrong board (e.g. an F4 in DFU while F7 firmware is selected) is rejected
+      // here — not silently connected — before any flash.
+      if (c && selectedFamily && typeof (c as any).flashInfo === 'function') {
+        const fam = (c as any).flashInfo().family;
+        if (fam !== 'unknown' && fam !== selectedFamily) {
+          log(`Wrong DFU device — it is an STM32${fam}, but you picked STM32${selectedFamily} firmware (${selectedName}). Click 🛠 Enter DFU again and select the ${selectedName} board's DFU device.`, 'err');
+          try { await (c as any).close?.(); } catch { /* ignore */ }
+          setStatus('Wrong DFU device — pick again', 'err');
+          return;
+        }
+      }
       conn = c; setStatus('● ' + c.chipLabel(), 'ok');
       log('DFU connected (' + c.chipLabel() + '). Pick the *_with_bl.hex and click Flash (DFU).', 'ok');
       refreshFlashEnabled();
@@ -340,6 +356,14 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   $('#dfuconnect').addEventListener('click', async () => {
     try {
       const c: any = await STM32Dfu.connect();               // navigator.usb.requestDevice(...) → picker
+      if (selectedFamily && typeof c.flashInfo === 'function') {
+        const fam = c.flashInfo().family;
+        if (fam !== 'unknown' && fam !== selectedFamily) {
+          log(`Wrong DFU device — it is an STM32${fam}, but you picked STM32${selectedFamily} firmware (${selectedName}). Connect the ${selectedName} board's DFU device.`, 'err');
+          try { await c.close?.(); } catch { /* ignore */ }
+          setStatus('Wrong DFU device — pick again', 'err'); return;
+        }
+      }
       ($('#dfuconnect') as HTMLElement).hidden = true;
       conn = c; setStatus('● ' + c.chipLabel(), 'ok');
       log('DFU connected (' + c.chipLabel() + '). Pick the *_with_bl.hex and click Flash (DFU).', 'ok');
