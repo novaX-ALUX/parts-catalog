@@ -39,10 +39,11 @@ rows.sort((a, b) =>
   || a.version.localeCompare(b.version, 'en', { numeric: true })
 );
 // Families whose full web flow (serial OTA + software DFU + DFU flash) is verified on real
-// hardware. F4 (long-standing) and H7 (AF-H7E, verified 2026-07: buttonless software DFU via
-// param4=99 magic + the bootloader self-heal that auto-boots the app after a DFU flash — no
-// brick, no power cycle). F7 stays hidden until its DFU path is verified.
-const WEB_UPDATE_FAMILIES = ['F4', 'H7'];
+// hardware. F4 (long-standing), H7 (AF-H7E, 2026-07: buttonless software DFU via param4=99
+// magic + bootloader self-heal), and F7 (AF-F7 Mini, verified 2026-07-09: param4=99 → 0483:df11,
+// app+bootloader flashed to board_id 6201 over serial, then a full DFU erase+write+leave→boot).
+// Windows needs the one-time WinUSB (Zadig) step on the df11 device, same as F4/H7.
+const WEB_UPDATE_FAMILIES = ['F4', 'F7', 'H7'];
 const fwRows = rows.filter((r) => r.method !== 'dfu' && WEB_UPDATE_FAMILIES.includes(r.family));
 const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.includes(r.family));
 ---
@@ -58,7 +59,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
       </div>
 
       <p class="mode-note" data-note="fw">Normal update over USB — device stays running, no jumper. Switch to <b>DFU Recovery</b> only if the board is blank or won't boot.</p>
-      <p class="mode-note" data-note="dfu" hidden><b>Pick a recovery image (<code>_with_bl.hex</code>) below</b>, then click <b>🛠 Enter DFU</b> to put a running board into USB DFU — buttonless (verified on AF-F4 and AF-H7E). Windows needs a one-time WinUSB driver (Zadig).</p>
+      <p class="mode-note" data-note="dfu" hidden><b>Pick a recovery image (<code>_with_bl.hex</code>) below</b>, then click <b>🛠 Enter DFU</b> to put a running board into USB DFU — buttonless (verified on AF-F4, AF-F7, and AF-H7E). Windows needs a one-time WinUSB driver (Zadig).</p>
 
       <div class="banner" data-banner="fw">
         <div class="step"><b>① Pick firmware</b>Plug in USB-C (no jumper, no BOOT0) and select the <code>.apj</code> below.</div>
@@ -103,7 +104,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
 
       <div class="row-connect">
         <button id="connect" class="btn btn-line">🔌 Connect</button>
-        <button id="softdfu" class="btn btn-line" hidden title="실행 중인 보드를 소프트웨어로 ROM DFU에 진입시킴 (AF-F4 ≥ v0.2.2 / T10 ≥ v0.3.2 / AF-H7E ≥ v0.2.2)">🛠 Enter DFU</button>
+        <button id="softdfu" class="btn btn-line" hidden title="실행 중인 보드를 소프트웨어로 ROM DFU에 진입시킴 (AF-F4 ≥ v0.2.2 / T10 ≥ v0.3.2 / AF-F7 ≥ v0.2.4 / AF-H7E ≥ v0.2.2)">🛠 Enter DFU</button>
         <button id="dfuconnect" class="btn btn-line" hidden title="보드가 DFU(0483:DF11)에 있을 때 WebUSB 장치 선택 팝업을 새 클릭으로 열어 연결 (브라우저 제스처 요구 우회)">🔌 Connect DFU device</button>
         <span id="status" class="chip">Not connected</span>
       </div>
@@ -168,7 +169,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-07-08 * DFU erase no longer freezes the page: during the long H7 erase, GETSTATUS is polled gently (honor bwPollTimeout, 33-250ms) instead of hammering it every ~1ms, so Chrome will not show page-unresponsive';
+  const BUILD = '2026-07-09 * AF-F7 Mini (F7) added: buttonless software DFU verified on hardware (param4=99 -> 0483:df11, full erase+write+leave->boot at board_id 6201). F7 now shows in the firmware/DFU lists + Enter DFU. Windows: one-time WinUSB (Zadig) on the df11 device, same as F4/H7.';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -198,7 +199,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
       soft.disabled = false;
       if (conn || !picked) { soft.hidden = true; }                       // connected, or pick firmware first
       else {                                                             // picked, not connected
-        const swdfu = (selectedFamily === 'F4' || selectedFamily === 'H7'); // software Enter DFU verified on F4 + H7
+        const swdfu = (selectedFamily === 'F4' || selectedFamily === 'F7' || selectedFamily === 'H7'); // software Enter DFU verified on F4 + F7 + H7
         soft.hidden = !swdfu;                                            // running board → Enter DFU first
         (swdfu ? soft : flashBtn).classList.add('pulse');                // running: Enter DFU; already in DFU: Flash
       }
@@ -284,7 +285,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
     // Software boot-to-DFU is verified on F4 and H7 (AF-H7E: param4=99 magic -> ST ROM DFU,
     // then the self-heal bootloader auto-boots the app after flashing). F7 is not yet verified.
     if (selectedFamily !== 'F4' && selectedFamily !== 'H7') {
-      log('Software DFU (Enter DFU) is verified on AF-F4 and AF-H7E — pick a matching recovery image first.', 'err');
+      log('Software DFU (Enter DFU) is verified on AF-F4, AF-F7, and AF-H7E — pick a matching recovery image first.', 'err');
       setStatus('Software DFU: F4 / H7 only', 'err');
       return;
     }
