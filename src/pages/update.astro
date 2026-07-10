@@ -104,7 +104,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
 
       <div class="row-connect">
         <button id="connect" class="btn btn-line">🔌 Connect</button>
-        <button id="softdfu" class="btn btn-line" hidden title="실행 중인 보드를 소프트웨어로 ROM DFU에 진입시킴 (AF-F4 ≥ v0.2.2 / T10 ≥ v0.3.2 / AF-F7 ≥ v0.2.4 / AF-H7E ≥ v0.2.2)">🛠 Enter DFU</button>
+        <button id="softdfu" class="btn btn-line" hidden title="실행 중인 보드를 소프트웨어로 ROM DFU에 진입시킴 (AF-F4 ≥ v0.2.2 / T10 ≥ v0.3.2 / nano v2 ≥ v1.0.1 / AF-F7 ≥ v0.2.4 / AF-H7E ≥ v0.2.2)">🛠 Enter DFU</button>
         <button id="dfuconnect" class="btn btn-line" hidden title="보드가 DFU(0483:DF11)에 있을 때 WebUSB 장치 선택 팝업을 새 클릭으로 열어 연결 (브라우저 제스처 요구 우회)">🔌 Connect DFU device</button>
         <span id="status" class="chip">Not connected</span>
       </div>
