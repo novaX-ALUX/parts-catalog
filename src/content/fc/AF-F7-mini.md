@@ -30,22 +30,22 @@ description: |
   AF-F7 mini is an F7-class flight controller powered by the STM32F765 running at 216 MHz. Dual IMUs (ICM-20689 primary, ICM-20602 / BMI055 secondary), an IST8310 magnetometer and an MS5611 barometer deliver redundant attitude, heading and altitude sensing. 8 PWM outputs, 4 UARTs, 3 I²C ports and 2 CAN buses cover mid-range UAV payload stacks running ArduPilot or PX4.
 firmware:
   - kind: "ArduPilot (.apj package)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F7_mini-v0.2.4/AF-F7_mini-v0.2.4.apj
-    version: "0.2.4"
-    date: "2026-07-09"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F7_mini-v1.2.4/AF-F7_mini-v1.2.4.apj
+    version: "1.2.4"
+    date: "2026-07-11"
     size: "1.4 MB"
-    sha256: "dc074e7b2c56437b10096514a64e1bb32a9f00ba296b8bb337544faafc2f4599"
+    sha256: "89ea37adf770b2823e660e333f15840af36a0c49437970f5603c0bf191142d14"
     notes: "ArduPilot Copter app (board_id 6201). Adds verified buttonless software DFU. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater → Firmware Update."
     method: ardupilot
-    webPath: /firmware/AF-F7_mini-v0.2.4.apj
+    webPath: /firmware/AF-F7_mini-v1.2.4.apj
   - kind: "Bootloader + App (merged HEX · DFU / SWD)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F7_mini-v0.2.4/AF-F7_mini-v0.2.4_with_bl.hex
-    version: "0.2.4"
-    date: "2026-07-09"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F7_mini-v1.2.4/AF-F7_mini-v1.2.4_with_bl.hex
+    version: "1.2.4"
+    date: "2026-07-11"
     size: "4.6 MB"
-    sha256: "fd9f10bd57f611dab133b549d0afe4fe8ff5db17c4c5947030c6bd25fc25eaaa"
+    sha256: "6d71164c975fd7b63699901d1b35ac757f63befa64c3f48e20c8ea52ee2c9e43"
     notes: "Bootloader + application combined image based at 0x08000000 (board_id 6201, ENABLE_DFU_BOOT). Flash via the Web Updater → DFU Recovery (buttonless: Enter DFU sends the app into ROM DFU; Windows needs a one-time WinUSB/Zadig on the 0483:df11 device), or SWD/ST-Link for a blank board."
     method: dfu
-    webPath: /firmware/AF-F7_mini-v0.2.4_with_bl.hex
+    webPath: /firmware/AF-F7_mini-v1.2.4_with_bl.hex
 firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases'
 ---
