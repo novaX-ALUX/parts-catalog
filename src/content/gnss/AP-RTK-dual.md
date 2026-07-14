@@ -1,7 +1,7 @@
 ---
 name: AP-RTK dual
 tagline: Dual-Antenna High-Precision RTK GNSS
-image: /images/products/gnss_X_RTK2.png
+image: /images/products/gnss_AP-RTK-dual_device.png
 pictureKey: gnss_X_RTK2
 pinoutImage: /images/products/gnss_AP-RTK-dual_pinout.png
 pinoutNotes: '① UART (5V · RX · TX · GND) · ② CAN (5V · CAN_H · CAN_L · GND).'
