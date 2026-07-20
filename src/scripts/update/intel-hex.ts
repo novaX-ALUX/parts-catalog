@@ -14,7 +14,7 @@ function hb(s: string, i: number): number {
   return parseInt(s.substr(i, 2), 16);
 }
 
-export function parseIntelHex(text: string): ParsedHex {
+export async function parseIntelHex(text: string): Promise<ParsedHex> {
   const raw: HexSegment[] = [];
   let upper = 0; // upper 16 bits from type 04 (linear) — type 02 is <<4
   const lines = text.split(/\r?\n/);
@@ -42,23 +42,39 @@ export function parseIntelHex(text: string): ParsedHex {
       upper = ((hb(line, 9) << 8) | hb(line, 11)) * 16;
     }
     // 0x03 / 0x05 (start address) intentionally ignored
+    // Yield every ~16k lines so a multi-MB hex (H7 _with_bl.hex ≈ 5 MB text / 130k records)
+    // doesn't stall the main thread → Chrome "page unresponsive (Wait / Exit)" dialog.
+    if ((ln & 0x3fff) === 0) await new Promise((r) => setTimeout(r, 0));
   }
   if (raw.length === 0) throw new Error('No data records found in HEX file');
 
-  // sort + merge contiguous runs
+  // sort, then merge contiguous runs in O(n). The old per-record grow-and-copy
+  // (new Uint8Array(last+seg); set(last); set(seg)) recopied the whole accumulated run on
+  // EVERY record → O(n²): ~130k contiguous 16 B records = tens of GB copied = a multi-second
+  // to minute main-thread freeze = the "page unresponsive" dialog. Here each byte is copied
+  // exactly once: collect a run's member arrays, allocate its buffer once, then blit them in.
   raw.sort((a, b) => a.address - b.address);
   const segments: HexSegment[] = [];
+  let members: Uint8Array[] = [];
+  let runAddr = raw[0].address;
+  let runLen = 0;
+  let expect = raw[0].address;
+  const flush = () => {
+    if (!members.length) return;
+    const buf = new Uint8Array(runLen);
+    let o = 0;
+    for (const m of members) { buf.set(m, o); o += m.length; }
+    segments.push({ address: runAddr, data: buf });
+  };
   for (const seg of raw) {
-    const last = segments[segments.length - 1];
-    if (last && seg.address === last.address + last.data.length) {
-      const merged = new Uint8Array(last.data.length + seg.data.length);
-      merged.set(last.data, 0);
-      merged.set(seg.data, last.data.length);
-      last.data = merged;
+    if (seg.address === expect) {
+      members.push(seg.data); runLen += seg.data.length; expect += seg.data.length;
     } else {
-      segments.push({ address: seg.address, data: new Uint8Array(seg.data) });
+      flush();
+      runAddr = seg.address; members = [seg.data]; runLen = seg.data.length; expect = seg.address + seg.data.length;
     }
   }
+  flush();
   const minAddress = segments[0].address;
   const lastSeg = segments[segments.length - 1];
   const maxAddress = lastSeg.address + lastSeg.data.length;

@@ -500,7 +500,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
       log(`Loaded ${src.name}`, 'ok');
       if (mode === 'dfu') {
         const text = src.text ?? new TextDecoder().decode(new Uint8Array(src.buf!));
-        const hex = parseIntelHex(text);
+        const hex = await parseIntelHex(text);
         log(`HEX 0x${hex.minAddress.toString(16)}–0x${hex.maxAddress.toString(16)}, ${hex.totalBytes} bytes`);
         // ---- chip guard: stop a wrong-chip flash before erasing anything ----
         const info = (conn as InstanceType<typeof STM32Dfu>).flashInfo();
