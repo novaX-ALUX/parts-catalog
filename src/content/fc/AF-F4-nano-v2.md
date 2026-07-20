@@ -1,6 +1,8 @@
 ---
 name: AF-F4 nano v2
 tagline: Compact F4 Flight Controller · Onboard GNSS + Compass · ArduPilot
+image: /images/products/fc_F4_nano_v2.png
+pictureKey: fc_F4_nano_v2
 order: 12
 specs:
   - { key: MCU, value: "STM32F405" }
@@ -20,6 +22,9 @@ specs:
   - { key: Supported F/W, value: "ArduPilot" }
 description: |
   AF-F4 nano v2 is a compact F4-class flight controller built around the STM32F405, with an ICM-42688-P IMU and a DPS368 barometer. An onboard MAX-M10S GNSS module and QMC5883P compass are wired to the first serial port and the I2C bus, so the board flies without an external GPS unit. Six PWM outputs, five serial ports and microSD blackbox logging round out the feature set. The board carries its own board ID (6204) and bootloader, so firmware for other novaX F4 boards cannot be flashed onto it by mistake.
+pinoutImages:
+  - /images/products/fc_F4_nano_v2_pinout_top.png
+  - /images/products/fc_F4_nano_v2_pinout_bottom.png
 firmware:
   - kind: "ArduPilot (.apj package)"
     file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F4_nano_v2-v1.0.2/AF-F4_nano_v2-v1.0.2.apj
