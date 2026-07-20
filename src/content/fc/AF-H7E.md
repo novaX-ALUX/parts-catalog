@@ -54,7 +54,7 @@ pinoutImage: /images/products/cuav-pixhawk6x-connectors.png
 pinoutImages:
   - /images/products/fc_AF-H7E_dimensions.png
   - /images/products/cuav-pixhawk6x-connectors.png
-pinoutNotes: ''
+pinoutNotes: 'I2C bus numbering on the multi-function ports: the GPS & Safety port carries I2C1, the GPS2 port carries I2C2, and the UART4 port carries I2C3.'
 firmware:
   - kind: "ArduPilot Copter (.apj package)"
     file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-H7E-v1.2.9/AF-H7E-v1.2.9-Copter.apj
