@@ -310,7 +310,14 @@ export class STM32Dfu {
       log('Verifying (read-back) …');
       await this.verify(hex, progress);
       log('Verify OK.');
-      await this.abortToIdle(); // clean dfuIDLE before the leave's Set Address
+      await this.abortToIdle();
+      // Set the app boot address via the ROM's @Option Bytes interface — reliable (= CubeProgrammer
+      // -ob), unlike the firmware self-heal which ~50%-fails on H7. After this the board boots the
+      // app on the next power-on; the leave below is best-effort.
+      log('Setting boot address (BOOT_CM7_ADD0 → 0x08000000) …');
+      await this.setBootAddress0(0x08000000);
+      log('✓ Boot address set. Unplug and re-plug the USB once to boot the app.');
+      await this.abortToIdle();
     }
     log('Leaving DFU …');
     await this.leave(hex.minAddress);
@@ -328,6 +335,44 @@ export class STM32Dfu {
     try { const st = await this.getStatus(); if (st.state === 10 /* dfuERROR */) await this.dev.controlTransferOut({ requestType: 'class', recipient: 'interface', request: CLRSTATUS, value: 0, index: this.iface }); } catch { /* ignore */ }
     try { await this.dev.controlTransferOut({ requestType: 'class', recipient: 'interface', request: ABORT, value: 0, index: this.iface }); } catch { /* ignore */ }
     try { await this.getStatus(); } catch { /* ignore */ }
+  }
+
+  /** Set the STM32H7 CM7 cold-boot address (BOOT_CM7_ADD0, used when BOOT0 is low) through the
+   *  ROM's DfuSe "@Option Bytes" alt interface — the exact reliable option-byte write CubeProgrammer
+   *  does over USB1 (verified on-bench via the pyusb twin, both directions, RDP preserved).
+   *
+   *  WHY the tool does this: the novaX firmware self-heal used to restore BOOT_CM7_ADD0=0x08000000
+   *  from the bootloader after a DFU flash, but on H7 an option-byte write issued from code running
+   *  in flash silently fails ~50% of the time (RWW: OPTSTART stalls the flash array for ~300 ms and
+   *  any fetch voids the write). The halted ROM has no such conflict, so writing it here is
+   *  deterministic. Read-modify-write: only the two BOOT_CM7 words (+0x24 BOOT7_CURR, +0x28
+   *  BOOT7_PRGR) change; RDP/WRP/PCROP are read back and rewritten unchanged so protection can't be
+   *  corrupted. Takes effect on the next power-on reset (re-plug). */
+  private async setBootAddress0(addr: number) {
+    const OB_BASE = 0x5200201c;    // DfuSe "@Option Bytes /0x5200201C/..." base (STM32H7)
+    const OB_LEN = 128;
+    const BOOT_OFF = 0x24;         // FLASH_BOOT7_CURR in the option window; BOOT7_PRGR at +0x28
+    const add0 = (addr >>> 16) & 0xffff; // BOOT_CM7_ADD0 = addr[31:16] (0x08000000 -> 0x0800)
+    await this.dev.selectAlternateInterface(this.iface, 1); // @Option Bytes
+    try {
+      await this.abortToIdle();
+      // read the current 128-byte option block
+      await this.dfuseCmd(0x21, OB_BASE);
+      await this.abortToIdle();
+      const blk = new Uint8Array(await this.upload(2, OB_LEN)); // fresh ArrayBuffer-backed copy
+      const rd = (o: number) => (blk[o] | (blk[o + 1] << 8) | (blk[o + 2] << 16) | (blk[o + 3] << 24)) >>> 0;
+      const wr = (o: number, v: number) => { blk[o] = v & 0xff; blk[o + 1] = (v >>> 8) & 0xff; blk[o + 2] = (v >>> 16) & 0xff; blk[o + 3] = (v >>> 24) & 0xff; };
+      const nv = ((rd(BOOT_OFF) & 0xffff0000) | add0) >>> 0; // keep BOOT_ADD1 (high 16), set BOOT_ADD0
+      wr(BOOT_OFF, nv); wr(BOOT_OFF + 4, nv);
+      // write the whole block back — the ROM programs the option bytes on the transfer
+      await this.abortToIdle();
+      await this.dfuseCmd(0x21, OB_BASE);
+      await this.abortToIdle();
+      await this.dnload(2, blk);
+      await this.pollIdle();
+    } finally {
+      try { await this.dev.selectAlternateInterface(this.iface, 0); } catch { /* ignore */ } // back to @Internal Flash
+    }
   }
 
   /** Read the whole image back and compare to what we wrote (mirrors flash_dfu.py do_verify).
