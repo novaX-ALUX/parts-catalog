@@ -32,6 +32,9 @@ export class STM32Dfu {
   private dev: USBDevice;
   private iface = 0;
   private sectors: Sector[] = [];
+  /** True after an H7 flash: the boot address was set via the ROM and the board must be
+   *  power-cycled (unplug/replug) to boot the app — it does NOT auto-reboot. */
+  needsPowerCycle = false;
 
   private constructor(dev: USBDevice) { this.dev = dev; }
 
@@ -298,26 +301,32 @@ export class STM32Dfu {
       }
     }
     log(`(used ${cap}B chunks)`);
-    // STM32H7 ONLY: read-back verify BEFORE leave, mirroring the bench-verified flash_dfu.py
-    // sequence. The full read-back drains the H7 flash write pipeline (both banks idle) so the
-    // freshly flashed bootloader's self-heal option-byte write (BOOT_ADD0 → 0x08000000)
-    // reliably COMMITS after the leave-jump and the app cold-boots — no re-plug, no manual
-    // CubeProgrammer fix. The old "verify-by-leave" left the pipeline unsettled, so on H7 the
-    // OPTSTART silently failed intermittently and the board kept re-entering ROM DFU
-    // (0483:df11) on every reset. F4/F7 don't use the BOOT_ADD0 mechanism and already boot
-    // reliably, so their flow is left unchanged (no added risk).
+    // STM32H7 path: verify, then set the app boot address via the ROM's @Option Bytes interface
+    // (reliable — the same option-byte write CubeProgrammer's -ob does, verified on-bench). We do
+    // NOT do a DFU-leave here: the leave-jump would run the firmware self-heal, whose option-byte
+    // write from flash silently ~50%-fails (RWW), and BOOT_CM7_ADD0 is re-latched only at a
+    // power-on reset anyway. So we end in DFU with the boot address already set and tell the user
+    // to power-cycle. F4/F7 don't use BOOT_ADD0 and boot on a normal leave, so they take the
+    // branch below unchanged.
     if (this.flashInfo().family === 'H7') {
       log('Verifying (read-back) …');
       await this.verify(hex, progress);
       log('Verify OK.');
       await this.abortToIdle();
-      // Set the app boot address via the ROM's @Option Bytes interface — reliable (= CubeProgrammer
-      // -ob), unlike the firmware self-heal which ~50%-fails on H7. After this the board boots the
-      // app on the next power-on; the leave below is best-effort.
-      log('Setting boot address (BOOT_CM7_ADD0 → 0x08000000) …');
-      await this.setBootAddress0(0x08000000);
-      log('✓ Boot address set. Unplug and re-plug the USB once to boot the app.');
+      log('Checking boot address (BOOT_CM7_ADD0) …');
+      const fixed = await this.setBootAddress0(0x08000000);
       await this.abortToIdle();
+      if (fixed) {
+        // The board entered ROM DFU via BOOT_CM7_ADD0 = 0x1FF0 (buttonless / soft DFU, e.g.
+        // AF-H7E). We reset it to 0x08000000 via the ROM; that only re-latches at a power-on
+        // reset, and a DFU-leave here would just run the unreliable firmware self-heal. So end
+        // in DFU and have the caller tell the user to power-cycle.
+        this.needsPowerCycle = true;
+        log('✓ Boot address set to the app (BOOT_CM7_ADD0 → 0x08000000).');
+        return;
+      }
+      // BOOT_CM7_ADD0 already = 0x08000000 (this H7 board did not enter DFU via the boot-address
+      // option byte), so a normal leave boots the app.
     }
     log('Leaving DFU …');
     await this.leave(hex.minAddress);
@@ -348,7 +357,7 @@ export class STM32Dfu {
    *  deterministic. Read-modify-write: only the two BOOT_CM7 words (+0x24 BOOT7_CURR, +0x28
    *  BOOT7_PRGR) change; RDP/WRP/PCROP are read back and rewritten unchanged so protection can't be
    *  corrupted. Takes effect on the next power-on reset (re-plug). */
-  private async setBootAddress0(addr: number) {
+  private async setBootAddress0(addr: number): Promise<boolean> {
     const OB_BASE = 0x5200201c;    // DfuSe "@Option Bytes /0x5200201C/..." base (STM32H7)
     const OB_LEN = 128;
     const BOOT_OFF = 0x24;         // FLASH_BOOT7_CURR in the option window; BOOT7_PRGR at +0x28
@@ -362,7 +371,9 @@ export class STM32Dfu {
       const blk = new Uint8Array(await this.upload(2, OB_LEN)); // fresh ArrayBuffer-backed copy
       const rd = (o: number) => (blk[o] | (blk[o + 1] << 8) | (blk[o + 2] << 16) | (blk[o + 3] << 24)) >>> 0;
       const wr = (o: number, v: number) => { blk[o] = v & 0xff; blk[o + 1] = (v >>> 8) & 0xff; blk[o + 2] = (v >>> 16) & 0xff; blk[o + 3] = (v >>> 24) & 0xff; };
-      const nv = ((rd(BOOT_OFF) & 0xffff0000) | add0) >>> 0; // keep BOOT_ADD1 (high 16), set BOOT_ADD0
+      const cur = rd(BOOT_OFF);
+      if ((cur & 0xffff) === add0) return false; // BOOT_ADD0 already points at the app — nothing to fix
+      const nv = ((cur & 0xffff0000) | add0) >>> 0; // keep BOOT_ADD1 (high 16), set BOOT_ADD0
       wr(BOOT_OFF, nv); wr(BOOT_OFF + 4, nv);
       // write the whole block back — the ROM programs the option bytes on the transfer
       await this.abortToIdle();
@@ -370,6 +381,7 @@ export class STM32Dfu {
       await this.abortToIdle();
       await this.dnload(2, blk);
       await this.pollIdle();
+      return true;
     } finally {
       try { await this.dev.selectAlternateInterface(this.iface, 0); } catch { /* ignore */ } // back to @Internal Flash
     }

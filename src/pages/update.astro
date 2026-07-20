@@ -527,7 +527,11 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
         await (conn as InstanceType<typeof Px4Updater>).flash(img.bytes, log, progress, img.boardId);
       }
       progress(1, 1);
-      log('✓ Done. Device rebooting.', 'ok');
+      if (mode === 'dfu' && (conn as InstanceType<typeof STM32Dfu>).needsPowerCycle) {
+        log('✓ Done. Unplug the USB cable and plug it back in to boot the app.', 'ok');
+      } else {
+        log('✓ Done. Device rebooting.', 'ok');
+      }
     } catch (e: any) { log('✗ ' + String(e?.message || e), 'err'); }
     flashBtn.disabled = false;
   });
