@@ -1,9 +1,9 @@
 ---
-name: AE-6S 60A BT
+name: AE-6S 60A BC
 tagline: 32-bit ESC for X-Blade 10/15 · 6S LiPo
-image: /images/products/esc_32-6S-60A-BT.png
-pictureKey: esc_32-6S-60A-BT
-pinoutImage: /images/products/esc_32-6S-60A-BT_pinout.png
+image: /images/products/esc_32-6S-60A-BC.png
+pictureKey: esc_32-6S-60A-BC
+pinoutImage: /images/products/esc_32-6S-60A-BC_pinout.png
 order: 25
 specs:
   - { key: Mounting Hole, value: "45 × 52 mm / Φ 4 mm" }
@@ -19,12 +19,12 @@ specs:
   - { key: Supported Protocols, value: "DShot150 / 300 / 600, MultiShot, OneShot" }
   - { key: Firmware, value: "AM32, novaX ef 1.0" }
 description: |
-  AE-6S 60A BT is a 32-bit ESC rated for 6S LiPo and 60 A continuous current. Supports DShot150 / 300 / 600, MultiShot and OneShot protocols with BDShot telemetry. Compatible with AM32 and novaX ef 1.0 firmware. Designed for X-Blade 10/15 class platforms.
+  AE-6S 60A BC is a 32-bit ESC rated for 6S LiPo and 60 A continuous current. The "BC" suffix stands for Battery Connector — this variant ships with a battery connector fitted for a solderless battery hookup. Supports DShot150 / 300 / 600, MultiShot and OneShot protocols with BDShot telemetry. Compatible with AM32 and novaX ef 1.0 firmware. Designed for X-Blade 10/15 class platforms.
 firmware:
   - kind: "Bootloader (AT32F415 · SWD)"
     file: https://github.com/novaX-ALUX/esc-am32/releases/download/TBS_12S_F415-v2.20/AM32_F415_BOOTLOADER_PB4_128K_V17.hex
     version: "V17"
-    notes: "AM32 bootloader for the AT32F415 (PB4). Flash on a blank board via SWD/ST-Link, then load the application over 4-way passthrough."
+    notes: "AM32 bootloader for the AT32F415 (PB4, 128K). Flash on a blank board via SWD/ST-Link, then load the application over 4-way passthrough."
   - kind: "Application (AM32 · 4-way passthrough)"
     file: https://github.com/novaX-ALUX/esc-am32/releases/download/TBS_12S_F415-v2.20/AM32_TBS_12S_F415_2.20.hex
     version: "2.20"
