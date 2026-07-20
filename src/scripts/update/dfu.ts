@@ -9,7 +9,7 @@
 import type { ParsedHex } from './intel-hex';
 
 const STM_VID = 0x0483, STM_PID = 0xdf11;
-const DNLOAD = 1, GETSTATUS = 3, CLRSTATUS = 4, ABORT = 6;
+const DNLOAD = 1, UPLOAD = 2, GETSTATUS = 3, CLRSTATUS = 4, ABORT = 6;
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export type Log = (msg: string) => void;
@@ -298,8 +298,67 @@ export class STM32Dfu {
       }
     }
     log(`(used ${cap}B chunks)`);
-    log('Program complete. Leaving DFU …');
+    // STM32H7 ONLY: read-back verify BEFORE leave, mirroring the bench-verified flash_dfu.py
+    // sequence. The full read-back drains the H7 flash write pipeline (both banks idle) so the
+    // freshly flashed bootloader's self-heal option-byte write (BOOT_ADD0 → 0x08000000)
+    // reliably COMMITS after the leave-jump and the app cold-boots — no re-plug, no manual
+    // CubeProgrammer fix. The old "verify-by-leave" left the pipeline unsettled, so on H7 the
+    // OPTSTART silently failed intermittently and the board kept re-entering ROM DFU
+    // (0483:df11) on every reset. F4/F7 don't use the BOOT_ADD0 mechanism and already boot
+    // reliably, so their flow is left unchanged (no added risk).
+    if (this.flashInfo().family === 'H7') {
+      log('Verifying (read-back) …');
+      await this.verify(hex, progress);
+      log('Verify OK.');
+      await this.abortToIdle(); // clean dfuIDLE before the leave's Set Address
+    }
+    log('Leaving DFU …');
     await this.leave(hex.minAddress);
+  }
+
+  private async upload(wValue: number, length: number): Promise<Uint8Array> {
+    const r = await this.dev.controlTransferIn(
+      { requestType: 'class', recipient: 'interface', request: UPLOAD, value: wValue, index: this.iface }, length);
+    if (r.status !== 'ok') throw new DfuError(`UPLOAD failed: ${r.status}`);
+    return new Uint8Array(r.data!.buffer);
+  }
+
+  /** ABORT the DfuSe state machine back to dfuIDLE (clearing a latched error first). */
+  private async abortToIdle() {
+    try { const st = await this.getStatus(); if (st.state === 10 /* dfuERROR */) await this.dev.controlTransferOut({ requestType: 'class', recipient: 'interface', request: CLRSTATUS, value: 0, index: this.iface }); } catch { /* ignore */ }
+    try { await this.dev.controlTransferOut({ requestType: 'class', recipient: 'interface', request: ABORT, value: 0, index: this.iface }); } catch { /* ignore */ }
+    try { await this.getStatus(); } catch { /* ignore */ }
+  }
+
+  /** Read the whole image back and compare to what we wrote (mirrors flash_dfu.py do_verify).
+   *  The DfuSe UPLOAD block stride equals the device wTransferSize (H7 ROM = 1024, F4/F7 = 2048),
+   *  so the read chunk MUST match it — the block number (wValue) alone selects the address
+   *  (addr = pointer + (blk-2)*wTransferSize). Set the read pointer once per segment, ABORT to
+   *  dfuIDLE, then read sequential blocks. */
+  private async verify(hex: ParsedHex, progress: Progress) {
+    const XFER = this.flashInfo().family === 'H7' ? 1024 : 2048;
+    let done = 0;
+    for (const seg of hex.segments) {
+      await this.abortToIdle();
+      await this.dfuseCmd(0x21, seg.address); // set DfuSe read pointer to the segment base
+      await this.abortToIdle();               // dfuIDLE before UPLOAD
+      let blk = 2;
+      for (let off = 0; off < seg.data.length; off += XFER) {
+        const n = Math.min(XFER, seg.data.length - off);
+        const rd = await this.upload(blk, n);
+        for (let k = 0; k < n; k++) {
+          if (rd[k] !== seg.data[off + k]) {
+            throw new DfuError(
+              `Verify mismatch @0x${(seg.address + off + k).toString(16)} — wrote 0x${seg.data[off + k].toString(16)}, read 0x${(((rd[k] ?? 0)) >>> 0).toString(16)}. Flash failed; re-flash before booting.`);
+          }
+        }
+        blk++; done += n;
+        progress(done, hex.totalBytes);
+        // Yield to the event loop periodically so the ~2000 read-back transfers don't
+        // saturate WinUSB / starve rendering → Chrome "page unresponsive" dialog.
+        if ((blk & 31) === 0) await sleep(1);
+      }
+    }
   }
 
   /** DfuSe Set Address Pointer (0x21) with a single status poll. */
