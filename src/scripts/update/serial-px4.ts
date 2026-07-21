@@ -174,17 +174,29 @@ export class Px4Updater {
     log(`Board ID ${this.boardId}, flash ${(this.flashSize / 1024) | 0} KB, BL rev ${this.blRev}`);
   }
 
-  async erase(log: Log) {
+  async erase(log: Log, progress?: Progress) {
     log('Erase app region … (takes a few seconds)');
+    // CHIP_ERASE is one long command with no sub-progress, so creep the bar toward 25% on a timer
+    // (H7 full-chip erase ≈ a few seconds); program() then advances it 25→100%.
+    const t0 = Date.now();
+    const timer = progress ? setInterval(() => {
+      const frac = Math.min(0.97, (Date.now() - t0) / 6000);
+      progress(Math.round(frac * 250), 1000);
+    }, 120) : null;
     try {
-      await this.cmd([P.CHIP_ERASE, P.EOC], 20000);
-    } catch (e) {
-      // Defense-in-depth: if the bootloader still rejects erase (INVALID), redo the
-      // device-info handshake (re-queries INFO_BL_REV) and retry once.
-      log('Erase rejected — retrying handshake …');
-      await this.identify(log);
-      await this.cmd([P.CHIP_ERASE, P.EOC], 20000);
+      try {
+        await this.cmd([P.CHIP_ERASE, P.EOC], 20000);
+      } catch (e) {
+        // Defense-in-depth: if the bootloader still rejects erase (INVALID), redo the
+        // device-info handshake (re-queries INFO_BL_REV) and retry once.
+        log('Erase rejected — retrying handshake …');
+        await this.identify(log);
+        await this.cmd([P.CHIP_ERASE, P.EOC], 20000);
+      }
+    } finally {
+      if (timer) clearInterval(timer);
     }
+    if (progress) progress(250, 1000); // erase complete = 25%
     log('Erase done.');
   }
 
@@ -194,7 +206,7 @@ export class Px4Updater {
     for (let off = 0; off < padded.length; off += P.PROG_MULTI_MAX) {
       const chunk = padded.subarray(off, Math.min(off + P.PROG_MULTI_MAX, padded.length));
       await this.cmd([P.PROG_MULTI, chunk.length, ...chunk, P.EOC], 2000);
-      progress(off + chunk.length, padded.length);
+      progress(250 + Math.round(((off + chunk.length) / padded.length) * 750), 1000); // program = 25→100%
     }
     log('Program complete.');
     return padded;
@@ -335,7 +347,7 @@ export class Px4Updater {
       await this.reboot(log); // leave bootloader → boot the still-intact app
       throw new Error(`Image too large — flash aborted, nothing erased. Firmware is ${(image.length / 1024) | 0} KB but this chip has only ${(this.flashSize / 1024) | 0} KB flash. Wrong firmware for this board.`);
     }
-    await this.erase(log);
+    await this.erase(log, progress);
     const programmed = await this.program(image, log, progress);
     if (!(await this.verify(programmed, log))) throw new Error('CRC verify failed — flash mismatch');
     await this.reboot(log);

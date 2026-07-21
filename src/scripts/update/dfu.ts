@@ -258,7 +258,7 @@ export class STM32Dfu {
     const eraseT0 = Date.now();
     const eraseTimer = setInterval(() => {
       const frac = Math.min(0.97, (Date.now() - eraseT0) / eraseEstMs);
-      progress(Math.round(frac * 300), 1000);
+      progress(Math.round(frac * 250), 1000); // erase → 0-25% (same split as the serial tab)
     }, 120);
     try {
       for (let i = 0; i < eraseStarts.length; i++) {
@@ -267,7 +267,7 @@ export class STM32Dfu {
     } finally {
       clearInterval(eraseTimer);
     }
-    progress(300, 1000); // erase complete = 30%
+    progress(250, 1000); // erase complete = 25%
     log('Erase done.');
 
     // Each block sets the address pointer explicitly (wBlockNum stays 2), so the chunk
@@ -288,7 +288,7 @@ export class STM32Dfu {
           await this.dnload(2, chunk);
           await this.pollIdle(); // wait for this block's program to finish before the next
           off += size; written += size;
-          progress(300 + Math.round((written / hex.totalBytes) * 700), 1000); // write = 30–100%
+          progress(250 + Math.round((written / hex.totalBytes) * 750), 1000); // write = 25–100% (same split as serial)
         } catch (e) {
           if (isXferError(e) && cap > 64) {
             cap = cap >> 1;
