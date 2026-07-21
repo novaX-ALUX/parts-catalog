@@ -301,21 +301,28 @@ export class STM32Dfu {
       }
     }
     log(`(used ${cap}B chunks)`);
-    // STM32H7 path: read-back verify, then LEAVE — mirroring the bench-verified CLI twin
-    // (parts-catalog/tools/flash_dfu.py) and the af-h7e-soft-dfu skill §E. The DFU leave is a JUMP
-    // to 0x08000000 (AN3156 — DFU has no host reset command); the freshly-flashed v0.2.9+ self-heal
-    // bootloader then sees BOOT_CUR==0x1FF0, restores BOOT_CM7_ADD0=0x08000000 and NVIC_SystemResets
-    // → clean cold boot, app USB enumerates with NO re-plug (verified on AF-H7E 2026-07 via the CLI).
-    // We MUST NOT pre-write BOOT_ADD0 from the host: that clears the 0x1FF0 discriminator the
-    // self-heal keys on, which was the regression that forced the manual power-cycle. F4/F7 don't
-    // use BOOT_ADD0 and boot on a normal leave, so they always took this path.
+    // STM32H7 path: verify, then RESTORE the app boot address via the ROM's @Option Bytes (reliable
+    // halted-ROM write, same as CubeProgrammer -ob). The leave-jump self-heal path was tried
+    // (2026-07-21) and did NOT auto-boot from the browser: it left BOOT_CM7_ADD0=0x1FF0, so a re-plug
+    // re-entered ROM DFU (board "stuck in DFU"). Writing 0x08000000 here GUARANTEES the next power
+    // cycle boots the app. We end in DFU with the boot address set and tell the user to power-cycle.
+    // F4/F7 don't use BOOT_ADD0 and boot on a normal leave, so they take the branch below.
     if (this.flashInfo().family === 'H7') {
       log('Verifying (read-back) …');
       await this.verify(hex, progress);
       log('Verify OK.');
       await this.abortToIdle();
+      log('Restoring app boot address (BOOT_CM7_ADD0 → 0x08000000) …');
+      const fixed = await this.setBootAddress0(0x08000000);
+      await this.abortToIdle();
+      if (fixed) {
+        this.needsPowerCycle = true;
+        log('✓ Boot address restored to the app (BOOT_CM7_ADD0 → 0x08000000).');
+        return;
+      }
+      // BOOT_CM7_ADD0 already = 0x08000000 → a normal leave boots the app.
     }
-    log('Leaving DFU (jump to app; H7 self-heals to a clean boot) …');
+    log('Leaving DFU …');
     await this.leave(hex.minAddress);
   }
 

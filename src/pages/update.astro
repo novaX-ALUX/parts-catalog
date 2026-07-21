@@ -170,7 +170,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-07-21b * DFU device picker now consistent with the serial tab: ⚡ Flash (DFU) ALWAYS opens the WebUSB picker (no silent reconnect — you choose the board). + H7E DFU auto-boot: the leave-jump self-heals (BOOT_ADD0 restore + reset) so the app boots with NO re-plug.';
+  const BUILD = '2026-07-21c * REVERTED the H7E leave-jump auto-boot (it did NOT boot from the browser and left the board stuck in DFU). H7E DFU again RESTORES BOOT_CM7_ADD0=0x08000000 so a power-cycle boots the app. DFU device picker stays consistent with serial (Flash (DFU) always shows the picker).';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -561,9 +561,11 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
         await (conn as InstanceType<typeof Px4Updater>).flash(img.bytes, log, progress, img.boardId);
       }
       progress(1, 1);
-      // All paths now auto-boot: serial REBOOT, F4/F7 DFU leave, and H7 DFU leave (the jump runs the
-      // firmware self-heal → clean cold boot). No manual power-cycle.
-      log('✓ Done. Device rebooting — the app should come back on its own (no re-plug needed).', 'ok');
+      if (mode === 'dfu' && (conn as InstanceType<typeof STM32Dfu>).needsPowerCycle) {
+        log('✓ Done. Unplug the USB cable and plug it back in — the app boots on the next power cycle.', 'ok');
+      } else {
+        log('✓ Done. Device rebooting.', 'ok');
+      }
     } catch (e: any) {
       log('✗ ' + String(e?.message || e), 'err');
       if (e?.blGrantNeeded) {
