@@ -301,34 +301,21 @@ export class STM32Dfu {
       }
     }
     log(`(used ${cap}B chunks)`);
-    // STM32H7 path: verify, then set the app boot address via the ROM's @Option Bytes interface
-    // (reliable — the same option-byte write CubeProgrammer's -ob does, verified on-bench). We do
-    // NOT do a DFU-leave here: the leave-jump would run the firmware self-heal, whose option-byte
-    // write from flash silently ~50%-fails (RWW), and BOOT_CM7_ADD0 is re-latched only at a
-    // power-on reset anyway. So we end in DFU with the boot address already set and tell the user
-    // to power-cycle. F4/F7 don't use BOOT_ADD0 and boot on a normal leave, so they take the
-    // branch below unchanged.
+    // STM32H7 path: read-back verify, then LEAVE — mirroring the bench-verified CLI twin
+    // (parts-catalog/tools/flash_dfu.py) and the af-h7e-soft-dfu skill §E. The DFU leave is a JUMP
+    // to 0x08000000 (AN3156 — DFU has no host reset command); the freshly-flashed v0.2.9+ self-heal
+    // bootloader then sees BOOT_CUR==0x1FF0, restores BOOT_CM7_ADD0=0x08000000 and NVIC_SystemResets
+    // → clean cold boot, app USB enumerates with NO re-plug (verified on AF-H7E 2026-07 via the CLI).
+    // We MUST NOT pre-write BOOT_ADD0 from the host: that clears the 0x1FF0 discriminator the
+    // self-heal keys on, which was the regression that forced the manual power-cycle. F4/F7 don't
+    // use BOOT_ADD0 and boot on a normal leave, so they always took this path.
     if (this.flashInfo().family === 'H7') {
       log('Verifying (read-back) …');
       await this.verify(hex, progress);
       log('Verify OK.');
       await this.abortToIdle();
-      log('Checking boot address (BOOT_CM7_ADD0) …');
-      const fixed = await this.setBootAddress0(0x08000000);
-      await this.abortToIdle();
-      if (fixed) {
-        // The board entered ROM DFU via BOOT_CM7_ADD0 = 0x1FF0 (buttonless / soft DFU, e.g.
-        // AF-H7E). We reset it to 0x08000000 via the ROM; that only re-latches at a power-on
-        // reset, and a DFU-leave here would just run the unreliable firmware self-heal. So end
-        // in DFU and have the caller tell the user to power-cycle.
-        this.needsPowerCycle = true;
-        log('✓ Boot address set to the app (BOOT_CM7_ADD0 → 0x08000000).');
-        return;
-      }
-      // BOOT_CM7_ADD0 already = 0x08000000 (this H7 board did not enter DFU via the boot-address
-      // option byte), so a normal leave boots the app.
     }
-    log('Leaving DFU …');
+    log('Leaving DFU (jump to app; H7 self-heals to a clean boot) …');
     await this.leave(hex.minAddress);
   }
 
