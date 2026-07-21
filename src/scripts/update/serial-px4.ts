@@ -296,7 +296,7 @@ export class Px4Updater {
     // composite), so the browser's stored Web Serial grant for the app does NOT cover it and
     // getPorts() never returns the new port. Only a user-gesture port pick can grant it — after
     // that one grant, this auto-reacquire finds it via getPorts() and updates are fully automatic.
-    const err: any = new Error('Could not auto-reconnect: the bootloader shows up as a NEW USB device (ArduPilot, PID 0x5741) this browser has not been granted yet — it is almost certainly running and waiting right now. Click ⚡ Update firmware again and pick "ArduPilot (COMxx)" in the port picker; flashing continues from the bootloader. This is one-time — afterwards reconnection is automatic. (If Device Manager shows no ArduPilot port at all, unplug & replug USB, then retry.)');
+    const err: any = new Error('Could not auto-reconnect: the bootloader is a NEW USB device (ArduPilot, PID 0x5741) the browser has not been granted — it is running and waiting now. Click 🔌 Connect, pick "ArduPilot (COMxx)" in the port picker, then ⚡ Update; flashing continues from the bootloader. One-time — afterwards it is automatic. (If Device Manager shows no ArduPilot port, unplug & replug USB, then retry.)');
     err.blGrantNeeded = true;
     throw err;
   }

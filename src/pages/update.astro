@@ -63,7 +63,8 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
 
       <div class="banner" data-banner="fw">
         <div class="step"><b>① Pick firmware</b>Plug in USB-C (no jumper, no BOOT0) and select the <code>.apj</code> below.</div>
-        <div class="step"><b>② Update</b>Click ⚡ Update firmware — it connects over Web Serial, reboots to the bootloader, and flashes.</div>
+        <div class="step"><b>② Connect</b>Click 🔌 Connect and pick your board's port (<code>ArduPilot</code>) in the popup.</div>
+        <div class="step"><b>③ Update</b>Click ⚡ Update firmware — it reboots to the bootloader and flashes.</div>
         <div class="step good"><b>Driver</b>None — standard USB serial (CDC). Chrome/Edge desktop.</div>
       </div>
       <div class="banner" data-banner="dfu" hidden>
@@ -206,7 +207,17 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
       if (conn && picked) flashBtn.classList.add('pulse');
     } else {
       soft.hidden = true;
-      if (picked) flashBtn.classList.add('pulse');                       // normal: Pick → Update (connects + flashes)
+      if (picked) {
+        // Explicit steps for the serial tab: Pick firmware → 🔌 Connect (choose the COM port in
+        // the picker) → ⚡ Update. The Connect picker is the ONLY way to reach a board sitting in
+        // the bootloader: its port (ArduPilot, PID 0x5741) is a DIFFERENT USB device than the app
+        // (PID 0x5740) that the browser has no silent grant for, so getPorts() can't auto-open it,
+        // but requestPort()'s picker lists every port for the user to select. flash() then detects
+        // an already-in-bootloader port (trySync) and programs it directly with no reboot.
+        connectBtn.hidden = false;
+        if (!conn) connectBtn.classList.add('pulse');   // step 2: pick a COM port
+        else flashBtn.classList.add('pulse');           // step 3: flash
+      }
     }
   }
 
@@ -541,7 +552,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
         // "Already in bootloader mode" path. One-time per browser — the grant persists.
         try { (conn as any)?.close?.(); } catch { /* ignore */ }
         conn = null; setStatus('Not connected', '');
-        log('→ The board is waiting in bootloader mode. Click ⚡ Update firmware again and select "ArduPilot" in the picker — the update continues from where it left off.', 'pend');
+        log('→ The board is now in bootloader mode on a new COM port. Click 🔌 Connect (now pulsing), pick "ArduPilot (COMxx)" in the picker, then ⚡ Update — flashing continues from the bootloader.', 'pend');
       }
     }
     flashBtn.disabled = false;
