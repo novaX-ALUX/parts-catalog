@@ -532,7 +532,18 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
       } else {
         log('✓ Done. Device rebooting.', 'ok');
       }
-    } catch (e: any) { log('✗ ' + String(e?.message || e), 'err'); }
+    } catch (e: any) {
+      log('✗ ' + String(e?.message || e), 'err');
+      if (e?.blGrantNeeded) {
+        // The board is sitting in the bootloader on a COM port this browser has no grant for
+        // (bootloader PID 0x5741 ≠ app PID 0x5740). Drop the dead app-port connection so the
+        // next ⚡ click opens the port picker; flash() then continues via its
+        // "Already in bootloader mode" path. One-time per browser — the grant persists.
+        try { (conn as any)?.close?.(); } catch { /* ignore */ }
+        conn = null; setStatus('Not connected', '');
+        log('→ The board is waiting in bootloader mode. Click ⚡ Update firmware again and select "ArduPilot" in the picker — the update continues from where it left off.', 'pend');
+      }
+    }
     flashBtn.disabled = false;
   });
 </script>

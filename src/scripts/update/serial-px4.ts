@@ -291,7 +291,14 @@ export class Px4Updater {
     } finally {
       try { (navigator as any).serial.removeEventListener('connect', onConnect); } catch { /**/ }
     }
-    throw new Error('Bootloader did not re-enumerate. This board intermittently fails USB re-enumeration after a soft reboot (a firmware/Windows USB quirk, not the browser — the host cannot force a re-scan). Fix: unplug & replug the USB once, then click Connect. For an update that avoids the soft reboot entirely, use DFU Recovery (hold BOOT0).');
+    // Bench-verified root cause (2026-07-21, AF-H7E): the board DOES re-enumerate — but the
+    // bootloader is a DIFFERENT USB device (PID 0x5741, single CDC) than the app (PID 0x5740,
+    // composite), so the browser's stored Web Serial grant for the app does NOT cover it and
+    // getPorts() never returns the new port. Only a user-gesture port pick can grant it — after
+    // that one grant, this auto-reacquire finds it via getPorts() and updates are fully automatic.
+    const err: any = new Error('Could not auto-reconnect: the bootloader shows up as a NEW USB device (ArduPilot, PID 0x5741) this browser has not been granted yet — it is almost certainly running and waiting right now. Click ⚡ Update firmware again and pick "ArduPilot (COMxx)" in the port picker; flashing continues from the bootloader. This is one-time — afterwards reconnection is automatic. (If Device Manager shows no ArduPilot port at all, unplug & replug USB, then retry.)');
+    err.blGrantNeeded = true;
+    throw err;
   }
 
   /** Full flow: reboot→bootloader if needed → identify → GUARD (capacity + board_id) → erase →
