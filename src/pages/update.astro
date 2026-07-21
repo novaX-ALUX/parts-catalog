@@ -176,6 +176,10 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
   let mode: 'fw' | 'dfu' = 'fw';
   let conn: any = null;
+  // Serial tab: true once 🔌 Connect has rebooted the running app into its bootloader. The board is
+  // now on a NEW COM port the browser hasn't granted, so the next step is ⚡ Update — which opens the
+  // picker for that port and flashes. Reset on firmware/port re-selection and tab switch.
+  let serialRebooted = false;
   let selectedPath: string | null = null;
   let droppedFile: File | null = null;
   let selectedFamily: string | null = null; // F4/F7/H7 of the picked catalog firmware (DFU guard)
@@ -215,8 +219,8 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
         // but requestPort()'s picker lists every port for the user to select. flash() then detects
         // an already-in-bootloader port (trySync) and programs it directly with no reboot.
         connectBtn.hidden = false;
-        if (!conn) connectBtn.classList.add('pulse');   // step 2: pick a COM port
-        else flashBtn.classList.add('pulse');           // step 3: flash
+        if (conn || serialRebooted) flashBtn.classList.add('pulse'); // connected, or app already rebooted → ⚡ Update (opens the picker for the bootloader port, then flashes)
+        else connectBtn.classList.add('pulse');                      // fresh → 🔌 Connect (pick the port; if it's the running app, Connect reboots it into the bootloader)
       }
     }
   }
@@ -281,6 +285,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
     connectBtn.hidden = true; // both tabs connect-on-action (Update/Flash opens the picker); guide() keeps this hidden
     // reset connection/selection on mode switch (different transport)
     if (conn) { conn.close?.(); conn = null; }
+    serialRebooted = false;
     selectedPath = null; droppedFile = null;
     document.querySelectorAll('.fwrow').forEach((r) => r.classList.remove('sel'));
     setStatus('Not connected'); refreshFlashEnabled();
@@ -404,6 +409,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
     row.classList.add('sel');
     selectedPath = row.dataset.path || null; droppedFile = null;
     selectedFamily = row.dataset.family || null; selectedName = row.dataset.name || null;
+    serialRebooted = false; // re-selecting firmware restarts the Connect→Update sequence
     // If we were auto-reconnected to a DFU device of a DIFFERENT chip (e.g. an F4 sitting in DFU
     // while the user now picks F7 firmware), release it so we neither flash nor stay "connected"
     // to the wrong board. The buttons below then re-reveal to connect the intended board.
@@ -454,15 +460,15 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
         // bootloader, exactly as expected.
         const px4 = await Px4Updater.connect(115200, true);
         if (await px4.isBootloader()) {
-          conn = px4;
+          conn = px4; serialRebooted = false;
           setStatus('● bootloader connected', 'ok');
           log('Connected to the bootloader — click ⚡ Update firmware to flash.', 'ok');
         } else {
           log('Connected to the app — rebooting it into the bootloader …', 'ok');
           await px4.rebootAppToBootloader(log);
-          conn = null;
-          setStatus('Rebooting to bootloader …', '');
-          log('→ The board is rebooting. In ~2 s a NEW "ArduPilot (COMxx)" port appears — click 🔌 Connect, pick THAT port, then ⚡ Update.', 'pend');
+          conn = null; serialRebooted = true;
+          setStatus('Bootloader ready — click ⚡ Update', 'ok');
+          log('→ Board is now in the bootloader on a NEW COM port. Click ⚡ Update firmware (now pulsing), pick "ArduPilot (COMxx)" in the picker, and it flashes.', 'pend');
         }
       }
     } catch (e: any) {
@@ -494,7 +500,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
     // Serial tab: 🔌 Connect must run first — it opens the picker AND reboots the app into the
     // bootloader (or recognises a bootloader port). Don't silently connect here, or we'd grab the
     // app port and bypass that. (DFU tab keeps connect-on-action below.)
-    if (mode !== 'dfu' && !conn) {
+    if (mode !== 'dfu' && !conn && !serialRebooted) {
       log('→ Click 🔌 Connect first (the pulsing button) and pick your board\'s port.', 'pend');
       return;
     }
@@ -510,9 +516,12 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
             setStatus('● ' + (conn as any).chipLabel(), 'ok');
             log('DFU connected (' + (conn as any).chipLabel() + ').', 'ok');
           } else {
-            conn = await Px4Updater.connect();
-            setStatus('● serial port connected', 'ok');
-            log('Connected.', 'ok');
+            // Reached only after Connect rebooted the app (serialRebooted): open the picker for the
+            // NEW bootloader port, then flash() detects it (trySync) and programs directly.
+            conn = await Px4Updater.connect(115200, true);
+            serialRebooted = false;
+            setStatus('● bootloader connected', 'ok');
+            log('Connected to the bootloader.', 'ok');
           }
         } catch (e: any) {
           const msg = String(e?.message || e);
