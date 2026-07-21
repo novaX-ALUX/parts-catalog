@@ -238,6 +238,17 @@ export class Px4Updater {
     await sleep(500);
   }
 
+  /** UI wrapper: is the port we just connected to already the AP bootloader? */
+  async isBootloader(): Promise<boolean> { return this.trySync(); }
+
+  /** Connected to the running app → reboot it into the bootloader and release the port. The board
+   *  re-enumerates as the bootloader (a DIFFERENT USB device / PID) that the browser has not been
+   *  granted, so the UI then asks the user to Connect + pick that new port before flashing. */
+  async rebootAppToBootloader(log: Log) {
+    await this.rebootToBootloader(log);
+    await this.close();
+  }
+
   /** Send the ArduPilot "boot to DFU" magic over the open serial port, then release it.
    *  The running app drops USB and resets; the (ENABLE_DFU_BOOT) bootloader then jumps to
    *  the ST ROM DFU (0483:DF11), which the caller flashes over WebUSB (see dfu.ts).
