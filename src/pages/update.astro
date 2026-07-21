@@ -447,7 +447,9 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
         setStatus('● ' + conn.chipLabel(), 'ok');
         log('Connected. Detected chip: ' + conn.chipLabel(), 'ok');
       } else {
-        conn = await Px4Updater.connect();
+        conn = await Px4Updater.connect(115200, true); // ALWAYS show the COM-port picker so the user
+        // picks the board — critical to reach a board sitting in the bootloader, whose port the
+        // browser has no silent grant for (auto-open would grab the wrong/stale port instead).
         setStatus('● serial port connected', 'ok');
         log('Connected.', 'ok');
       }
