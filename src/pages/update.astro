@@ -170,7 +170,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-07-21a * H7E DFU auto-boot: after flashing, the DFU leave-jump runs the firmware self-heal (BOOT_ADD0 restore + reset) so the app boots with NO re-plug. Host no longer pre-writes BOOT_ADD0 (that defeated the self-heal). Mirrors the bench-verified CLI recipe.';
+  const BUILD = '2026-07-21b * DFU device picker now consistent with the serial tab: ⚡ Flash (DFU) ALWAYS opens the WebUSB picker (no silent reconnect — you choose the board). + H7E DFU auto-boot: the leave-jump self-heals (BOOT_ADD0 restore + reset) so the app boots with NO re-plug.';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -230,16 +230,12 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   async function autoDetect() {
     if (conn) return;
     if (mode === 'dfu') {
-      // WebUSB: a granted DFU device can be reopened without a picker (no exclusive COM seized).
+      // Consistency with the serial tab: do NOT silently reopen a granted DFU device. Let the user
+      // pick it in the ⚡ Flash (DFU) click (a fresh gesture → WebUSB device picker) so the picker
+      // ALWAYS shows and the user chooses which board — never a silent grab.
       try {
-        const c = await STM32Dfu.autoConnect();
-        if (c) {
-          conn = c;
-          setStatus('● ' + (c as any).chipLabel() + ' — pick firmware', 'ok');
-          log('Already in DFU — reconnected to the authorized DFU device (' + (c as any).chipLabel() + '). No Enter DFU / Connect needed: just pick a firmware below and click Flash (DFU).', 'ok');
-          refreshFlashEnabled();
-        }
-      } catch { /* none granted — use Connect */ }
+        if (await STM32Dfu.anyPresent()) setStatus('🔌 DFU device detected — pick firmware, then ⚡ Flash (DFU)', 'ok');
+      } catch { /* ignore */ }
       return;
     }
     // Serial: do NOT silently open a COM port. Opening blindly seizes whatever port was
@@ -327,21 +323,18 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
         } catch (e: any) {
           log('Serial step skipped (' + (e?.message || e) + ') — board may already be in DFU.', 'pend');
         }
-        // 2) Try a silent reconnect (already-authorized device). The WebUSB picker
-        //    (requestDevice) CANNOT run here: the awaits above (serial + re-enum wait)
-        //    consumed the click's user-gesture, so the browser would throw
-        //    "Must be handling a user gesture". Instead reveal "Connect DFU device" so the
-        //    user opens the picker in a FRESH click (see #dfuconnect handler).
-        c = await STM32Dfu.autoConnect(selectedFamily).catch(() => null);
-        if (!c) {
-          log('Board is now in STM32 DFU (0483:DF11). Click ⚡ Flash (DFU) — it picks the DFU device and flashes.', 'pend');
-          setStatus('In DFU — click Flash (DFU)', 'pend');
-          ($('#softdfu') as HTMLButtonElement).disabled = true;              // entered DFU — retire Enter DFU
-          ($('#softdfu') as HTMLElement).classList.remove('pulse');
-          flashBtn.disabled = false;
-          flashBtn.classList.add('pulse');                                  // ← next: Flash (connects + flashes)
-          return;
-        }
+        // 2) Board is now in ROM DFU (0483:DF11). Do NOT silently reconnect it — that would let the
+        //    ⚡ Flash click skip the device picker (the inconsistency we're fixing). The WebUSB picker
+        //    also can't run here (the awaits above consumed this click's gesture). So always route to
+        //    ⚡ Flash (DFU): a fresh click opens the picker, the user selects the df11 device, and
+        //    flash() verifies the chip family/capacity before erasing anything.
+        log('Board is now in STM32 DFU (0483:DF11). Click ⚡ Flash (DFU) — it opens the device picker, then flashes.', 'pend');
+        setStatus('In DFU — click ⚡ Flash (DFU)', 'pend');
+        ($('#softdfu') as HTMLButtonElement).disabled = true;              // entered DFU — retire Enter DFU
+        ($('#softdfu') as HTMLElement).classList.remove('pulse');
+        flashBtn.disabled = false;
+        flashBtn.classList.add('pulse');                                  // ← next: ⚡ Flash (DFU) picks + flashes
+        return;
       }
       // Guard: the picked/connected DFU device must match the selected firmware's chip, so
       // picking the wrong board (e.g. an F4 in DFU while F7 firmware is selected) is rejected
