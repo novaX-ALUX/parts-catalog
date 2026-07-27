@@ -28,22 +28,22 @@ pinoutImages:
   - /images/products/fc_F4_nano_v2_pinout_bottom.png
 firmware:
   - kind: "ArduPilot (.apj package)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F4_nano_v2-v1.0.2/AF-F4_nano_v2-v1.0.2.apj
-    version: "1.0.2"
-    date: "2026-07-11"
-    size: "765 KB"
-    sha256: "28d253f17bc143ede05eb727ce0e3f31f950305d22350419e57cf4db447dec98"
-    notes: "ArduPilot Copter app. v1.0.2 lights both status LEDs (blue + green) and enables USB-presence detection. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater → Firmware Update."
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F4_nano_v2-v1.0.8/AF-F4_nano_v2-v1.0.8.apj
+    version: "1.0.8"
+    date: "2026-07-28"
+    size: "683 KB"
+    sha256: "bafaffccf5a669bd86eb7d534aa3d24abc29687be0d9cabc4ffaa0427be80312"
+    notes: "ArduPilot Copter app. v1.0.8 = DShot300 ESC output, gimbal (CADDX MNT_TYPE 13) TX on DMA, RC-over-MAVLink control (no physical RX thread), OSD/CRSF/MSP removed. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater → Firmware Update."
     method: ardupilot
-    webPath: /firmware/AF-F4_nano_v2-v1.0.2.apj
+    webPath: /firmware/AF-F4_nano_v2-v1.0.8.apj
   - kind: "Bootloader + App (merged HEX · DFU / SWD)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F4_nano_v2-v1.0.2/AF-F4_nano_v2-v1.0.2_with_bl.hex
-    version: "1.0.2"
-    date: "2026-07-11"
-    size: "2.4 MB"
-    sha256: "9ca68d9dfee0cddf0902a3409c99de47b1388aef361cde93d9bd3357122d0b1f"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F4_nano_v2-v1.0.8/AF-F4_nano_v2-v1.0.8_with_bl.hex
+    version: "1.0.8"
+    date: "2026-07-28"
+    size: "2.2 MB"
+    sha256: "60fcfda3fa4b5e725ccc1e890cfcd4ad9af39eb29219d403cd38fcb4891346ff"
     notes: "Bootloader + application combined image based at 0x08000000. Flash via the catalog Web Updater → DFU Recovery (🛠 Enter DFU works buttonless on this board) or SWD/ST-Link for a blank/bricked board."
     method: dfu
-    webPath: /firmware/AF-F4_nano_v2-v1.0.2_with_bl.hex
+    webPath: /firmware/AF-F4_nano_v2-v1.0.8_with_bl.hex
 firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases'
 ---
