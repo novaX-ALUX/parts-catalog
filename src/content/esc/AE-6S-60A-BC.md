@@ -23,16 +23,16 @@ description: |
   AE-6S 60A BC is a 32-bit ESC rated for 6S LiPo and 60 A continuous current. The "BC" suffix stands for Battery Connector — this variant ships with a battery connector fitted for a solderless battery hookup. Supports DShot150 / 300 / 600, MultiShot and OneShot protocols with BDShot telemetry. Compatible with AM32 and novaX ef 1.0 firmware. Designed for X-Blade 10/15 class platforms.
 firmware:
   - kind: "Bootloader (AT32F415 · SWD)"
-    file: https://github.com/novaX-ALUX/esc-am32/releases/download/TBS_12S_F415-v2.20/AM32_F415_BOOTLOADER_PB4_128K_V17.hex
+    file: https://github.com/novaX-ALUX/esc-am32/releases/download/TBS_12S_F415-v2.27/AM32_F415_BOOTLOADER_PB4_128K_V17.hex
     version: "V17"
     notes: "AM32 bootloader built for a 128 KB part — matching this board's AT32F415KBU7 — with PB4 as the signal pin. The \"128K\" in the filename is the target flash size, not the bootloader size: the bootloader itself is about 3.7 KB and occupies 0x0000–0x0FFF, with the application starting at 0x1000. This build puts the settings EEPROM at 0x1F800, leaving 121 KB for the application. Flash on a blank or bricked board via SWD/ST-Link, then load the application over 4-way passthrough."
   - kind: "Application (AM32 · 4-way passthrough)"
-    file: https://github.com/novaX-ALUX/esc-am32/releases/download/TBS_12S_F415-v2.20/AM32_TBS_12S_F415_2.20.hex
-    version: "2.20"
-    notes: "AM32 application v2.20 (TBS_12S_F415). Flash over an existing bootloader via the AM32 configurator / 4-way passthrough."
+    file: https://github.com/novaX-ALUX/esc-am32/releases/download/TBS_12S_F415-v2.27/AM32_TBS_12S_F415_2.27.hex
+    version: "2.27"
+    notes: "AM32 application v2.27 (TBS_12S_F415) with the do-mi-sol startup chime, played on arming. Parameter handling matches stock AM32, so settings are preserved across updates. Occupies flash pages 4–24 plus 61 only — it never touches the bootloader or the settings EEPROM, and it reads the bootloader devinfo at boot so the same image works under a 32K / 64K / 128K bootloader. Flash over an existing bootloader via the AM32 configurator / 4-way passthrough."
   - kind: "Bootloader + App (merged HEX · SWD)"
-    file: https://github.com/novaX-ALUX/esc-am32/releases/download/TBS_12S_F415-v2.20/AM32_TBS_12S_F415_2.20_BootApp_V17.hex
-    version: "2.20 / V17"
-    notes: "Combined bootloader + application image for a single SWD/ST-Link flash on a blank or bricked board."
+    file: https://github.com/novaX-ALUX/esc-am32/releases/download/TBS_12S_F415-v2.27/AM32_TBS_12S_F415_2.27_BootApp_V17.hex
+    version: "2.27 / V17"
+    notes: "V17 bootloader + application v2.27 in one image, for a single SWD/ST-Link flash on a blank or bricked board. SWD only — do not flash this over 4-way passthrough, which carries 16-bit addresses and would place the 128 KB-layout data at the wrong offset."
 firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/esc-am32/releases'
 ---
