@@ -6,6 +6,7 @@ pictureKey: esc_32-6S-60A-BC
 pinoutImage: /images/products/esc_32-6S-60A-BC_pinout.png
 order: 25
 specs:
+  - { key: MCU, value: "AT32F415KBU7 (128 KB Flash)" }
   - { key: Mounting Hole, value: "45 × 52 mm / Φ 4 mm" }
   - { key: Weight, value: "18.5 g" }
   - { key: Voltage Range, value: "4 – 6S LiPo (16.8 – 25.2 V)" }
@@ -24,7 +25,7 @@ firmware:
   - kind: "Bootloader (AT32F415 · SWD)"
     file: https://github.com/novaX-ALUX/esc-am32/releases/download/TBS_12S_F415-v2.20/AM32_F415_BOOTLOADER_PB4_128K_V17.hex
     version: "V17"
-    notes: "AM32 bootloader for the 128 KB AT32F415 (AT32F415KB…, signal pin PB4). This build places the settings EEPROM at 0x1F800, which only exists on a 128 KB part — check the chip marking before flashing, a 64 KB part (AT32F415K8…) cannot store settings with it. Flash on a blank board via SWD/ST-Link, then load the application over 4-way passthrough."
+    notes: "AM32 bootloader built for a 128 KB part — matching this board's AT32F415KBU7 — with PB4 as the signal pin. The \"128K\" in the filename is the target flash size, not the bootloader size: the bootloader itself is about 3.7 KB and occupies 0x0000–0x0FFF, with the application starting at 0x1000. This build puts the settings EEPROM at 0x1F800, leaving 121 KB for the application. Flash on a blank or bricked board via SWD/ST-Link, then load the application over 4-way passthrough."
   - kind: "Application (AM32 · 4-way passthrough)"
     file: https://github.com/novaX-ALUX/esc-am32/releases/download/TBS_12S_F415-v2.20/AM32_TBS_12S_F415_2.20.hex
     version: "2.20"
