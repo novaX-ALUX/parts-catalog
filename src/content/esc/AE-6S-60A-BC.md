@@ -40,8 +40,8 @@ firmware:
     file: https://github.com/novaX-ALUX/esc-am32/releases/download/TBS_12S_F415-v2.27/AM32_TBS_12S_F415_2.27_BootApp_V17.hex
     version: "2.27 / V17"
     date: "2026-07-28"
-    size: "67.0 KB"
-    sha256: "211127c40c9cedffac4d9ecb74c2ba5b9f04d2a204e6e0176b2c55cd78f368be"
-    notes: "V17 bootloader + application v2.27 in one image, for a single SWD/ST-Link flash on a blank or bricked board. SWD only — do not flash this over 4-way passthrough, which carries 16-bit addresses and would place the 128 KB-layout data at the wrong offset."
+    size: "67.5 KB"
+    sha256: "baf6024b303c79d9d96af844ad2ee2d936b059ea1e85e0f3ad0e114a62e73963"
+    notes: "V17 bootloader + application v2.27 + a factory settings EEPROM at 0x1F800, for a single SWD/ST-Link flash on a blank or bricked board. The EEPROM block is required: after a Mass Erase that area reads 0xFF, which leaves input_type at 255 so the firmware selects no input protocol at all — the ESC boots and even plays its startup chime, but never answers the configurator. SWD only — do not flash this over 4-way passthrough, which carries 16-bit addresses and would place the 128 KB-layout data at the wrong offset."
 firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/esc-am32/releases'
 ---
