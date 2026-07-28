@@ -42,6 +42,6 @@ firmware:
     date: "2026-07-28"
     size: "67.5 KB"
     sha256: "baf6024b303c79d9d96af844ad2ee2d936b059ea1e85e0f3ad0e114a62e73963"
-    notes: "V17 bootloader + application v2.27 + a factory settings EEPROM at 0x1F800, for a single SWD/ST-Link flash on a blank or bricked board. The EEPROM block is required: after a Mass Erase that area reads 0xFF, which leaves input_type at 255 so the firmware selects no input protocol at all — the ESC boots and even plays its startup chime, but never answers the configurator. SWD only — do not flash this over 4-way passthrough, which carries 16-bit addresses and would place the 128 KB-layout data at the wrong offset."
+    notes: "V17 bootloader + application v2.27 + a factory settings EEPROM at 0x1F800, for a single SWD/ST-Link flash on a blank or bricked board. The EEPROM block matters: a Mass Erase leaves that area at 0xFF, and the firmware then reads input_type as 255, which selects no input protocol at all (main.c gates the selection on input_type < 10). The bootloader does not check the EEPROM before jumping, so the ESC still boots and plays its startup chime in that state. SWD only — do not flash this over 4-way passthrough, which carries 16-bit addresses and would place the 128 KB-layout data at the wrong offset."
 firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/esc-am32/releases'
 ---
