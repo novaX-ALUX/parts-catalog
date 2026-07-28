@@ -15,7 +15,7 @@ specs:
   - { key: Current Sensor, value: "Supported" }
   - { key: BEC Output, value: "None" }
   - { key: Capacitor, value: "1000 µF / 63 V" }
-  - { key: PWM Frequency, value: "24 – 48 kHz (Bluejay 96 kHz)" }
+  - { key: PWM Frequency, value: "24 / 48 / 96 kHz" }
   - { key: Supported Protocols, value: "DShot150 / 300 / 600, MultiShot, OneShot" }
   - { key: Firmware, value: "AM32, novaX ef 1.0" }
 description: |
@@ -24,7 +24,7 @@ firmware:
   - kind: "Bootloader (AT32F415 · SWD)"
     file: https://github.com/novaX-ALUX/esc-am32/releases/download/TBS_12S_F415-v2.20/AM32_F415_BOOTLOADER_PB4_128K_V17.hex
     version: "V17"
-    notes: "AM32 bootloader for the AT32F415 (PB4, 128K). Flash on a blank board via SWD/ST-Link, then load the application over 4-way passthrough."
+    notes: "AM32 bootloader for the 128 KB AT32F415 (AT32F415KB…, signal pin PB4). This build places the settings EEPROM at 0x1F800, which only exists on a 128 KB part — check the chip marking before flashing, a 64 KB part (AT32F415K8…) cannot store settings with it. Flash on a blank board via SWD/ST-Link, then load the application over 4-way passthrough."
   - kind: "Application (AM32 · 4-way passthrough)"
     file: https://github.com/novaX-ALUX/esc-am32/releases/download/TBS_12S_F415-v2.20/AM32_TBS_12S_F415_2.20.hex
     version: "2.20"

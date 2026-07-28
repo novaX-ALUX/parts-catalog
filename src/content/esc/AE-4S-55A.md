@@ -8,7 +8,7 @@ specs:
   - { key: Size, value: "45.5 × 52.2 mm" }
   - { key: Mounting Hole, value: "30 × 30 mm / Φ 4 mm" }
   - { key: Weight, value: "14.8 g" }
-  - { key: Voltage Range, value: "3 – 6S LiPo (12.6 – 25.2 V)" }
+  - { key: Voltage Range, value: "3 – 4S LiPo (12.6 – 16.8 V)" }
   - { key: Constant Current, value: "55 A" }
   - { key: Burst Current, value: "65 A" }
   - { key: Capacitor, value: "470 µF / 35 V" }

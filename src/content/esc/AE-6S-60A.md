@@ -14,7 +14,7 @@ specs:
   - { key: Current Sensor, value: "Supported" }
   - { key: BEC Output, value: "None" }
   - { key: Capacitor, value: "1000 µF / 63 V" }
-  - { key: PWM Frequency, value: "24 – 48 kHz (Bluejay 96 kHz)" }
+  - { key: PWM Frequency, value: "24 / 48 / 96 kHz" }
   - { key: Supported Protocols, value: "DShot150 / 300 / 600, MultiShot, OneShot" }
   - { key: Firmware, value: "AM32, novaX ef 1.0" }
 description: |
