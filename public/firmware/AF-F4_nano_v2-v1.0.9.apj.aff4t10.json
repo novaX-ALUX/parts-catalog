@@ -1,0 +1,15 @@
+{
+  "schema": "af-f4-t10-fw-integrity/1",
+  "file": "AF-F4_nano_v2-v1.0.9.apj",
+  "product": "AF-F4_nano_v2",
+  "version": "1.0.9",
+  "board_id": 6204,
+  "size": 703382,
+  "hash_alg": "SHA-256",
+  "sha256": "f7a04700b1b9da75bda6ae656b1fc5937f515db229000a55a9753ca347a44613",
+  "sig_alg": "Ed25519",
+  "key_id": "af-f4-t10-fw-ed25519-2026",
+  "signature": "HM0+rTRj3KUubx9LIDyimDG5gV1e8VxXJ0kqbCiDOasFSQlAv9OQT7ELTegRPu4BOGE+evilnjko2e5dZdqZDw==",
+  "signed_at": "2026-07-30T15:50:54Z",
+  "signed_by": "AF-F4 T10 firmware release key"
+}
