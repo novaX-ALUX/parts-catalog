@@ -33,7 +33,7 @@ firmware:
     date: "2026-07-28"
     size: "683 KB"
     sha256: "bafaffccf5a669bd86eb7d534aa3d24abc29687be0d9cabc4ffaa0427be80312"
-    notes: "ArduPilot Copter app. v1.0.8 = DShot300 ESC output, gimbal (CADDX MNT_TYPE 13) TX on DMA, RC-over-MAVLink control (no physical RX thread), OSD/CRSF/MSP removed. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater → Firmware Update."
+    notes: "ArduPilot Copter app. v1.0.8 = DShot300 ESC output, AG-F4-1A gimbal (MNT_TYPE 13) TX on DMA, RC-over-MAVLink control (no physical RX thread), OSD/CRSF/MSP removed. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater → Firmware Update."
     method: ardupilot
     webPath: /firmware/AF-F4_nano_v2-v1.0.8.apj
   - kind: "Bootloader + App (merged HEX · DFU / SWD)"
