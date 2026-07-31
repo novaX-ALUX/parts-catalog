@@ -28,22 +28,22 @@ pinoutImages:
   - /images/products/fc_F4_nano_v2_pinout_bottom.png
 firmware:
   - kind: "ArduPilot (.apj package)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F4_nano_v2-v1.0.9/AF-F4_nano_v2-v1.0.9.apj
-    version: "1.0.9"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F4_nano_v2-v1.0.10/AF-F4_nano_v2-v1.0.10.apj
+    version: "1.0.10"
     date: "2026-07-31"
     size: "686 KB"
-    sha256: "f7a04700b1b9da75bda6ae656b1fc5937f515db229000a55a9753ca347a44613"
-    notes: "ArduPilot Copter app. v1.0.9 adds BRAKE mode and EKF3 wind estimation (drag fusion), corrects board orientation (AHRS_ORIENTATION none) and raises the log buffer to 8 KB; battery calibration, baro wind compensation and DShot300 output are baked into the defaults. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater → Firmware Update."
+    sha256: "0877db40912e1a23981ff49a58a3eee0ee5fb000146cb0cfd4d6e1bde45ec0d4"
+    notes: "ArduPilot Copter app. v1.0.10 fixes the MAVLink2 signing side effect that flooded the flash-emulated storage with signing-timestamp writes (GPS UART overruns, stalled loops); signing stays fully usable. v1.0.9 added BRAKE mode, EKF3 wind estimation (drag fusion), corrected board orientation and an 8 KB log buffer; battery calibration, baro wind compensation and DShot300 output are baked into the defaults. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater → Firmware Update."
     method: ardupilot
-    webPath: /firmware/AF-F4_nano_v2-v1.0.9.apj
+    webPath: /firmware/AF-F4_nano_v2-v1.0.10.apj
   - kind: "Bootloader + App (merged HEX · DFU / SWD)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F4_nano_v2-v1.0.9/AF-F4_nano_v2-v1.0.9_with_bl.hex
-    version: "1.0.9"
+    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F4_nano_v2-v1.0.10/AF-F4_nano_v2-v1.0.10_with_bl.hex
+    version: "1.0.10"
     date: "2026-07-31"
     size: "2.2 MB"
-    sha256: "474b116a06adb6db020024cf82fe4e99044f3807a0982dd72045e6a5b0386e34"
+    sha256: "d8205a68d995b4e0ac63ef354944e90c84dfae632c3500dd799de7281f9927ef"
     notes: "Bootloader + application combined image based at 0x08000000. Flash via the catalog Web Updater → DFU Recovery (🛠 Enter DFU works buttonless on this board) or SWD/ST-Link for a blank/bricked board."
     method: dfu
-    webPath: /firmware/AF-F4_nano_v2-v1.0.9_with_bl.hex
+    webPath: /firmware/AF-F4_nano_v2-v1.0.10_with_bl.hex
 firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases'
 ---
