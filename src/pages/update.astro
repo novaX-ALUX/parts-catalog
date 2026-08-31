@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
-import { statSync } from 'node:fs';
+import { existsSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -14,13 +14,23 @@ const all = [
   ...await getCollection('motor'),
   ...await getCollection('camera'),
 ];
-type Row = { product: string; version: string; kind: string; method: string; path: string; file: string; size: string; family: string; mcu: string };
+type Row = { product: string; version: string; kind: string; method: string; path: string; file: string; size: string; family: string; mcu: string; signed: boolean };
 // File size in KB, read from the public/ asset at build time.
 function kbOf(webPath: string): string {
   try {
     const p = fileURLToPath(new URL('../../public' + webPath, import.meta.url));
     return Math.round(statSync(p).size / 1024).toLocaleString('en-US') + ' KB';
   } catch { return ''; }
+}
+// Does this artifact ship an Ed25519 release-signature manifest next to it?
+// Decided at BUILD time from the file on disk, then baked into the row as
+// data-signed. Doing it here (not by probing at runtime) means a missing or
+// removed manifest is a hard failure in the browser instead of silently
+// downgrading to "unverified" -- the page already knows it must verify.
+function signedOf(webPath: string): boolean {
+  try {
+    return existsSync(fileURLToPath(new URL('../../public' + webPath + '.aff4t10.json', import.meta.url)));
+  } catch { return false; }
 }
 const rows: Row[] = [];
 for (const e of all) {
@@ -29,7 +39,7 @@ for (const e of all) {
   const family = /H7/i.test(mcu) ? 'H7' : /F7/i.test(mcu) ? 'F7' : /F4/i.test(mcu) ? 'F4' : '';
   for (const fw of e.data.firmware ?? []) {
     if (fw.method && fw.webPath) {
-      rows.push({ product: e.data.name, version: fw.version, kind: fw.kind, method: fw.method, path: base + fw.webPath, file: fw.webPath.split('/').pop() || '', size: kbOf(fw.webPath), family, mcu });
+      rows.push({ product: e.data.name, version: fw.version, kind: fw.kind, method: fw.method, path: base + fw.webPath, file: fw.webPath.split('/').pop() || '', size: kbOf(fw.webPath), family, mcu, signed: signedOf(fw.webPath) });
     }
   }
 }
@@ -81,7 +91,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
           <tbody data-list="fw">
             {fwRows.length === 0 && <tr><td colspan="4" class="empty">No web-flashable app firmware yet.</td></tr>}
             {fwRows.map((r, i) => (
-              <tr class="fwrow" data-method={r.method} data-path={r.path} data-name={`${r.product} ${r.version}`} data-family={r.family} data-mcu={r.mcu}>
+              <tr class="fwrow" data-method={r.method} data-path={r.path} data-name={`${r.product} ${r.version}`} data-family={r.family} data-mcu={r.mcu} data-signed={r.signed ? "1" : "0"}>
                 <td><span class="rad" data-radio></span></td>
                 <td class="pname">{r.product}</td><td>{r.version}</td>
                 <td><code>{r.file}</code> <span class="mtag">{r.method}</span>{r.size && <span class="fsize">{r.size}</span>}</td>
@@ -91,7 +101,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
           <tbody data-list="dfu" hidden>
             {dfuRows.length === 0 && <tr><td colspan="4" class="empty">No web-flashable recovery image yet.</td></tr>}
             {dfuRows.map((r) => (
-              <tr class="fwrow" data-method={r.method} data-path={r.path} data-name={`${r.product} ${r.version}`} data-family={r.family} data-mcu={r.mcu}>
+              <tr class="fwrow" data-method={r.method} data-path={r.path} data-name={`${r.product} ${r.version}`} data-family={r.family} data-mcu={r.mcu} data-signed={r.signed ? "1" : "0"}>
                 <td><span class="rad" data-radio></span></td>
                 <td class="pname">{r.product}</td><td>{r.version}</td>
                 <td><code>{r.file}</code> <span class="mtag">{r.method}</span>{r.size && <span class="fsize">{r.size}</span>}</td>
@@ -184,6 +194,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   let droppedFile: File | null = null;
   let selectedFamily: string | null = null; // F4/F7/H7 of the picked catalog firmware (DFU guard)
   let selectedName: string | null = null;
+  let selectedSigned = false;   // this catalog artifact ships an Ed25519 manifest
 
   const log = (m: string, cls = '') => { const d = document.createElement('div'); if (cls) d.className = cls; d.textContent = m; logEl.appendChild(d); logEl.scrollTop = 1e9; };
   const progress = (done: number, total: number) => { barEl.style.width = total ? `${Math.round((done / total) * 100)}%` : '0'; };
@@ -402,6 +413,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
     row.classList.add('sel');
     selectedPath = row.dataset.path || null; droppedFile = null;
     selectedFamily = row.dataset.family || null; selectedName = row.dataset.name || null;
+    selectedSigned = row.dataset.signed === '1';
     serialRebooted = false; // re-selecting firmware restarts the Connect→Update sequence
     // If we were auto-reconnected to a DFU device of a DIFFERENT chip (e.g. an F4 sitting in DFU
     // while the user now picks F7 firmware), release it so we neither flash nor stay "connected"
@@ -474,18 +486,68 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
     refreshFlashEnabled();
   });
 
+  // ---- AF-F4 T10 release-signature gate -------------------------------------
+  // The F405 bootloader is too small for ArduPilot secure boot, so authenticity
+  // is enforced on the DISTRIBUTION path instead: every signed artifact ships an
+  // Ed25519 manifest (<file>.aff4t10.json) and we verify it HERE, before a single
+  // byte reaches the board. Same checks and same fail-closed rule as the CLI
+  // updater (tools/serial_update.py -> af_f4_t10_fwsig.verify_file).
+  const AFF4T10_PUBKEY_SPKI = 'MCowBQYDK2VwAyEArgGcHEkt8CG4VENHSnf18A+UgOT+QG7IQ6Qm55RXJL4=';
+
+  function b64ToBytes(b64: string): Uint8Array {
+    const bin = atob(b64); const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+
+  async function verifyRelease(buf: ArrayBuffer, path: string, name: string) {
+    const manUrl = path + '.aff4t10.json';
+    const r = await fetch(manUrl);
+    if (!r.ok) throw new Error(`REFUSING TO FLASH: ${name} is published as signed but its signature manifest is missing (${manUrl} -> ${r.status}).`);
+    const man = await r.json();
+    const data = new Uint8Array(buf);
+
+    if (man.size !== data.length)
+      throw new Error(`REFUSING TO FLASH: ${name} size ${data.length} != manifest ${man.size} (truncated or replaced).`);
+
+    const digest = [...new Uint8Array(await crypto.subtle.digest('SHA-256', data))]
+      .map((b) => b.toString(16).padStart(2, '0')).join('');
+    if (digest !== man.sha256)
+      throw new Error(`REFUSING TO FLASH: ${name} SHA-256 mismatch — the image was modified.`);
+
+    let key: CryptoKey;
+    try {
+      key = await crypto.subtle.importKey('spki', b64ToBytes(AFF4T10_PUBKEY_SPKI), { name: 'Ed25519' }, false, ['verify']);
+    } catch {
+      throw new Error('REFUSING TO FLASH: this browser cannot verify Ed25519 signatures (needs a current Chrome/Edge). Use the CLI updater instead.');
+    }
+    const ok = await crypto.subtle.verify('Ed25519', key, b64ToBytes(man.signature), data);
+    if (!ok)
+      throw new Error(`REFUSING TO FLASH: ${name} is NOT signed with the novaX release key — tampered or from an untrusted source.`);
+
+    log(`✔ signature OK — ${name} signed by ${man.key_id} (board_id ${man.board_id}, v${man.version})`, 'ok');
+  }
+
   // ---- load firmware bytes (same-origin path or dropped file) ----
   async function loadBytes(): Promise<{ text?: string; buf?: ArrayBuffer; name: string }> {
     if (droppedFile) {
       const name = droppedFile.name;
+      // A file the operator supplied themselves is outside the signed release
+      // channel; we cannot authenticate it, so say so rather than implying it passed.
+      log(`⚠ ${name} is a local file — release signature NOT checked. The board's own board_id + CRC still apply.`, 'pend');
       if (name.endsWith('.hex') || name.endsWith('.apj')) return { text: await droppedFile.text(), name };
       return { buf: await droppedFile.arrayBuffer(), name };
     }
     const res = await fetch(selectedPath!);
     if (!res.ok) throw new Error(`fetch ${selectedPath} → ${res.status}`);
     const name = selectedPath!.split('/').pop() || '';
-    if (name.endsWith('.hex') || name.endsWith('.apj')) return { text: await res.text(), name };
-    return { buf: await res.arrayBuffer(), name };
+    // Read the RAW bytes once: the signature is over the file as published, so
+    // text and signature input must come from the same buffer (no re-encoding).
+    const buf = await res.arrayBuffer();
+    if (selectedSigned) await verifyRelease(buf, selectedPath!, name);
+    if (name.endsWith('.hex') || name.endsWith('.apj'))
+      return { text: new TextDecoder().decode(buf), name };
+    return { buf, name };
   }
 
   // ---- flash ----
