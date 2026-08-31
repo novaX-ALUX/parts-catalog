@@ -3,7 +3,7 @@
 # Reliable, repeatable flashing for stability testing.
 #   flash_dfu.py <hex> [--loop N] [--no-leave] [--no-verify]
 # libusb handles 2048-byte control transfers (unlike WebUSB), so it streams fast.
-import sys, time, struct, re
+import os, sys, time, struct, re
 import usb.core, usb.util, usb.backend.libusb1, libusb_package
 
 VID, PID, XFER = 0x0483, 0xdf11, 2048
@@ -175,7 +175,28 @@ def read_transfer_size(dev, default=2048):
         pass
     return default
 
+
+# Release-signature gate, same rule as tools/serial_update.py. The DFU path is the
+# MORE dangerous one: _with_bl.hex rewrites the BOOTLOADER and the ST ROM DFU makes
+# no on-device check at all (no board_id, no CRC), so a wrong or tampered image
+# bricks the board into SWD-only recovery. Verify BEFORE we erase anything.
+# Local dev bypass: AFF4T10_SKIP_VERIFY=1.
+def _signature_gate():
+    if os.environ.get('AFF4T10_SKIP_VERIFY') == '1':
+        print('AF-F4 T10 signature check SKIPPED (AFF4T10_SKIP_VERIFY=1)')
+        return
+    try:
+        from af_f4_t10_fwsig import verify_file
+    except Exception as e:
+        print('REFUSING TO FLASH: signature verifier unavailable (%s)' % e)
+        sys.exit(3)
+    print('AF-F4 T10 integrity check on %s ...' % HEXFILE)
+    if not verify_file(HEXFILE):
+        print('REFUSING TO FLASH: AF-F4 T10 signature verification failed')
+        sys.exit(3)
+
 def main():
+    _signature_gate()
     global XFER
     be = usb.backend.libusb1.get_backend(find_library=libusb_package.find_library)
     dev = usb.core.find(idVendor=VID, idProduct=PID, backend=be)
