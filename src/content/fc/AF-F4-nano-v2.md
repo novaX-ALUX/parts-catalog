@@ -28,7 +28,7 @@ pinoutImages:
   - /images/products/fc_F4_nano_v2_pinout_bottom.png
 firmware:
   - kind: "ArduPilot (.apj package)"
-    file: https://github.com/novaX-ALUX/fc/releases/download/AF-F4_nano_v2-v1.0.11/AF-F4_nano_v2-v1.0.11.apj
+    file: https://github.com/novaX-ALUX/fc-boards/releases/download/AF-F4_nano_v2-v1.0.11/AF-F4_nano_v2-v1.0.11.apj
     version: "1.0.11"
     date: "2026-08-31"
     size: "687 KB"
@@ -37,7 +37,7 @@ firmware:
     method: ardupilot
     webPath: /firmware/AF-F4_nano_v2-v1.0.11.apj
   - kind: "Bootloader + App (merged HEX · DFU / SWD)"
-    file: https://github.com/novaX-ALUX/fc/releases/download/AF-F4_nano_v2-v1.0.11/AF-F4_nano_v2-v1.0.11_with_bl.hex
+    file: https://github.com/novaX-ALUX/fc-boards/releases/download/AF-F4_nano_v2-v1.0.11/AF-F4_nano_v2-v1.0.11_with_bl.hex
     version: "1.0.11"
     date: "2026-08-31"
     size: "2.2 MB"
@@ -45,5 +45,5 @@ firmware:
     notes: "Bootloader + application combined image based at 0x08000000. Flash via the catalog Web Updater → DFU Recovery (🛠 Enter DFU works buttonless on this board) or SWD/ST-Link for a blank/bricked board."
     method: dfu
     webPath: /firmware/AF-F4_nano_v2-v1.0.11_with_bl.hex
-firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/fc/releases'
+firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/fc-boards/releases'
 ---
