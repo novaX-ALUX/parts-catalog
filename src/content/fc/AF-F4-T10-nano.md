@@ -23,7 +23,7 @@ description: |
   AF-F4 T10 nano is the AF-F4 nano (STM32F405) with the AG-F4-1A gimbal mount enabled in firmware (ArduPilot MNT_TYPE 13). Same hardware and board ID as AF-F4 nano, so an existing AF-F4 nano accepts this firmware over the normal .apj updater. Feature set mirrors the curated novaX build with the AG-F4-1A camera-mount backend added.
 firmware:
   - kind: "ArduPilot (.apj package)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F4_T10_nano-v1.3.4/AF-F4_T10_nano-v1.3.4.apj
+    file: https://github.com/novaX-ALUX/fc/releases/download/AF-F4_T10_nano-v1.3.4/AF-F4_T10_nano-v1.3.4.apj
     version: "1.3.4"
     date: "2026-07-11"
     size: "780 KB"
@@ -32,7 +32,7 @@ firmware:
     method: ardupilot
     webPath: /firmware/AF-F4_T10_nano-v1.3.4.apj
   - kind: "Bootloader + App (merged HEX · DFU / SWD)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F4_T10_nano-v1.3.4/AF-F4_T10_nano-v1.3.4_with_bl.hex
+    file: https://github.com/novaX-ALUX/fc/releases/download/AF-F4_T10_nano-v1.3.4/AF-F4_T10_nano-v1.3.4_with_bl.hex
     version: "1.3.4"
     date: "2026-07-11"
     size: "2.4 MB"
@@ -40,5 +40,5 @@ firmware:
     notes: "Bootloader + application combined image based at 0x08000000. Flash via the catalog Web Updater → DFU Recovery (hold BOOT0) or SWD/ST-Link for a blank/bricked board."
     method: dfu
     webPath: /firmware/AF-F4_T10_nano-v1.3.4_with_bl.hex
-firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases'
+firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/fc/releases'
 ---

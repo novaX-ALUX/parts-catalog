@@ -30,7 +30,7 @@ description: |
   AF-F7 mini is an F7-class flight controller powered by the STM32F765 running at 216 MHz. Dual IMUs (ICM-20689 primary, ICM-20602 / BMI055 secondary), an IST8310 magnetometer and an MS5611 barometer deliver redundant attitude, heading and altitude sensing. 8 PWM outputs, 4 UARTs, 3 I²C ports and 2 CAN buses cover mid-range UAV payload stacks running ArduPilot or PX4.
 firmware:
   - kind: "ArduPilot Copter (.apj package)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F7_mini-v1.3.0/AF-F7_mini-v1.3.0-Copter.apj
+    file: https://github.com/novaX-ALUX/fc/releases/download/AF-F7_mini-v1.3.0/AF-F7_mini-v1.3.0-Copter.apj
     version: "1.3.0"
     date: "2026-08-31"
     size: "1.5 MB"
@@ -39,7 +39,7 @@ firmware:
     method: ardupilot
     webPath: /firmware/AF-F7_mini-v1.3.0-Copter.apj
   - kind: "ArduPilot Copter - Bootloader + App (merged HEX / DFU / SWD)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F7_mini-v1.3.0/AF-F7_mini-v1.3.0-Copter_with_bl.hex
+    file: https://github.com/novaX-ALUX/fc/releases/download/AF-F7_mini-v1.3.0/AF-F7_mini-v1.3.0-Copter_with_bl.hex
     version: "1.3.0"
     date: "2026-08-31"
     size: "4.8 MB"
@@ -48,7 +48,7 @@ firmware:
     method: dfu
     webPath: /firmware/AF-F7_mini-v1.3.0-Copter_with_bl.hex
   - kind: "ArduPilot Plane (.apj package)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F7_mini-v1.3.0/AF-F7_mini-v1.3.0-Plane.apj
+    file: https://github.com/novaX-ALUX/fc/releases/download/AF-F7_mini-v1.3.0/AF-F7_mini-v1.3.0-Plane.apj
     version: "1.3.0"
     date: "2026-08-31"
     size: "1.5 MB"
@@ -57,7 +57,7 @@ firmware:
     method: ardupilot
     webPath: /firmware/AF-F7_mini-v1.3.0-Plane.apj
   - kind: "ArduPilot Plane - Bootloader + App (merged HEX / DFU / SWD)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F7_mini-v1.3.0/AF-F7_mini-v1.3.0-Plane_with_bl.hex
+    file: https://github.com/novaX-ALUX/fc/releases/download/AF-F7_mini-v1.3.0/AF-F7_mini-v1.3.0-Plane_with_bl.hex
     version: "1.3.0"
     date: "2026-08-31"
     size: "4.8 MB"
@@ -65,5 +65,5 @@ firmware:
     notes: "Bootloader + application combined image based at 0x08000000 (board_id 6201, ENABLE_DFU_BOOT). Flash via the Web Updater -> DFU Recovery (buttonless: Enter DFU sends the app into ROM DFU; Windows needs a one-time WinUSB/Zadig on the 0483:df11 device), or SWD/ST-Link for a blank board. On F7 the ROM jump lives in the BOOTLOADER, so this merged image is what ENABLES buttonless DFU - a .apj alone cannot turn it on. Copter and Plane share board_id 6201 - select by file name."
     method: dfu
     webPath: /firmware/AF-F7_mini-v1.3.0-Plane_with_bl.hex
-firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases'
+firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/fc/releases'
 ---

@@ -25,7 +25,7 @@ description: |
   AF-F4 nano is a compact F4-class flight controller built around the STM32F405. Equipped with an ICM-42688-P IMU and DPS-310 barometer, it delivers reliable attitude and altitude sensing in a 39.4×39.4 mm form factor at just 9.3 g. Wide 9–25 V DC input with regulated 3.3 / 5 / 10 V rails and 9 PWM outputs make it suitable for compact 3"–5" multirotors running Betaflight, ArduPilot or PX4.
 firmware:
   - kind: "ArduPilot (.apj package)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F4_nano-v1.2.3/AF-F4_nano-v1.2.3.apj
+    file: https://github.com/novaX-ALUX/fc/releases/download/AF-F4_nano-v1.2.3/AF-F4_nano-v1.2.3.apj
     version: "1.2.3"
     date: "2026-07-11"
     size: "815 KB"
@@ -34,7 +34,7 @@ firmware:
     method: ardupilot
     webPath: /firmware/AF-F4_nano-v1.2.3.apj
   - kind: "Bootloader + App (merged HEX · DFU / SWD)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-F4_nano-v1.2.3/AF-F4_nano-v1.2.3_with_bl.hex
+    file: https://github.com/novaX-ALUX/fc/releases/download/AF-F4_nano-v1.2.3/AF-F4_nano-v1.2.3_with_bl.hex
     version: "1.2.3"
     date: "2026-07-11"
     size: "2.5 MB"
@@ -42,5 +42,5 @@ firmware:
     notes: "Bootloader + application combined image based at 0x08000000. Flash via the catalog Web Updater → DFU Recovery (hold BOOT0) or SWD/ST-Link for a blank/bricked board."
     method: dfu
     webPath: /firmware/AF-F4_nano-v1.2.3_with_bl.hex
-firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases'
+firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/fc/releases'
 ---

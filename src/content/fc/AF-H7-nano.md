@@ -7,7 +7,7 @@ pinoutImage: /images/products/fc_H743_nano_pinout.png
 order: 20
 firmware:
   - kind: "ArduPilot (.apj package)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-H7_nano-v1.2.3/AF-H7_nano-v1.2.3.apj
+    file: https://github.com/novaX-ALUX/fc/releases/download/AF-H7_nano-v1.2.3/AF-H7_nano-v1.2.3.apj
     version: "1.2.3"
     date: "2026-07-11"
     size: "1.3 MB"
@@ -16,7 +16,7 @@ firmware:
     method: ardupilot
     webPath: /firmware/AF-H7_nano-v1.2.3.apj
   - kind: "Bootloader + App (merged HEX · DFU / SWD)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AF-H7_nano-v1.2.3/AF-H7_nano-v1.2.3_with_bl.hex
+    file: https://github.com/novaX-ALUX/fc/releases/download/AF-H7_nano-v1.2.3/AF-H7_nano-v1.2.3_with_bl.hex
     version: "1.2.3"
     date: "2026-07-11"
     size: "5.2 MB"
@@ -47,5 +47,5 @@ pinoutNotes: |
 
   VBat input is routed through a 4-pin connector accepting 2S–8S LiPo. The on-board 5 V / 2.5 A regulator powers the FC, receiver and low-current peripherals. Servo rail is unregulated — feed it directly from a BEC or motor PDB.
 firmwareNotes: |
-  Supports Betaflight, INAV, and ArduPilot out of the box. Recommended targets: Betaflight MATEKH743 / ArduPilot MatekH743. Enter USB-C DFU bootloader by holding the BOOT button during power-up. All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases
+  Supports Betaflight, INAV, and ArduPilot out of the box. Recommended targets: Betaflight MATEKH743 / ArduPilot MatekH743. Enter USB-C DFU bootloader by holding the BOOT button during power-up. All firmware releases are published on GitHub: https://github.com/novaX-ALUX/fc/releases
 ---

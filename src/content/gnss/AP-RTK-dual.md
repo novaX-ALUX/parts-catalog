@@ -30,27 +30,27 @@ description: |
   AP-RTK dual is a high-precision dual-antenna RTK GNSS receiver built on an STM32F4 processor. Centimeter-level positioning and dual-antenna heading make it ideal for survey-grade autonomous platforms and applications that demand reliable yaw determination independent of magnetic interference.
 firmware:
   - kind: "AP_Periph (DroneCAN OTA)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AP-RTK_dual-v0.1.0/AP-RTK_dual-v0.1.0.bin
+    file: https://github.com/novaX-ALUX/fc/releases/download/AP-RTK_dual-v0.1.0/AP-RTK_dual-v0.1.0.bin
     version: "0.1.0"
     date: "2026-06-04"
     size: "157 KB"
     sha256: "d77268b9d9bb3638eea0749cc5a937a11394d00d20b9dd57ee99df2f1f4c4e74"
     notes: "Update over DroneCAN: Mission Planner → Optional Hardware → DroneCAN → select node → Update. No cable change needed."
   - kind: "AP_Periph (.apj package)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AP-RTK_dual-v0.1.0/AP-RTK_dual-v0.1.0.apj
+    file: https://github.com/novaX-ALUX/fc/releases/download/AP-RTK_dual-v0.1.0/AP-RTK_dual-v0.1.0.apj
     version: "0.1.0"
     date: "2026-06-04"
     size: "157 KB"
     sha256: "886c19a1bb251f0168bca72744c26f743261d3fcb6262488513226e785df4ac3"
     notes: "ArduPilot firmware package — upload via Mission Planner over the USB-C bootloader, or update over DroneCAN (OTA above). Not flashable from the catalog Web Updater (this is a DroneCAN peripheral, not a USB-serial/DFU device)."
   - kind: "Bootloader + App (merged HEX · SWD)"
-    file: https://github.com/novaX-ALUX/flight_controller/releases/download/AP-RTK_dual-v0.1.0/AP-RTK_dual-v0.1.0_with_bl.hex
+    file: https://github.com/novaX-ALUX/fc/releases/download/AP-RTK_dual-v0.1.0/AP-RTK_dual-v0.1.0_with_bl.hex
     version: "0.1.0"
     date: "2026-06-04"
     size: "608 KB"
     sha256: "1ed5a9af0044ba585978ddb4cde3eabe7f45b78504d61313967ad5463ad96f7a"
     notes: "Bootloader + application combined image based at 0x08000000. SWD/ST-Link only (e.g. STM32CubeProgrammer) for factory bring-up or recovery on a blank MCU — this DroneCAN peripheral has no USB DFU, so it is not offered in the Web Updater. For routine updates use the DroneCAN OTA or .apj methods above."
-firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/flight_controller/releases'
+firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/fc/releases'
 configImages:
   - { src: /images/products/gnss_AP-RTK-dual_antenna-setup.png, caption: "Antenna placement & wiring — Master (ANT1) front, Slave (ANT2) rear, ≥ 500 mm apart" }
   - { src: /images/products/gnss_AP-RTK-dual_offset-convention.png, caption: "Moving-baseline offset sign convention (X / Y / Z)" }
