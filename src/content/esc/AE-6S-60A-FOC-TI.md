@@ -24,25 +24,25 @@ description: |
   passthrough.
 firmware:
   - kind: "Application (TI-TXT · SWD/JTAG)"
-    file: https://github.com/novaX-ALUX/esc-f280049c/releases/download/verified%2Falite-killshot-v1.0.46/novaX_AE-6S-60A-FOC-TI_v1.0.46_App_SWD.txt
+    file: /firmware/esc/ae-6s-60a-foc-ti/novaX_AE-6S-60A-FOC-TI_v1.0.46_App_SWD.txt
     version: "1.0.46"
     date: "2026-09-01"
     size: "314.7 KB"
     sha256: "0475dd3da154eaecf1ec6734ba4f35fb3ffc0235e929e572beaf15bad3f1421c"
     notes: "CRC-stamped application image (TI-TXT) for Bank1. Includes the 25 V high-duty stability package (est_freq_sf 1.5 + 2 A flux-weakening floor, bench-verified 95% staircase completion). Flash via UniFlash / CCS over SWD/JTAG together with the bootloader below in ONE flash operation — boards with the pre-2026-08-31 flash map must take both images together (Bank0/Bank1 map revision)."
   - kind: "Bootloader (TI-TXT · SWD/JTAG)"
-    file: https://github.com/novaX-ALUX/esc-f280049c/releases/download/verified%2Falite-killshot-v1.0.46/novaX_AE-6S-60A-FOC-TI_v1.0.46_Bootloader_SWD.txt
+    file: /firmware/esc/ae-6s-60a-foc-ti/novaX_AE-6S-60A-FOC-TI_v1.0.46_Bootloader_SWD.txt
     version: "1.0.46"
     date: "2026-09-01"
     size: "76.0 KB"
     sha256: "7f8bba3feb463ae03bedd4cde00ac3cba806189e84072488ac1c39b44e62cced"
     notes: "Bank0 resident bootloader (TI-TXT): DroneCAN OTA firmware update, app CRC validation, journal. Flash together with the application in one UniFlash / CCS session."
   - kind: "Bootloader (CCS .out · SWD/JTAG)"
-    file: https://github.com/novaX-ALUX/esc-f280049c/releases/download/verified%2Falite-killshot-v1.0.46/novaX_AE-6S-60A-FOC-TI_v1.0.46_Bootloader_CCS.out
+    file: /firmware/esc/ae-6s-60a-foc-ti/novaX_AE-6S-60A-FOC-TI_v1.0.46_Bootloader_CCS.out
     version: "1.0.46"
     date: "2026-09-01"
     size: "270.2 KB"
     sha256: "61cd1eaa8a14c6cfb039d1547725539ba5f3be187138ee817bb5b053c2805337"
     notes: "Same bootloader as an ELF (.out) for Code Composer Studio users."
-firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/esc-f280049c/releases'
+firmwareNotes: 'Firmware downloads are hosted on this site (the source repository is private); the internal release archive lives at novaX-ALUX/esc-f280049c.'
 ---
