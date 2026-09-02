@@ -20,29 +20,24 @@ description: |
   precision prop parking. Hardware overcurrent protection is handled by the on-chip CMPSS
   comparators driving the ePWM trip-zone. Firmware v1.0.46 carries the 25 V high-duty
   stability package verified on the bench (95% staircase completion at 6S full charge).
-  Firmware is flashed over SWD/JTAG (UniFlash / Code Composer Studio) — not over 4-way
-  passthrough.
+  Two firmware files cover every case: the BootApp .hex (bootloader + application, both
+  flash banks in one file) is flashed once over SWD/JTAG with UniFlash; after that the
+  application-only .bin is updated in the field over DroneCAN by the resident bootloader —
+  no 4-way passthrough is involved.
 firmware:
-  - kind: "Application (TI-TXT · SWD/JTAG)"
-    file: /firmware/esc/ae-6s-60a-foc-ti/novaX_AE-6S-60A-FOC-TI_v1.0.46_App_SWD.txt
+  - kind: "BootApp (Intel HEX · SWD/JTAG)"
+    file: /firmware/esc/ae-6s-60a-foc-ti/novaX_AE-6S-60A-FOC-TI_v1.0.46_BootApp_JTAG.hex
     version: "1.0.46"
-    date: "2026-09-01"
-    size: "314.7 KB"
-    sha256: "0475dd3da154eaecf1ec6734ba4f35fb3ffc0235e929e572beaf15bad3f1421c"
-    notes: "CRC-stamped application image (TI-TXT) for Bank1. Includes the 25 V high-duty stability package (est_freq_sf 1.5 + 2 A flux-weakening floor, bench-verified 95% staircase completion). Flash via UniFlash / CCS over SWD/JTAG together with the bootloader below in ONE flash operation — boards with the pre-2026-08-31 flash map must take both images together (Bank0/Bank1 map revision)."
-  - kind: "Bootloader (TI-TXT · SWD/JTAG)"
-    file: /firmware/esc/ae-6s-60a-foc-ti/novaX_AE-6S-60A-FOC-TI_v1.0.46_Bootloader_SWD.txt
+    date: "2026-09-02"
+    size: "357.4 KB"
+    sha256: "a755fb01d79a79bd7fa9788cc48ec85a144ee181adac1c071e54fc7b273e66d7"
+    notes: "Bootloader (Bank0) + CRC-stamped application (Bank1) merged into ONE Intel HEX in the C28x word-addressed form that UniFlash / DSLite programs directly. Flash over SWD/JTAG (XDS110) as a single file — both banks in one program cycle, so a board can never sit half-flashed; disconnect the probe before power-cycling. Ship build of v1.0.46 (25 V high-duty stability package: est_freq_sf 1.5 + 2 A flux-weakening floor, bench-verified 95% staircase completion). Do not flash TI-TXT (.txt) images with UniFlash — the loader reads their byte addresses as word addresses and silently drops them."
+  - kind: "Application (flat .bin · DroneCAN OTA)"
+    file: /firmware/esc/ae-6s-60a-foc-ti/novaX_AE-6S-60A-FOC-TI_v1.0.46_App_CAN.bin
     version: "1.0.46"
-    date: "2026-09-01"
-    size: "76.0 KB"
-    sha256: "7f8bba3feb463ae03bedd4cde00ac3cba806189e84072488ac1c39b44e62cced"
-    notes: "Bank0 resident bootloader (TI-TXT): DroneCAN OTA firmware update, app CRC validation, journal. Flash together with the application in one UniFlash / CCS session."
-  - kind: "Bootloader (CCS .out · SWD/JTAG)"
-    file: /firmware/esc/ae-6s-60a-foc-ti/novaX_AE-6S-60A-FOC-TI_v1.0.46_Bootloader_CCS.out
-    version: "1.0.46"
-    date: "2026-09-01"
-    size: "270.2 KB"
-    sha256: "61cd1eaa8a14c6cfb039d1547725539ba5f3be187138ee817bb5b053c2805337"
-    notes: "Same bootloader as an ELF (.out) for Code Composer Studio users."
+    date: "2026-09-02"
+    size: "102.8 KB"
+    sha256: "1846884e9c32fbbc41b5e94186ed2514d7e17a2c37cd013dcde5ddaad9b96257"
+    notes: "Application-only flat binary for the DroneCAN OTA path: the resident bootloader receives it over CAN, CRC-validates it and reflashes Bank1 — no JTAG needed. Requires a board that already runs a working bootloader + application pair (a blank board takes the BootApp .hex above once)."
 firmwareNotes: 'Firmware downloads are hosted on this site (the source repository is private); the internal release archive lives at novaX-ALUX/esc-f280049c.'
 ---
