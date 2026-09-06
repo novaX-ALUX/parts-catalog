@@ -39,5 +39,5 @@ firmware:
     size: "102.8 KB"
     sha256: "1846884e9c32fbbc41b5e94186ed2514d7e17a2c37cd013dcde5ddaad9b96257"
     notes: "Application-only flat binary for the DroneCAN OTA path: the resident bootloader receives it over CAN, CRC-validates it and reflashes Bank1 — no JTAG needed. Requires a board that already runs a working bootloader + application pair (a blank board takes the BootApp .hex above once)."
-firmwareNotes: 'Firmware downloads are hosted on this site (the source repository is private); the internal release archive lives at novaX-ALUX/esc-f280049c.'
+firmwareNotes: 'Firmware downloads are hosted on this site (the source repository is private); the active product-family source is novaX-ALUX/esc.'
 ---

@@ -1,0 +1,60 @@
+{
+  "purpose": "Byte-identical copies of previously public FC/GNSS and AM32 releases; no new firmware versions.",
+  "verifiedAt": "2026-09-06",
+  "mirrors": [
+    {
+      "source": "https://github.com/novaX-ALUX/fc-boards/releases/download/AP-RTK_dual-v0.1.0/AP-RTK_dual-v0.1.0.bin",
+      "sha256": "d77268b9d9bb3638eea0749cc5a937a11394d00d20b9dd57ee99df2f1f4c4e74",
+      "target": "/firmware/gnss/AP-RTK-dual/AP-RTK_dual-v0.1.0.bin",
+      "bytes": 160976
+    },
+    {
+      "source": "https://github.com/novaX-ALUX/fc-boards/releases/download/AP-RTK_dual-v0.1.0/AP-RTK_dual-v0.1.0.apj",
+      "sha256": "886c19a1bb251f0168bca72744c26f743261d3fcb6262488513226e785df4ac3",
+      "target": "/firmware/gnss/AP-RTK-dual/AP-RTK_dual-v0.1.0.apj",
+      "bytes": 160464
+    },
+    {
+      "source": "https://github.com/novaX-ALUX/fc-boards/releases/download/AP-RTK_dual-v0.1.0/AP-RTK_dual-v0.1.0_with_bl.hex",
+      "sha256": "1ed5a9af0044ba585978ddb4cde3eabe7f45b78504d61313967ad5463ad96f7a",
+      "target": "/firmware/gnss/AP-RTK-dual/AP-RTK_dual-v0.1.0_with_bl.hex",
+      "bytes": 622984
+    },
+    {
+      "source": "https://github.com/novaX-ALUX/fc-boards/releases/download/AP-RTK_G5H-v0.1.0/AP-RTK_G5H-v0.1.0.bin",
+      "sha256": "2a5535a9a9f36f0114ccc1990521fb4179c415e31d60a335bb37e9b01a90e5b8",
+      "target": "/firmware/gnss/AP-RTK-G5H/AP-RTK_G5H-v0.1.0.bin",
+      "bytes": 205984
+    },
+    {
+      "source": "https://github.com/novaX-ALUX/fc-boards/releases/download/AP-RTK_G5H-v0.1.0/AP-RTK_G5H-v0.1.0.apj",
+      "sha256": "44ebc48e64a929050bddc4fe79625ce2596bee9d6b5fc716695914af47aa653e",
+      "target": "/firmware/gnss/AP-RTK-G5H/AP-RTK_G5H-v0.1.0.apj",
+      "bytes": 206431
+    },
+    {
+      "source": "https://github.com/novaX-ALUX/fc-boards/releases/download/AP-RTK_G5H-v0.1.0/AP-RTK_G5H-v0.1.0_with_bl.hex",
+      "sha256": "02ca929e71670dcb685064e36d1e7beddccf3c24803e70df8d7a919832fc04ac",
+      "target": "/firmware/gnss/AP-RTK-G5H/AP-RTK_G5H-v0.1.0_with_bl.hex",
+      "bytes": 746772
+    },
+    {
+      "source": "https://github.com/novaX-ALUX/esc-am32/releases/download/novaX_12S_F415-v2.29/novaX_12S_F415_2.29_Bootloader_PB4_32K_V16.hex",
+      "sha256": "b0a1993a7df91152838780a71f2b38f2e9e9570fe668ea7079b44ccdede27915",
+      "target": "/firmware/esc/am32/novaX_12S_F415_2.29_Bootloader_PB4_32K_V16.hex",
+      "bytes": 10559
+    },
+    {
+      "source": "https://github.com/novaX-ALUX/esc-am32/releases/download/novaX_12S_F415-v2.29/novaX_12S_F415_2.29.hex",
+      "sha256": "2562669ef1f1df3927ce05b8808a74706e846c1ffcfafd14de0a4770c4bc2a91",
+      "target": "/firmware/esc/am32/novaX_12S_F415_2.29.hex",
+      "bytes": 57764
+    },
+    {
+      "source": "https://github.com/novaX-ALUX/esc-am32/releases/download/novaX_12S_F415-v2.29/novaX_12S_F415_2.29_BootApp_PB4_32K_V16.hex",
+      "sha256": "5eecca4ea7ba0249a0e3dccd10de4c8fae79afdb94fb8a57d3c98623cadfe487",
+      "target": "/firmware/esc/am32/novaX_12S_F415_2.29_BootApp_PB4_32K_V16.hex",
+      "bytes": 68791
+    }
+  ]
+}

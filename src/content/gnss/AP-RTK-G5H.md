@@ -30,27 +30,27 @@ description: |
   AP-RTK G5H is the successor to AP-RTK dual with a non-Chinese receiver: a single Septentrio mosaic-G5 P3H module (Belgium) tracks both antennas and computes the heading on-chip, so the autopilot receives position, RTK status and heading over one DroneCAN node. The same carrier design, connectors and cables as AP-RTK dual are used, so it is a drop-in replacement on the airframe. Quad-band, 789-channel tracking with AIM+ interference detection and mitigation.
 firmware:
   - kind: "AP_Periph (DroneCAN OTA)"
-    file: https://github.com/novaX-ALUX/fc-boards/releases/download/AP-RTK_G5H-v0.1.0/AP-RTK_G5H-v0.1.0.bin
+    file: /firmware/gnss/AP-RTK-G5H/AP-RTK_G5H-v0.1.0.bin
     version: "0.1.0"
     date: "2026-09-02"
     size: "201 KB"
     sha256: "2a5535a9a9f36f0114ccc1990521fb4179c415e31d60a335bb37e9b01a90e5b8"
     notes: "Update over DroneCAN: Mission Planner → Optional Hardware → DroneCAN → select node 'AP-RTK G5H' → Update. The bootloader refuses any file whose board_id is not 6206, so the AP-RTK dual image cannot be flashed by mistake (and vice versa). v0.1.0 = first build (ArduPilot 4.6.3 AP_Periph, SBF dual-antenna driver)."
   - kind: "AP_Periph (.apj package)"
-    file: https://github.com/novaX-ALUX/fc-boards/releases/download/AP-RTK_G5H-v0.1.0/AP-RTK_G5H-v0.1.0.apj
+    file: /firmware/gnss/AP-RTK-G5H/AP-RTK_G5H-v0.1.0.apj
     version: "0.1.0"
     date: "2026-09-02"
     size: "202 KB"
     sha256: "44ebc48e64a929050bddc4fe79625ce2596bee9d6b5fc716695914af47aa653e"
     notes: "ArduPilot firmware package — upload with Mission Planner or uploader.py over the USB-C bootloader, or update over DroneCAN (OTA above). Not flashable from the catalog Web Updater."
   - kind: "Bootloader + App (merged HEX · SWD / USB DFU)"
-    file: https://github.com/novaX-ALUX/fc-boards/releases/download/AP-RTK_G5H-v0.1.0/AP-RTK_G5H-v0.1.0_with_bl.hex
+    file: /firmware/gnss/AP-RTK-G5H/AP-RTK_G5H-v0.1.0_with_bl.hex
     version: "0.1.0"
     date: "2026-09-02"
     size: "729 KB"
     sha256: "02ca929e71670dcb685064e36d1e7beddccf3c24803e70df8d7a919832fc04ac"
     notes: "Bootloader + application combined image based at 0x08000000, for factory bring-up or recovery on a blank MCU: SWD/ST-Link, or the STM32 ROM USB DFU (hold BOOT while connecting USB-C → 0483:DF11). For routine updates use the DroneCAN OTA or .apj methods above."
-firmwareNotes: 'All firmware releases are published on GitHub: https://github.com/novaX-ALUX/fc-boards/releases'
+firmwareNotes: 'Downloads below are hosted in this catalog under /firmware/gnss/. Existing released firmware bytes and SHA-256 checksums are unchanged.'
 configImages:
   - { src: /images/products/gnss_AP-RTK-dual_antenna-setup.png, caption: "Antenna placement & wiring — ANT1 (main) front, ANT2 (aux) rear, ≥ 500 mm apart (same layout as AP-RTK dual)" }
   - { src: /images/products/gnss_AP-RTK-dual_offset-convention.png, caption: "Baseline offset sign convention (X / Y / Z) — set on the GNSS node, not on the autopilot" }
