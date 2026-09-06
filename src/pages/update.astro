@@ -1,8 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
-import { existsSync, statSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { publicDir } from 'astro:config/server';
+import { readFirmwareMetadata } from '../lib/firmware-metadata.mjs';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
@@ -15,23 +15,6 @@ const all = [
   ...await getCollection('camera'),
 ];
 type Row = { product: string; version: string; kind: string; method: string; path: string; file: string; size: string; family: string; mcu: string; signed: boolean };
-// File size in KB, read from the public/ asset at build time.
-function kbOf(webPath: string): string {
-  try {
-    const p = fileURLToPath(new URL('../../public' + webPath, import.meta.url));
-    return Math.round(statSync(p).size / 1024).toLocaleString('en-US') + ' KB';
-  } catch { return ''; }
-}
-// Does this artifact ship an Ed25519 release-signature manifest next to it?
-// Decided at BUILD time from the file on disk, then baked into the row as
-// data-signed. Doing it here (not by probing at runtime) means a missing or
-// removed manifest is a hard failure in the browser instead of silently
-// downgrading to "unverified" -- the page already knows it must verify.
-function signedOf(webPath: string): boolean {
-  try {
-    return existsSync(fileURLToPath(new URL('../../public' + webPath + '.aff4t10.json', import.meta.url)));
-  } catch { return false; }
-}
 const rows: Row[] = [];
 for (const e of all) {
   // The DFU chip guard needs each board's MCU family (F4/F7/H7), read from its specs.
@@ -39,7 +22,7 @@ for (const e of all) {
   const family = /H7/i.test(mcu) ? 'H7' : /F7/i.test(mcu) ? 'F7' : /F4/i.test(mcu) ? 'F4' : '';
   for (const fw of e.data.firmware ?? []) {
     if (fw.method && fw.webPath) {
-      rows.push({ product: e.data.name, version: fw.version, kind: fw.kind, method: fw.method, path: base + fw.webPath, file: fw.webPath.split('/').pop() || '', size: kbOf(fw.webPath), family, mcu, signed: signedOf(fw.webPath) });
+      rows.push({ product: e.data.name, version: fw.version, kind: fw.kind, method: fw.method, path: base + fw.webPath, file: fw.webPath.split('/').pop() || '', family, mcu, ...readFirmwareMetadata(publicDir, fw.webPath) });
     }
   }
 }

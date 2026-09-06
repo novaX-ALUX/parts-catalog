@@ -42,6 +42,18 @@ _base_fields: &base_fields
       - { label: Size, name: size, widget: string, required: false, hint: "예) 896 KB" }
       - { label: SHA-256, name: sha256, widget: string, required: false }
       - { label: Notes, name: notes, widget: string, required: false }
+      - label: Web Update Method
+        name: method
+        widget: select
+        required: false
+        options: [dfu, ardupilot, novax-fc]
+        hint: "웹 업데이트용인 경우에만 지정. 아래 Web Mirror Path도 함께 필요하며 잘못된 조합은 배포 검증에서 거부됩니다."
+      - label: Web Mirror Path
+        name: webPath
+        widget: string
+        required: false
+        pattern: ['^/firmware/[^\\?#%]+$', '기존 public/firmware 파일의 /firmware/... 경로를 입력하세요.']
+        hint: "동일 버전의 실제 펌웨어를 먼저 Git으로 추가한 뒤 지정. 다운로드 URL과 미러의 SHA-256 일치 및 서명 검증을 통과해야 배포됩니다."
   - { label: Configuration Notes, name: configNotes, widget: text, required: false, hint: "GNSS — Configuration 탭 단계별 안내 (줄바꿈 유지됨)" }
   - label: Config Images
     name: configImages
