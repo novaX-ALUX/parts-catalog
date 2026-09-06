@@ -5,7 +5,7 @@ new firmware. Released firmware bytes, hashes and signatures were not changed.
 
 ## FC source of truth
 
-Compared the five FC catalog pages against
+Compared the five public FC catalog pages and the hidden T10 entry against
 [novaX FC board definitions at e93efe59](https://github.com/novaX-ALUX/fc/tree/e93efe59ef8d45ce7e88307d6ea240c6d6ed99a8/boards).
 PWM counts distinguish motor/servo channels from LED and IOMCU outputs. UART and
 I2C counts now state whether they count configured buses or physical connectors.

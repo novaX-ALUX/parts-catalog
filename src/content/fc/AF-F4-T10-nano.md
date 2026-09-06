@@ -9,12 +9,12 @@ hidden: true   # 공개 카탈로그(카드 + /fc/af-f4-t10-nano/ 제품페이�
 specs:
   - { key: MCU, value: "STM32F405" }
   - { key: IMU, value: "ICM-42688-P" }
-  - { key: Barometer, value: "DPS-310" }
+  - { key: Barometer, value: "SPL06 (current novaX hardware definition)" }
   - { key: Gimbal, value: "AG-F4-1A (MNT_TYPE 13)" }
   - { key: Operating Voltage, value: "9 – 25 V DC" }
   - { key: USB Input, value: "USB Type-C (Firmware & Power)" }
-  - { key: PWM Output, value: "9 Channel" }
-  - { key: Serial Ports, value: "5 Port" }
+  - { key: PWM Output, value: "8 motor/servo channels + 1 LED channel" }
+  - { key: Serial Ports, value: "6 hardware UARTs + USB configured; verify connector pinout" }
   - { key: RC Input, value: "PWM / PPM / S.Bus" }
   - { key: Size, value: "39.4 × 39.4 mm" }
   - { key: Weight, value: "9.3 g" }

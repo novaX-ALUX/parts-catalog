@@ -12,6 +12,7 @@ function spec(product, key) { return product.specs.find(row => row.key === key)?
 test('FC catalog separates actual PWM channels, LED and auxiliary channels', () => {
   assert.match(spec(product('fc', 'AF-F4-nano-v2'), 'PWM Output'), /^5 channels/);
   assert.match(spec(product('fc', 'AF-F4-nano'), 'PWM Output'), /^8 motor\/servo channels \+ 1 LED/);
+  assert.match(spec(product('fc', 'AF-F4-T10-nano'), 'PWM Output'), /^8 motor\/servo channels \+ 1 LED/);
   assert.match(spec(product('fc', 'AF-H7-nano'), 'PWM Output'), /^10 motor\/servo channels \+ 1 WS2812/);
   assert.match(spec(product('fc', 'AF-F7-mini'), 'PWM Output'), /^8 FMU channels \+ 3 auxiliary/);
   assert.match(spec(product('fc', 'AF-H7E'), 'PWM Output'), /^8 FMU \+ 8 IOMCU/);
