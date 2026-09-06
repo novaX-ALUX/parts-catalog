@@ -24,15 +24,15 @@ specs:
   - key: Servo Rail
     value: 0 – 9.9 V
   - key: PWM Output
-    value: 16 CH
+    value: 8 FMU + 8 IOMCU channels
   - key: RC Input
     value: S.Bus, PPM, DSM / Spektrum
   - key: RSSI Input
     value: Analog / PWM
   - key: UART
-    value: 8 Port
+    value: 7 peripheral serial interfaces + dedicated IOMCU link
   - key: I²C
-    value: 2 Port
+    value: 4 configured buses including internal sensors; 3 exposed on multifunction ports
   - key: CAN
     value: 2 Port
   - key: ADC
@@ -46,10 +46,10 @@ specs:
   - key: Operating Temp
     value: -20 ~ +85 ℃
   - key: Supported F/W
-    value: PX4, ArduPilot
+    value: novaX ArduPilot (Copter and Plane releases)
   - key: Ethernet
     value: 100 Mbps x 1 Port
-description: AF-H7E is an enterprise-class H7 flight controller based on the Pixhawk FMUv6x standard. An STM32H753 at 480 MHz drives triple-redundant IMUs (BMI088 / ICM-42688-P / ICM-20649), an RM3100 magnetometer and dual ICP-20100 barometers. 16 PWM outputs, 8 UARTs, 2 CAN buses and a modular core / baseboard design support large industrial and commercial UAV platforms with PX4 and ArduPilot.
+description: AF-H7E is a modular STM32H753 flight controller based on the Pixhawk FMUv6x architecture. The CUAV variant configures BMI088, ICM-42688-P and ICM-20649 IMUs, an RM3100 compass and two ICP-20100 barometers. Eight FMU outputs and eight IOMCU outputs provide 16 channels. Seven peripheral serial interfaces, a dedicated IOMCU link, four I2C buses including internal sensors, and two CAN buses are configured. Published firmware here is novaX ArduPilot Copter and Plane; PX4 compatibility is not verified by this catalog.
 pinoutImage: /images/products/cuav-pixhawk6x-connectors.png
 pinoutImages:
   - /images/products/fc_AF-H7E_dimensions.png

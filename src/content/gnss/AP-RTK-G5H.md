@@ -19,11 +19,11 @@ specs:
   - { key: Standalone / DGNSS, value: "H 1.2 m / 0.4 m · V 1.9 m / 0.7 m (RMS)" }
   - { key: Velocity Accuracy, value: "3 cm/s" }
   - { key: Cold / Warm Start, value: "< 35 s / < 10 s · Re-acquisition 1 s" }
-  - { key: Update Rate, value: "Max. 20 Hz (10 Hz over DroneCAN)" }
+  - { key: Update Rate, value: "Receiver position up to 20 Hz; node requests 10 Hz. Actual CAN/heading rate requires measurement" }
   - { key: Interference Protection, value: "AIM+ jamming / spoofing detection & mitigation, APME+ multipath, LOCK+, IONO+" }
   - { key: Data Format, value: "RTCM 3.x input (MSM)" }
   - { key: Comm. Protocol, value: "DroneCAN (heading via ardupilot.gnss.Heading)" }
-  - { key: I/O Ports, value: "2× Antenna (MMCX, 3.3 V bias, 150 mA) · 1× CAN · 1× UART · 1× USB-C" }
+  - { key: I/O Ports, value: "2× Antenna (MMCX, 3.3 V bias, combined current below 150 mA) · 1× CAN · 1× UART · 1× USB-C" }
   - { key: Operating Temp, value: "-40 ~ +85 ℃ (receiver)" }
   - { key: Operating Voltage, value: "4.7 – 5.2 V" }
 description: |

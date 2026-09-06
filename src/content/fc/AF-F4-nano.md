@@ -8,21 +8,21 @@ order: 10
 specs:
   - { key: MCU, value: "STM32F405" }
   - { key: IMU, value: "ICM-42688-P" }
-  - { key: Barometer, value: "DPS-310" }
+  - { key: Barometer, value: "SPL06 (current novaX hardware definition)" }
   - { key: Operating Voltage, value: "9 – 25 V DC" }
   - { key: Output Voltage, value: "3.3V/1A · 5V/3A · 10V/3A" }
   - { key: USB Input, value: "USB Type-C (Firmware & Power)" }
-  - { key: PWM Output, value: "9 Channel" }
-  - { key: Serial Ports, value: "5 Port" }
+  - { key: PWM Output, value: "8 motor/servo channels + 1 LED channel" }
+  - { key: Serial Ports, value: "6 hardware UARTs + USB configured; verify connector pinout" }
   - { key: Servo Output, value: "2 Port" }
   - { key: RC Input, value: "PWM / PPM / S.Bus" }
   - { key: Size, value: "39.4 × 39.4 mm" }
   - { key: Mount Hole, value: "30.5 × 30.5 mm / M4" }
   - { key: Weight, value: "9.3 g" }
   - { key: Operating Temp, value: "-20 ~ +70 ℃" }
-  - { key: Supported F/W, value: "Betaflight, ArduPilot, PX4" }
+  - { key: Supported F/W, value: "novaX ArduPilot (released); Betaflight board configuration available" }
 description: |
-  AF-F4 nano is a compact F4-class flight controller built around the STM32F405. Equipped with an ICM-42688-P IMU and DPS-310 barometer, it delivers reliable attitude and altitude sensing in a 39.4×39.4 mm form factor at just 9.3 g. Wide 9–25 V DC input with regulated 3.3 / 5 / 10 V rails and 9 PWM outputs make it suitable for compact 3"–5" multirotors running Betaflight, ArduPilot or PX4.
+  AF-F4 nano is a compact STM32F405 flight controller with an ICM-42688-P IMU. The novaX hardware definition configures an SPL06 barometer, eight motor/servo PWM outputs, one LED output and six hardware UARTs plus USB. Use the matching AF-F4_nano ArduPilot release. Betaflight board configuration is available in the FC repository; a verified PX4 release is not provided here.
 firmware:
   - kind: "ArduPilot (.apj package)"
     file: https://github.com/novaX-ALUX/fc/releases/download/AF-F4_nano-v1.2.3/AF-F4_nano-v1.2.3.apj

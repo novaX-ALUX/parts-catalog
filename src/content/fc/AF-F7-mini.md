@@ -14,20 +14,19 @@ specs:
   - { key: Operating Voltage, value: "4.75 – 5.5 V (Rated 5 V)" }
   - { key: USB Input, value: "4.75 – 5.25 V" }
   - { key: Servo Rail, value: "Max. 36 V (No Internal Regulator)" }
-  - { key: PWM Output, value: "8 CH" }
-  - { key: PWM / Capture Input, value: "3 CH" }
+  - { key: PWM Output, value: "8 FMU channels + 3 auxiliary channels in current ArduPilot configuration" }
   - { key: RC Input, value: "S.Bus, PPM, DSM/DSM2/DSMX, CPPM" }
   - { key: RSSI Input, value: "Analog / PWM" }
-  - { key: UART, value: "4 Port" }
-  - { key: I²C, value: "3 Port" }
+  - { key: UART, value: "6 hardware serial interfaces configured; verify connector pinout" }
+  - { key: I²C, value: "4 buses configured, including internal sensor buses" }
   - { key: CAN, value: "2 Port" }
   - { key: ADC, value: "VBat/Current + Aux Analog Input 2Ch" }
   - { key: Size, value: "64.2 × 42.3 × 14.6 mm" }
   - { key: Weight, value: "39.7 g" }
   - { key: Operating Temp, value: "-20 ~ +85 ℃" }
-  - { key: Supported F/W, value: "ArduPilot, PX4" }
+  - { key: Supported F/W, value: "novaX ArduPilot (Copter and Plane releases)" }
 description: |
-  AF-F7 mini is an F7-class flight controller powered by the STM32F765 running at 216 MHz. Dual IMUs (ICM-20689 primary, ICM-20602 / BMI055 secondary), an IST8310 magnetometer and an MS5611 barometer deliver redundant attitude, heading and altitude sensing. 8 PWM outputs, 4 UARTs, 3 I²C ports and 2 CAN buses cover mid-range UAV payload stacks running ArduPilot or PX4.
+  AF-F7 mini uses an STM32F765 with ICM-20689, ICM-20602 and BMI055 IMUs, an IST8310 compass and an MS5611 barometer. Its novaX ArduPilot definition configures all three IMUs, eight FMU PWM outputs and three auxiliary PWM outputs, six hardware serial interfaces, four I2C buses including internal sensors, and two CAN buses. There is no IOMCU. Published firmware here is novaX ArduPilot Copter and Plane; PX4 compatibility is not verified by this catalog.
 firmware:
   - kind: "ArduPilot Copter (.apj package)"
     file: https://github.com/novaX-ALUX/fc/releases/download/AF-F7_mini-v1.3.0/AF-F7_mini-v1.3.0-Copter.apj

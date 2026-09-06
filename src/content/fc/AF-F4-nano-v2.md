@@ -13,8 +13,8 @@ specs:
   - { key: GPS Port, value: "6-pin connector (UART TX/RX + I2C SCL/SDA)" }
   - { key: Operating Voltage, value: "9 – 25 V DC" }
   - { key: Output Voltage, value: "3.3V/1A · 5V/3A · 10V/3A" }
-  - { key: PWM Output, value: "6 Channel" }
-  - { key: Serial Ports, value: "5 Port" }
+  - { key: PWM Output, value: "5 channels in current novaX ArduPilot configuration" }
+  - { key: Serial Ports, value: "3 hardware UARTs + USB in current novaX ArduPilot configuration" }
   - { key: Blackbox, value: "microSD card" }
   - { key: RC Input, value: "PWM / PPM / S.Bus" }
   - { key: Size, value: "39.4 × 39.4 mm" }
@@ -22,7 +22,7 @@ specs:
   - { key: Weight, value: "9.3 g" }
   - { key: Supported F/W, value: "ArduPilot" }
 description: |
-  AF-F4 nano v2 is a compact F4-class flight controller built around the STM32F405, with an ICM-42688-P IMU and a DPS368 barometer onboard. GNSS and compass are NOT onboard: the board exposes a 6-pin GPS port (UART on USART1 + I2C on I2C1) for an external GPS module that carries the MAX-M10S GNSS receiver and QMC5883P compass. Without that module the board has no positioning or heading, and it is configured to arm with no compass. Six PWM outputs, five serial ports and microSD blackbox logging round out the feature set. The board carries its own board ID (6204) and bootloader, so firmware for other novaX F4 boards cannot be flashed onto it by mistake.
+  AF-F4 nano v2 is a compact F4-class flight controller built around the STM32F405, with an ICM-42688-P IMU and a DPS368 barometer onboard. GNSS and compass are external: the 6-pin GPS port carries USART1 and I2C1 for a module with MAX-M10S and QMC5883P. Without an external positioning or heading source those measurements are unavailable. The current novaX ArduPilot definition enables five PWM outputs, three hardware UARTs plus USB, and microSD logging. Board ID 6204 allows compatible APJ uploaders to check the target; raw DFU and SWD flashing do not provide that protection. Use only the matching AF-F4_nano_v2 image.
 pinoutImages:
   - /images/products/fc_F4_nano_v2_pinout_top.png
   - /images/products/fc_F4_nano_v2_pinout_bottom.png
@@ -33,7 +33,7 @@ firmware:
     date: "2026-08-31"
     size: "687 KB"
     sha256: "02390d6f631f9897a18927ecca8c37a514ee7fff26b62838186ec80a9f43140c"
-    notes: "ArduPilot Copter app. v1.0.11 pins the onboard MAX-M10S internal LNA to NORMAL (full gain): the u-blox default differs by module firmware (SPG 5.10 = NORMAL, SPG 5.20 = LOWGAIN), so identical boards could ship with different GPS front-end gain. v1.0.10 fixes the MAVLink2 signing side effect that flooded the flash-emulated storage with signing-timestamp writes (GPS UART overruns, stalled loops); signing stays fully usable. v1.0.9 added BRAKE mode, EKF3 wind estimation (drag fusion), corrected board orientation and an 8 KB log buffer; battery calibration, baro wind compensation and DShot300 output are baked into the defaults. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater → Firmware Update."
+    notes: "ArduPilot Copter app. v1.0.11 pins the external MAX-M10S module's internal LNA to NORMAL (full gain): the u-blox default differs by module firmware (SPG 5.10 = NORMAL, SPG 5.20 = LOWGAIN). v1.0.10 fixes signing-timestamp flash writes that caused GPS UART overruns and stalled loops; signing remains available. v1.0.9 added BRAKE mode, EKF3 wind estimation, corrected board orientation and an 8 KB log buffer. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater → Firmware Update."
     method: ardupilot
     webPath: /firmware/AF-F4_nano_v2-v1.0.11.apj
   - kind: "Bootloader + App (merged HEX · DFU / SWD)"

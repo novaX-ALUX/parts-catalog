@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">AF-H7 nano — novaX ArduPilot port mapping</title>
+  <desc id="desc">Firmware logical mapping, not connector pin order. GPS USART3, RC USART6, VTX USART1, DJI RC USART2, DJI MSP UART4, spare UART7 and UART8; ten PWM outputs and a separate LED channel.</desc>
+  <rect width="1200" height="720" rx="20" fill="#111b29"/>
+  <g font-family="Arial, sans-serif" fill="#e8eef7">
+    <text x="50" y="70" font-size="36" font-weight="700">AF-H7 nano · novaX ArduPilot</text>
+    <text x="50" y="112" font-size="22" fill="#a5b7cc">Board ID 6200 · Firmware mapping — NOT connector pin order</text>
+    <path d="M50 143H1150 M50 205H1150 M50 265H1150 M50 325H1150 M50 385H1150 M50 445H1150 M50 505H1150 M50 565H1150" stroke="#35465e"/>
+    <g font-size="23" font-weight="700" fill="#62dcc7">
+      <text x="60" y="182">Connection</text><text x="370" y="182">Hardware UART</text><text x="675" y="182">ArduPilot</text><text x="935" y="182">MCU pins TX / RX</text>
+    </g>
+    <g font-size="23">
+      <text x="60" y="245">GPS</text><text x="370" y="245">USART3</text><text x="675" y="245">SERIAL3</text><text x="950" y="245">PD8 / PD9</text>
+      <text x="60" y="305">ELRS / RC</text><text x="370" y="305">USART6</text><text x="675" y="305">SERIAL6</text><text x="950" y="305">PC6 / PC7</text>
+      <text x="60" y="365">VTX serial control</text><text x="370" y="365">USART1</text><text x="675" y="365">SERIAL1</text><text x="950" y="365">PA9 / PA10</text>
+      <text x="60" y="425">DJI O3 RC</text><text x="370" y="425">USART2</text><text x="675" y="425">SERIAL2</text><text x="950" y="425">PD5 / PD6</text>
+      <text x="60" y="485">DJI O3 MSP</text><text x="370" y="485">UART4</text><text x="675" y="485">SERIAL4</text><text x="950" y="485">PB9 / PB8</text>
+      <text x="60" y="545">Spare pads</text><text x="370" y="545">UART7 / UART8</text><text x="675" y="545">SERIAL7 / 8</text><text x="950" y="545">PE8/7 · PE1/0</text>
+    </g>
+    <text x="60" y="615" font-size="24" fill="#62dcc7">PWM1–10: motor / servo · PWM11: WS2812 LED</text>
+    <text x="60" y="658" font-size="20">Source: novaX-ALUX/fc · boards/AF-H7_nano/ardupilot/hwdef.dat</text>
+    <text x="60" y="692" font-size="18" fill="#a5b7cc">Verify PCB revision and connector orientation before wiring. Flash only matching AF-H7_nano firmware.</text>
+  </g>
+</svg>
