@@ -39,3 +39,24 @@ test('GNSS receiver limits are not presented as measured end-to-end rates', () =
   assert.match(spec(g5, 'Update Rate'), /requires measurement/);
   assert.match(spec(g5, 'I/O Ports'), /combined current below 150 mA/);
 });
+
+test('X20D is a separate R3 engineering product with its own heading contract', () => {
+  const x20 = product('gnss', 'AP-RTK-X20D');
+  assert.equal(x20.name, 'AP-RTK X20D');
+  assert.equal(x20.order, 22);
+  assert.match(x20.image, /X20D_R3_top_isometric\.png$/);
+  assert.equal(x20.gallery.length, 4);
+  assert.match(spec(x20, 'Update Rate'), /requires measurement/);
+  assert.match(x20.configNotes, /ANT1 \/ RF_IN_1 at the rear; ANT2 \/ RF_IN_2 at the front/);
+  assert.equal(x20.configParams.find(p => p.name === 'GPS1_MB_TYPE').value, '0');
+  assert.match(x20.firmwareNotes, /engineering release/);
+  assert.match(x20.firmwareNotes, /6205/);
+  assert.match(x20.firmwareNotes, /upstream AP_Periph numeric version remains 1\.8/);
+  assert.equal(x20.firmware.length, 4);
+  for (const fw of x20.firmware) {
+    assert.equal(fw.version, '1.0.1');
+    assert.match(fw.file, /^\/firmware\/gnss\/AP-RTK-X20D\/AP-RTK_X20D-v1\.0\.1/);
+    assert.match(fw.sha256, /^[0-9a-f]{64}$/);
+    assert.equal(fw.method, undefined, 'Do not enable an unqualified browser-flash target');
+  }
+});

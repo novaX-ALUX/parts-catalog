@@ -345,6 +345,11 @@ img { display: block; max-width: 100%; height: auto; }
 }
 .gallery-grid img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
 
+/* Portrait PCB renders must fit the allotted image area, not expand its grid row. */
+.card .imgwrap, .detail-body .imgwrap, .gallery-grid .cell {
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+}
+
 /* === Footer === */
 .site-footer {
   background: var(--paper); border-top: 1px solid var(--line); margin-top: 64px;

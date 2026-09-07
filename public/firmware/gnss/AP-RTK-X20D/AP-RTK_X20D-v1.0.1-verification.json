@@ -1,0 +1,72 @@
+{
+  "board": "AP-RTK_X20D",
+  "board_id": 6205,
+  "version": "1.0.1",
+  "qualification": "engineering; hardware/flight pending",
+  "product_commit": "190642e0437749a50b23a7fa3f65be1e5257e989",
+  "ardupilot_commit": "44fc3b1593dbab40ce40bc858f95d80cede727ef",
+  "compiler": "Windows arm-none-eabi-gcc.exe 10.2.1 (10-2020-q4-major); Cygwin, no WSL",
+  "source_recipes_match": true,
+  "binary_hex_apj_match": true,
+  "product_string_verified": true,
+  "upstream_numeric_version": "1.8.0-dev",
+  "local_build_tools": [
+    {
+      "path": "Tools/novax/build_ap.ps1",
+      "sha256": "55a507a485575d16e132b8edb20f146ce95c6f6744eb5c2b84e76ac6be103f04",
+      "matches_committed_head": false
+    },
+    {
+      "path": "Tools/novax/windows_entry.sh",
+      "sha256": "ccadc42b29261aa11320c01cc41977bac35e7dfa39a7f6618299df562a77535e",
+      "matches_committed_head": false
+    },
+    {
+      "path": "Tools/novax/toolchain.sh",
+      "sha256": "e769c5374ee604450b09b5bf45ae2fbf22a8e88209d1d7e0019d810d32c4a03d",
+      "matches_committed_head": false
+    },
+    {
+      "path": "Tools/novax/build_ap.sh",
+      "sha256": "4572b7dfdb607da176f4ae619483a94fa18cf8d75bd99ab93738f66f5eaf9d8b",
+      "matches_committed_head": false
+    },
+    {
+      "path": "Tools/novax/package_fw.sh",
+      "sha256": "af169aa228f7699ff76544f0c9df496fca124ead74110fce17ed92774d8929cd",
+      "matches_committed_head": false
+    }
+  ],
+  "files": [
+    {
+      "name": "AP-RTK_X20D-v1.0.1.apj",
+      "bytes": 201056,
+      "sha256": "e896e08ee87b92bc930ebd737ad5196fe2973cf6ef569962d2d067d2c94d21e0"
+    },
+    {
+      "name": "AP-RTK_X20D-v1.0.1.bin",
+      "bytes": 200296,
+      "sha256": "d83dacf71278302587b3fc6e42c9c7e2d5eeab3d308bc7dc85302b4e9407f452"
+    },
+    {
+      "name": "AP-RTK_X20D-v1.0.1.hex",
+      "bytes": 563441,
+      "sha256": "397660fb48b0117b167873ef4edfbc154da8dcc666e4bb7e7ccdc26632f21ac0"
+    },
+    {
+      "name": "AP-RTK_X20D-v1.0.1_with_bl.hex",
+      "bytes": 731136,
+      "sha256": "2c843e66707e2843c5364f9f82a821954192b20ba6020b3f252d686b97733b36"
+    },
+    {
+      "name": "AP-RTK_X20D_bl.bin",
+      "bytes": 29096,
+      "sha256": "dc997ec3fed58430811a7e6c27dea24fdd62462d1910529f3ee1c6d6df0f3cc0"
+    },
+    {
+      "name": "AP-RTK_X20D_bl.hex",
+      "bytes": 81890,
+      "sha256": "a913f7467aea5bccf01dbf36095434c955b40d53ddc918bd924e695737407fad"
+    }
+  ]
+}

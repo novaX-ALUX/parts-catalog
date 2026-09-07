@@ -53,7 +53,7 @@ const hrefOf = (f: string) => (isExternal(f) ? f : `${base}${f}`);
 </div>
 
 <style>
-  .firmware-list { margin-top: 8px; }
+  .firmware-list { margin-top: 8px; max-width: 100%; overflow-x: auto; }
   .fw-table { width: 100%; border-collapse: collapse; font-size: 14px; }
   .fw-table th, .fw-table td {
     text-align: left;
