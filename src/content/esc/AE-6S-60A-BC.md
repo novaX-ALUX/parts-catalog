@@ -43,5 +43,12 @@ firmware:
     size: "67.2 KB"
     sha256: "5eecca4ea7ba0249a0e3dccd10de4c8fae79afdb94fb8a57d3c98623cadfe487"
     notes: "V16 bootloader (32K layout) + application v2.29 + a factory settings EEPROM at 0x7C00, in one image for a single SWD/ST-Link flash on a blank or bricked board. The EEPROM carries Motor KV 1140 to match the actual motors, coasting enabled, Startup power 100, 24–48 kHz variable PWM and protocol AUTO — so flashing this also resets every setting to those defaults. Include the EEPROM block: a Mass Erase leaves that area at 0xFF and the firmware then reads input_type as 255, which selects no input protocol at all (main.c gates it on input_type < 10). SWD only: do not flash a BootApp image over 4-way passthrough, whose 16-bit addressing truncates the EEPROM address and writes it to the wrong place."
+  - kind: "Bootloader + App + T10 settings (merged HEX · SWD)"
+    file: /firmware/esc/am32/novaX_12S_F415_2.29_BootApp_PB4_32K_V16_T10.hex
+    version: "2.29 / V16 · T10 preset"
+    date: "2026-09-10"
+    size: "67.2 KB"
+    sha256: "71f9fe36014aee37144e3510b9ce9302ba756e95e551dfda00ee0d925e1a3dc3"
+    notes: "The same V16 bootloader (32K layout) and application v2.29 as the image above, with the factory settings EEPROM at 0x7C00 replaced by the parameter set finalised in the AE-6S 60A BC / T10 flight tests (2026-09-10): Complementary PWM on (deceleration braking, Running brake level 10, Brake on stop Off), Startup power 50, Minimum duty cycle 0.5 %, Motor KV 1140, 14 poles, Timing advance 15°, 24–48 kHz variable PWM, protocol AUTO, and normal rotation on every ESC — reverse the motors that need it with the flight controller's SERVO_BLH_RVMASK instead of per-ESC settings. Flashing this over SWD/ST-Link resets every setting to that preset. A 4-way application update never touches the settings, so an ESC still running the older factory defaults keeps them until this image is flashed or the values are entered in the configurator."
 firmwareNotes: 'Downloads below are hosted in this catalog under /firmware/esc/. Active product-family source: novaX-ALUX/esc (private). Existing released firmware bytes and SHA-256 checksums are unchanged.'
 ---
