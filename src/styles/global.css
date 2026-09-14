@@ -118,6 +118,17 @@ img { display: block; max-width: 100%; height: auto; }
 .card .imgwrap.placeholder {
   color: var(--ink-4); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
 }
+/* "Coming Soon" badge — same pill as the active filter chip, overlaid on the card image. */
+.card .imgwrap { position: relative; }
+.soon {
+  display: inline-block; padding: 4px 11px; border-radius: 999px;
+  font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600;
+  white-space: nowrap; line-height: 1.4;
+}
+.card .soon {
+  position: absolute; top: 12px; left: 12px;
+  background: var(--ink); color: #fff; border: 1px solid var(--ink);
+}
 .card .body { padding: 16px 18px 20px; }
 .card .cat { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-4); }
 .card .name { font-size: 16px; font-weight: 600; margin: 6px 0 4px; color: var(--ink); }
@@ -130,6 +141,10 @@ img { display: block; max-width: 100%; height: auto; }
 .detail-hero .tag { font-size: 14px; color: #C0C0C0; margin-top: 8px; }
 .detail-hero .crumbs { font-size: 12px; opacity: 0.55; margin-bottom: 8px; }
 .detail-hero .crumbs a:hover { opacity: 1; text-decoration: underline; }
+.detail-hero .soon {
+  margin-left: 14px; vertical-align: middle;
+  color: #fff; border: 1px solid rgba(255, 255, 255, 0.55);
+}
 
 .detail-body { padding: 48px 0 96px; }
 .detail-body .row {
@@ -229,6 +244,7 @@ img { display: block; max-width: 100%; height: auto; }
 
 /* === Tabs === */
 .tabs-section { margin-top: 56px; padding-top: 8px; }
+.tabs-section:first-child { margin-top: 0; } /* product without image/specs (e.g. Coming Soon) */
 .tabs-wrap { margin-top: 8px; }
 .tabs-nav {
   display: flex; gap: 0; border-bottom: 1px solid var(--line);
@@ -326,6 +342,11 @@ img { display: block; max-width: 100%; height: auto; }
   padding-top: 14px; padding-bottom: 10px;
 }
 .cfg-steps { white-space: pre-line; }
+
+/* Pinout tab: connector pin table (reuses the Configuration table look). */
+.pin-table { margin-top: 28px; }
+.pin-table td:first-child { width: 64px; font-variant-numeric: tabular-nums; }
+.pin-table td:nth-child(2) { width: 150px; }
 
 /* Configuration diagrams labelled Figure 1 / Figure 2 */
 .config-figure { margin: 0; }

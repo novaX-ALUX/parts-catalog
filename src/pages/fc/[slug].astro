@@ -25,13 +25,14 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
     <div class="container">
       <div class="crumbs"><a href={`${base}/#fc`}>{CATEGORY_LABEL.fc}</a></div>
       <div class="meta">Product · Catalog 2026</div>
-      <h1>{d.name}</h1>
+      <h1>{d.name}{d.comingSoon && <span class="soon">Coming Soon</span>}</h1>
       {d.tagline && <div class="tag">{d.tagline}</div>}
     </div>
   </section>
 
   <section class="detail-body">
     <div class="container">
+      {(d.image || d.description || d.specs.length > 0) && (
       <div class="row">
         {d.image && (
           <div class="imgwrap"><img src={`${base}${d.image}`} alt={d.name} /></div>
@@ -43,9 +44,10 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
               <div class="prose"><p>{d.description}</p></div>
             </div>
           )}
-          <SpecTable specs={d.specs} />
+          {d.specs.length > 0 && <SpecTable specs={d.specs} />}
         </div>
       </div>
+      )}
 
       <div class="tabs-section">
         <Tabs tabs={[
@@ -66,9 +68,30 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
                 <div class="zoom-hint">Click any image to open full size</div>
               </div>
             ) : (
-              <div class="panel-empty">Pinout diagram coming soon</div>
+              !d.pinTable && <div class="panel-empty">Pinout diagram coming soon</div>
             )}
             {d.pinoutNotes && <div class="prose panel-notes"><p><Linkify text={d.pinoutNotes} /></p></div>}
+            {d.pinTable && d.pinTable.length > 0 && (
+              <table class="cfg-table pin-table">
+                <thead>
+                  <tr><th>Pin</th><th>Signal</th><th>Function</th></tr>
+                </thead>
+                <tbody>
+                  {d.pinTable.map((c) => (
+                    <Fragment>
+                      <tr class="cfg-section"><td colspan="3">{[c.name, c.type, c.mapping].filter(Boolean).join('  ·  ')}</td></tr>
+                      {c.pins.map((p) => (
+                        <tr>
+                          <td>{p.pin}</td>
+                          <td><code>{p.signal}</code></td>
+                          <td>{p.function}</td>
+                        </tr>
+                      ))}
+                    </Fragment>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
 
           <div class="tab-panel" data-panel="firmware">

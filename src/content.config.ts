@@ -15,7 +15,23 @@ const baseSchema = z.object({
   datasheet: z.string().optional(),
   order: z.number().default(999),
   hidden: z.boolean().optional().default(false), // exclude from public catalog card + product page (update tool still lists firmware)
+  comingSoon: z.boolean().optional().default(false), // announced but not released — "Coming Soon" badge on card + product page
   specs: z.array(specPair)
+});
+
+// Connector pin definition shown as a table in the Pinout tab.
+// `mapping` is the firmware-side name (e.g. "SERIAL1 · UART7"), `type` the housing (e.g. "JST-GH 6P").
+const pinRow = z.object({
+  pin: z.union([z.string(), z.number()]),
+  signal: z.string(),
+  function: z.string()
+});
+
+const pinConnector = z.object({
+  name: z.string(),
+  type: z.string().optional(),
+  mapping: z.string().optional(),
+  pins: z.array(pinRow)
 });
 
 const motorThrustRow = z.object({
@@ -74,6 +90,7 @@ const detailSchema = baseSchema.extend({
   // When present this takes priority over the single `pinoutImage`.
   pinoutImages: z.array(z.string()).optional(),
   pinoutNotes: z.string().optional(),
+  pinTable: z.array(pinConnector).optional(),
   firmwareNotes: z.string().optional(),
   firmware: z.array(firmwareItem).optional(),
   configNotes: z.string().optional(),

@@ -8,7 +8,7 @@ import Linkify from '../../components/Linkify.astro';
 import { CATEGORY_LABEL } from '../../content.config';
 
 export async function getStaticPaths() {
-  const items = await getCollection('gnss');
+  const items = (await getCollection('gnss')).filter((i) => !i.data.hidden);
   return items.map((item) => ({ params: { slug: item.id }, props: { item } }));
 }
 const { item } = Astro.props;
@@ -24,7 +24,7 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
     <div class="container">
       <div class="crumbs"><a href={`${base}/#gnss`}>{CATEGORY_LABEL.gnss}</a></div>
       <div class="meta">Product · Catalog 2026</div>
-      <h1>{d.name}</h1>
+      <h1>{d.name}{d.comingSoon && <span class="soon">Coming Soon</span>}</h1>
       {d.tagline && <div class="tag">{d.tagline}</div>}
     </div>
   </section>

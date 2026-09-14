@@ -60,3 +60,40 @@ test('X20D is a separate R3 engineering product with its own heading contract', 
     assert.equal(fw.method, undefined, 'Do not enable an unqualified browser-flash target');
   }
 });
+
+test('catalog status flags: G5H withdrawn, X20D and AF-H7E Lite announced as coming soon', () => {
+  assert.equal(product('gnss', 'AP-RTK-G5H').hidden, true);
+  assert.equal(product('gnss', 'AP-RTK-X20D').comingSoon, true);
+  const lite = product('fc', 'AF-H7E-Lite');
+  assert.equal(lite.comingSoon, true);
+  assert.equal(lite.order, product('fc', 'AF-H7E').order + 1, 'Lite card sits right after AF-H7E');
+  assert.ok(!lite.firmware, 'no firmware is published for an unreleased board');
+});
+
+test('AF-H7E Lite pin table follows the Pixhawk connector convention and ArduPilot defaults', () => {
+  const table = product('fc', 'AF-H7E-Lite').pinTable;
+  const names = table.map((c) => c.name);
+  assert.equal(new Set(names).size, names.length, 'connector names are unique');
+  // UART n is ArduPilot SERIALn, so UART 1-2 come up as telemetry and UART 3-4 as GPS without setup.
+  for (let n = 1; n <= 6; n++) {
+    const uart = table.find((c) => c.name === `UART ${n}`);
+    assert.match(uart.mapping, new RegExp(`^SERIAL${n} `));
+  }
+  for (const n of [1, 2]) assert.match(table.find((c) => c.name === `UART ${n}`).mapping, /MAVLink2/);
+  for (const n of [3, 4]) assert.match(table.find((c) => c.name === `UART ${n}`).mapping, /GPS/);
+  // Flow control is only claimed on the 6-pin ports.
+  for (const c of table.filter((c) => /^UART/.test(c.name))) {
+    const hasFlow = c.pins.some((p) => p.signal === 'RTS');
+    assert.equal(hasFlow, c.pins.length === 6, `${c.name} flow-control pins match its pin count`);
+  }
+  // JST supply/ground convention: pin 1 carries supply, last pin is GND.
+  for (const c of table.filter((c) => /^JST/.test(c.type ?? '') && c.name !== 'ETHERNET')) {
+    assert.match(c.pins[0].signal, /^(VCC|VCC_IN|VREF)$/, `${c.name} pin 1`);
+    assert.equal(c.pins.at(-1).signal, 'GND', `${c.name} last pin`);
+  }
+  // Removed on the Lite: IOMCU aux outputs, CAN power input, dedicated GPS/safety port.
+  for (const gone of ['AUX', 'POWER C1', 'POWER C2', 'GPS', 'SAFETY', 'IO DEBUG']) {
+    assert.ok(!names.some((n) => n.startsWith(gone)), `${gone} is not on the Lite`);
+  }
+  assert.ok(names.includes('POWER 1') && names.includes('POWER 2'), 'dual power inputs');
+});
