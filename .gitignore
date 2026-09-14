@@ -10,3 +10,11 @@ dist/
 tools/keys/af_f4_t10_fw_signing_key.pem
 tools/keys/*signing_key*
 tools/__pycache__/
+
+# 매뉴얼 생성기 작업물(글꼴 캐시·중간 HTML)
+tools/manual/.fonts/
+tools/manual/.build/
+tools/manual/__pycache__/
+
+# 로컬 미리보기 (preview 스킬)
+미리보기/

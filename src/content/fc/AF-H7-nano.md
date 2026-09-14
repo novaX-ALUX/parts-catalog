@@ -5,6 +5,9 @@ image: /images/products/fc_Matek_H743_Slim_V4.png
 pictureKey: fc_Matek_H743_Slim_V4
 pinoutImage: /images/products/fc_AF-H7_nano_firmware_ports.svg
 order: 20
+manuals:
+  - { label: "한국어", file: /manuals/fc_AF-H7-nano_manual_ko.pdf }
+  - { label: English, file: /manuals/fc_AF-H7-nano_manual_en.pdf }
 firmware:
   - kind: "ArduPilot (.apj package)"
     file: https://github.com/novaX-ALUX/fc/releases/download/AF-H7_nano-v1.2.3/AF-H7_nano-v1.2.3.apj

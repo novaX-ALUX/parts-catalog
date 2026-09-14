@@ -4,6 +4,9 @@ tagline: Compact F4 Flight Controller · External GPS/Compass Port · ArduPilot
 image: /images/products/fc_F4_nano_v2.png
 pictureKey: fc_F4_nano_v2
 order: 12
+manuals:
+  - { label: "한국어", file: /manuals/fc_AF-F4-nano-v2_manual_ko.pdf }
+  - { label: English, file: /manuals/fc_AF-F4-nano-v2_manual_en.pdf }
 specs:
   - { key: MCU, value: "STM32F405" }
   - { key: IMU, value: "ICM-42688-P" }

@@ -2,6 +2,9 @@
 name: AE-6S 60A FOC TI
 tagline: TI C2000 Sensorless-FOC ESC · 6S LiPo
 order: 27
+manuals:
+  - { label: "한국어", file: /manuals/esc_AE-6S-60A-FOC-TI_manual_ko.pdf }
+  - { label: English, file: /manuals/esc_AE-6S-60A-FOC-TI_manual_en.pdf }
 specs:
   - { key: MCU, value: "TI TMS320F280049C (C2000 · 100 MHz · FPU/TMU)" }
   - { key: Control, value: "Sensorless FOC (InstaSPIN-FAST)" }

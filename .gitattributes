@@ -4,3 +4,6 @@
 
 # Firmware images must be stored byte-exact (no EOL/encoding conversion).
 public/firmware/** binary
+
+# Manual PDFs and their page previews must be stored byte-exact too (Illustrator PDFs can look like text).
+public/manuals/** binary

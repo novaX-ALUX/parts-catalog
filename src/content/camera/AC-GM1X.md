@@ -4,6 +4,9 @@ tagline: FPV Gimbal · 19 mm Camera Stabilization
 image: /images/products/cam_GM1X.png
 pictureKey: cam_GM1X
 order: 20
+manuals:
+  - { label: "한국어", file: /manuals/camera_AC-GM1X_manual_ko.pdf }
+  - { label: English, file: /manuals/camera_AC-GM1X_manual_en.pdf }
 specs:
   - { key: Camera, value: "19 mm FPV Camera" }
   - { key: Stabilization, value: "±0.005°" }

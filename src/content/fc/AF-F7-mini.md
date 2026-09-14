@@ -4,6 +4,9 @@ tagline: F7 Mini Flight Controller
 image: /images/products/fc_F7_mini.png
 pictureKey: fc_F7_mini
 order: 30
+manuals:
+  - { label: "한국어", file: /manuals/fc_AF-F7-mini_manual_ko.pdf }
+  - { label: English, file: /manuals/fc_AF-F7-mini_manual_en.pdf }
 specs:
   - { key: MCU, value: "STM32F765, ARM Cortex-M7, 216 MHz" }
   - { key: RAM / Flash, value: "512 KB / 2 MB" }

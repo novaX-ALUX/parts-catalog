@@ -4,6 +4,9 @@ tagline: 32-bit ESC for X-Blade 10/15 · 6S LiPo
 image: /images/products/esc_32-6S-60A.png
 pictureKey: esc_32-6S-60A
 order: 20
+manuals:
+  - { label: "한국어", file: /manuals/esc_AE-6S-60A_manual_ko.pdf }
+  - { label: English, file: /manuals/esc_AE-6S-60A_manual_en.pdf }
 specs:
   - { key: MCU, value: "AT32F415KBU7 (128 KB Flash)" }
   - { key: Mounting Hole, value: "45 × 52 mm / Φ 4 mm" }

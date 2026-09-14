@@ -1,7 +1,11 @@
 ---
 name: AF-H7E Lite
 tagline: Compact Pixhawk FMUv6x Flight Controller
+image: /images/products/fc_AF-H7E-Lite.png
 order: 41
+manuals:
+  - { label: "한국어", file: /manuals/fc_AF-H7E-Lite_manual_ko.pdf }
+  - { label: English, file: /manuals/fc_AF-H7E-Lite_manual_en.pdf }
 comingSoon: true
 specs: []
 pinoutImage: /images/products/fc_AF-H7E-Lite_pinout.png
@@ -153,4 +157,8 @@ pinTable:
       - { pin: S, signal: M1 … M12, function: "Motor / servo output signal, one per channel (PWM · OneShot · DShot)" }
       - { pin: +, signal: V_SERVO, function: "Servo rail, bussed across all channels — supplied externally (e.g. BEC)" }
       - { pin: −, signal: GND, function: "Ground" }
+gallery:
+  - /images/products/fc_AF-H7E-Lite.png
+  - /images/products/fc_AF-H7E-Lite_flat.png
+  - /images/products/fc_AF-H7E-Lite_rear.png
 ---

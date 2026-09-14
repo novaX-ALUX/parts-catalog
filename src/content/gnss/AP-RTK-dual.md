@@ -6,6 +6,9 @@ pictureKey: gnss_X_RTK2
 pinoutImage: /images/products/gnss_AP-RTK-dual_pinout.png
 pinoutNotes: '① UART (5V · RX · TX · GND) · ② CAN (5V · CAN_H · CAN_L · GND).'
 order: 20
+manuals:
+  - { label: "한국어", file: /manuals/gnss_AP-RTK-dual_manual_ko.pdf }
+  - { label: English, file: /manuals/gnss_AP-RTK-dual_manual_en.pdf }
 specs:
   - { key: MCU, value: "STM32F4, ARM Cortex-M4, 180 MHz" }
   - { key: Compass, value: "RM3100" }

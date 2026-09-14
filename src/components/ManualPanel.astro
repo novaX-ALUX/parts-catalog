@@ -1,0 +1,21 @@
+---
+// Manual tab body shared by every product page: page-overview image per language, click opens the PDF.
+interface Manual { label: string; file: string }
+interface Props { manuals?: Manual[]; name: string }
+const { manuals = [], name } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+{manuals.length > 0 ? (
+  <div class="panel-images">
+    {manuals.map((m) => (
+      <div class="datasheet" style="margin-top:0;">
+        <a class="datasheet-link" href={`${base}${m.file}`} target="_blank" rel="noopener">
+          <img src={`${base}${m.file.replace(/\.pdf$/, '.png')}`} alt={`${name} user manual (${m.label})`} />
+          <span class="datasheet-cta">{m.label} · Open user manual (PDF)</span>
+        </a>
+      </div>
+    ))}
+  </div>
+) : (
+  <div class="panel-empty">User manual coming soon</div>
+)}

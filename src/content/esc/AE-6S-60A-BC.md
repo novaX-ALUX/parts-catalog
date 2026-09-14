@@ -5,6 +5,9 @@ image: /images/products/esc_32-6S-60A-BC.png
 pictureKey: esc_32-6S-60A-BC
 pinoutImage: /images/products/esc_32-6S-60A-BC_pinout.png
 order: 25
+manuals:
+  - { label: "한국어", file: /manuals/esc_AE-6S-60A-BC_manual_ko.pdf }
+  - { label: English, file: /manuals/esc_AE-6S-60A-BC_manual_en.pdf }
 specs:
   - { key: MCU, value: "AT32F415KBU7 (128 KB Flash)" }
   - { key: Mounting Hole, value: "45 × 52 mm / Φ 4 mm" }

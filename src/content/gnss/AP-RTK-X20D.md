@@ -3,6 +3,9 @@ name: AP-RTK X20D
 tagline: Dual-Antenna RTK GNSS with u-blox ZED-X20D
 image: /images/products/gnss_AP-RTK-X20D_R3_top_isometric.png
 order: 22
+manuals:
+  - { label: "한국어", file: /manuals/gnss_AP-RTK-X20D_manual_ko.pdf }
+  - { label: English, file: /manuals/gnss_AP-RTK-X20D_manual_en.pdf }
 comingSoon: true
 specs:
   - { key: Receiver, value: "u-blox ZED-X20D — single module, dual antenna, HDG 2.00" }

@@ -4,6 +4,9 @@ tagline: FPV Camera Module · Image Sensor + ISP + Comm Integrated
 image: /images/products/cam_C2M104L.png
 pictureKey: cam_C2M104L_module
 order: 10
+manuals:
+  - { label: "한국어", file: /manuals/camera_AC-C2M104L_manual_ko.pdf }
+  - { label: English, file: /manuals/camera_AC-C2M104L_manual_en.pdf }
 specs:
   - { key: Resolution, value: "1920 × 1080" }
   - { key: Pixel Pitch, value: "3 µm" }

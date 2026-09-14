@@ -4,6 +4,9 @@ tagline: Compact GNSS Module with Integrated Compass
 image: /images/products/gnss_X_G10C.png
 pictureKey: gnss_X_G10C
 order: 10
+manuals:
+  - { label: "한국어", file: /manuals/gnss_AP-M10_manual_ko.pdf }
+  - { label: English, file: /manuals/gnss_AP-M10_manual_en.pdf }
 specs:
   - key: Chipset
     value: u-blox M10 Series

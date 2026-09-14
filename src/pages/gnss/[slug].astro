@@ -5,6 +5,7 @@ import SpecTable from '../../components/SpecTable.astro';
 import Tabs from '../../components/Tabs.astro';
 import FirmwareTable from '../../components/FirmwareTable.astro';
 import Linkify from '../../components/Linkify.astro';
+import ManualPanel from '../../components/ManualPanel.astro';
 import { CATEGORY_LABEL } from '../../content.config';
 
 export async function getStaticPaths() {
@@ -51,6 +52,7 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
           {id:'pinout', label:'Pinout'},
           {id:'firmware', label:'Firmware'},
           {id:'config', label:'Configuration'},
+          {id:'manual', label:'Manual'},
           {id:'gallery', label:'Gallery'}
         ]}>
           <div class="tab-panel active" data-panel="pinout">
@@ -118,6 +120,10 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
             {d.configNotes
               ? <div class="prose panel-notes"><p class="cfg-steps"><Linkify text={d.configNotes} /></p></div>
               : (!d.configImages && !d.configParams && <div class="panel-empty">Configuration notes coming soon</div>)}
+          </div>
+
+          <div class="tab-panel" data-panel="manual">
+            <ManualPanel manuals={d.manuals} name={d.name} />
           </div>
 
           <div class="tab-panel" data-panel="gallery">

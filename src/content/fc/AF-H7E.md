@@ -4,6 +4,9 @@ tagline: Pixhawk FMUv6x Flight Controller · Modular Design
 image: /images/products/fc_CUAV_V6X.jpg
 pictureKey: fc_CUAV_V6X
 order: 40
+manuals:
+  - { label: "한국어", file: /manuals/fc_AF-H7E_manual_ko.pdf }
+  - { label: English, file: /manuals/fc_AF-H7E_manual_en.pdf }
 specs:
   - key: MCU
     value: STM32H753, ARM Cortex-M7, 480 MHz

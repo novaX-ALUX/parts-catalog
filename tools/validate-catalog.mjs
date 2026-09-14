@@ -100,7 +100,8 @@ export async function validateCatalog(root, { remote = false } = {}) {
       const data = yaml.load(match[1]);
       counts.products++;
       const images = [data.image, data.datasheet, data.pinoutImage, ...(data.pinoutImages ?? []),
-        ...(data.gallery ?? []), ...(data.configImages ?? []).map((i) => typeof i === 'string' ? i : i.src)].filter(Boolean);
+        ...(data.gallery ?? []), ...(data.configImages ?? []).map((i) => typeof i === 'string' ? i : i.src),
+        ...(data.manuals ?? []).flatMap((m) => [m.file, m.file.replace(/\.pdf$/, '.png')])].filter(Boolean);
       for (const name of images) check(`${data.name} asset`, () => publicAsset(name));
       for (const fw of data.firmware ?? []) {
         counts.firmware++;

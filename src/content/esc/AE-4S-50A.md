@@ -2,6 +2,9 @@
 name: AE-4S 50A
 tagline: Compact 4S ESC for Blade8 Platforms
 order: 5
+manuals:
+  - { label: "한국어", file: /manuals/esc_AE-4S-50A_manual_ko.pdf }
+  - { label: English, file: /manuals/esc_AE-4S-50A_manual_en.pdf }
 specs:
   - { key: Size, value: "45.5 × 52.2 mm" }
   - { key: Mounting Hole, value: "30 × 30 mm / Φ 4 mm" }

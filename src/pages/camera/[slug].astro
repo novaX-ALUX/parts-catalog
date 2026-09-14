@@ -4,6 +4,7 @@ import Layout from '../../layouts/Layout.astro';
 import SpecTable from '../../components/SpecTable.astro';
 import Tabs from '../../components/Tabs.astro';
 import Linkify from '../../components/Linkify.astro';
+import ManualPanel from '../../components/ManualPanel.astro';
 import { CATEGORY_LABEL } from '../../content.config';
 
 export async function getStaticPaths() {
@@ -48,6 +49,7 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
       <div class="tabs-section">
         <Tabs tabs={[
           {id:'pinout', label:'Pinout'},
+          {id:'manual', label:'Manual'},
           {id:'gallery', label:'Gallery'}
         ]}>
           <div class="tab-panel active" data-panel="pinout">
@@ -61,6 +63,10 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
               <div class="panel-empty">Pinout coming soon</div>
             )}
             {d.pinoutNotes && <div class="prose panel-notes"><p><Linkify text={d.pinoutNotes} /></p></div>}
+          </div>
+
+          <div class="tab-panel" data-panel="manual">
+            <ManualPanel manuals={d.manuals} name={d.name} />
           </div>
 
           <div class="tab-panel" data-panel="gallery">

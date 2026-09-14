@@ -4,6 +4,9 @@ tagline: Thermal Imaging Module · SoC vs FPGA Variants
 image: /images/products/cam_THE02F.png
 pictureKey: cam_THE02F
 order: 30
+manuals:
+  - { label: "한국어", file: /manuals/camera_AC-THE02F_manual_ko.pdf }
+  - { label: English, file: /manuals/camera_AC-THE02F_manual_en.pdf }
 specs:
   - { key: Detector Type, value: "Vox" }
   - { key: Resolution, value: "640 × 512" }
