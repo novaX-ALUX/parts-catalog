@@ -1,7 +1,6 @@
 ---
 name: AF-H7E Lite
 tagline: Compact Pixhawk FMUv6x Flight Controller
-image: /images/products/fc_AF-H7E-Lite.png
 order: 41
 comingSoon: true
 specs: []
