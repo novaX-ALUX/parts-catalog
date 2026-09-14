@@ -4,7 +4,7 @@
 서식은 AP-RTK dual 사용자 매뉴얼(260714)을 실측해 맞췄다(판형 198.425 × 274.961 pt, 제목 띠, Pretendard 본문, 회색 표 머리칸, 쪽번호, QR, 뒷표지 novaX 로고).
 
 ```powershell
-python tools/manual/build_manual.py motor/AM-2810 fc/AF-H7E --lang ko,en   # 넘침 검사 실패 시 종료 코드 1
+python tools/manual/build_manual.py fc/AF-H7E gnss/AP-RTK-X20D --lang ko,en   # 넘침 검사 실패 시 종료 코드 1
 python tools/manual/manual_preview.py public/manuals/<이름>.pdf              # 받은 PDF 를 올릴 때 미리보기만 만들 경우
 ```
 
@@ -19,7 +19,8 @@ python tools/manual/manual_preview.py public/manuals/<이름>.pdf              #
 | `translate_manual.py` | 받은 매뉴얼의 반대 언어판(AP-RTK dual → 영어, AF-F7 mini → 한국어): 원본 디자인 그대로, 번역할 글자 조각만 지우고 같은 기준선·굵기로 얹음 |
 
 - **쪽 나누기**는 크롬이 실제 배치로 한다(`FLOW_JS`): 본문 블록을 넣다 넘치면 다음 쪽, 긴 표는 행 단위로 이어짐. 파이썬은 넘침 검사만.
-- **그림**: 모터 = `public/datasheets` 제원 도면 원본 선. 3D 제품 = 블렌더 렌더 → 먹선. 그 밖 = 제품 사진 → 먹선(원격 PC, `D:\remote-work\venvs\lineart` + `D:\remote-work\models\sk_model.pth`).
+- **대상**: FC · ESC · GNSS · 카메라. **모터는 매뉴얼을 만들지 않는다**(사용자 결정 2026-09-15 — Manual 탭도 없음).
+- **그림**: 3D 제품 = 블렌더 렌더 → 먹선. 그 밖 = 제품 사진 → 먹선(원격 PC, `D:\remote-work\venvs\lineart` + `D:\remote-work\models\sk_model.pth`).
 - **글꼴**(저장소에 넣지 않음): `tools/manual/.fonts/` 에 Pretendard 1.3.9 woff2(Light·Regular·Medium·SemiBold·Bold, `cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/woff2/`) · GmarketSans Medium·Bold woff.
   번역판용 TTF(`…/dist/public/static/alternative/Pretendard-*.ttf`) — **OTF(CFF)는 PDF 에 넣으면 ( ) - × + & 가 다른 글자로 찍혀 쓰지 않는다.**
 - **QR** = 카탈로그 제품 페이지 주소. QR 생성은 `qrcode-generator@1.4.4`(jsDelivr)를 인쇄 때 불러온다.

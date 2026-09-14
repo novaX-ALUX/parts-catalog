@@ -1,0 +1,28 @@
+---
+// Connector pin definitions (content `pinTable`) shown in the Pinout tab.
+interface Pin { pin: string | number; signal: string; function: string }
+interface Connector { name: string; type?: string; mapping?: string; pins: Pin[] }
+interface Props { connectors?: Connector[] }
+const { connectors = [] } = Astro.props;
+---
+{connectors.length > 0 && (
+  <table class="cfg-table pin-table">
+    <thead>
+      <tr><th>Pin</th><th>Signal</th><th>Function</th></tr>
+    </thead>
+    <tbody>
+      {connectors.map((c) => (
+        <Fragment>
+          <tr class="cfg-section"><td colspan="3">{[c.name, c.type, c.mapping].filter(Boolean).join('  ·  ')}</td></tr>
+          {c.pins.map((p) => (
+            <tr>
+              <td>{p.pin}</td>
+              <td><code>{p.signal}</code></td>
+              <td>{p.function}</td>
+            </tr>
+          ))}
+        </Fragment>
+      ))}
+    </tbody>
+  </table>
+)}

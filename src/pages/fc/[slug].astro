@@ -6,6 +6,7 @@ import Tabs from '../../components/Tabs.astro';
 import FirmwareTable from '../../components/FirmwareTable.astro';
 import Linkify from '../../components/Linkify.astro';
 import ManualPanel from '../../components/ManualPanel.astro';
+import PinTable from '../../components/PinTable.astro';
 import { CATEGORY_LABEL } from '../../content.config';
 
 export async function getStaticPaths() {
@@ -73,27 +74,7 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
               !d.pinTable && <div class="panel-empty">Pinout diagram coming soon</div>
             )}
             {d.pinoutNotes && <div class="prose panel-notes"><p><Linkify text={d.pinoutNotes} /></p></div>}
-            {d.pinTable && d.pinTable.length > 0 && (
-              <table class="cfg-table pin-table">
-                <thead>
-                  <tr><th>Pin</th><th>Signal</th><th>Function</th></tr>
-                </thead>
-                <tbody>
-                  {d.pinTable.map((c) => (
-                    <Fragment>
-                      <tr class="cfg-section"><td colspan="3">{[c.name, c.type, c.mapping].filter(Boolean).join('  ·  ')}</td></tr>
-                      {c.pins.map((p) => (
-                        <tr>
-                          <td>{p.pin}</td>
-                          <td><code>{p.signal}</code></td>
-                          <td>{p.function}</td>
-                        </tr>
-                      ))}
-                    </Fragment>
-                  ))}
-                </tbody>
-              </table>
-            )}
+            <PinTable connectors={d.pinTable} />
           </div>
 
           <div class="tab-panel" data-panel="firmware">

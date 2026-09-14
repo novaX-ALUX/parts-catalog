@@ -55,14 +55,14 @@ KO_VALUE = {
         "Receiver-computed ANT1-to-ANT2 heading; UBX-NAV-DAHEADING v2": "수신기가 계산한 ANT1→ANT2 헤딩 · UBX-NAV-DAHEADING v2",
         "Firmware requests 5 Hz navigation at 230400 baud; end-to-end CAN rate requires measurement": "5 Hz 항법 설정 (230400 baud) · CAN 종단 갱신율은 측정 필요",
         "DroneCAN — position, ardupilot.gnss.Heading and separate magnetometer data": "DroneCAN — 위치 · ardupilot.gnss.Heading · 별도 나침반 데이터",
-        "2× MMCX antenna · CAN · USB-C (MCU) · external receiver UART": "MMCX 안테나 2 · CAN · USB-C (MCU) · 수신기 외부 UART",
+        "2× MMCX antenna · CAN · UART (RTCM input) · DEBUG (SWD + console) · PPS/EVENT · USB-C (MCU)": "MMCX 안테나 2 · CAN · UART (RTCM 입력) · DEBUG (SWD + 콘솔) · PPS/EVENT · USB-C (MCU)",
         "R3 · 33.00 × 45.17 mm · 4 layers · 0.8 mm": "R3 · 33.00 × 45.17 mm · 4층 · 0.8 mm",
         "AP_Periph · novaX 1.0.1 engineering release · board ID 6205": "AP_Periph · novaX 1.0.1 엔지니어링 릴리스 · 보드 ID 6205",
         "Windows GCC 10.2.1 build verified; first-article hardware and flight qualification pending": "Windows GCC 10.2.1 빌드 검증 · 초도품 하드웨어·비행 검증 대기"},
 }
 KO_COMMON = {"Supported": "지원", "None": "없음"}
 
-# 표지 그림을 카탈로그 image 대신 쓸 때(저장소 기준 경로) — X20D 카탈로그 사진은 PCB 렌더라 케이스 렌더로
+# 표지 그림을 카탈로그 image 대신 쓸 때(저장소 기준 경로) — X20D = 케이스 렌더(원격 PC 블렌더)에서 따로 뽑은 표지
 COVER = {"AP-RTK-X20D": "tools/manual/art/AP-RTK-X20D_cover.jpg"}
 
 OVERVIEW = {
@@ -246,8 +246,11 @@ PINOUT_NOTES_KO = {
     "AF-H7-nano": "핀맵은 일반 H7 보드가 아니라 novaX AF-H7_nano 기준입니다. PWM1–10 은 모터/서보 출력, PWM11 은 WS2812 LED 선입니다. GPS 커넥터는 USART3(SERIAL3, PD8/PD9), ELRS/RC 커넥터는 USART6(SERIAL6, PC6/PC7), UART7/8 은 예비 패드이고 UART4 는 DJI O3 MSP 용입니다. "
                   "배터리 입력은 2S–8S 를 받는 4핀 커넥터이며, 보드 5 V / 2.5 A 레귤레이터가 FC · 수신기 · 저전력 주변장치에 전원을 줍니다. 서보 레일은 조정되지 않으므로 BEC 나 모터 PDB 에서 직접 공급하십시오.",
     "AF-H7E": "다기능 포트의 I2C 번호: GPS & Safety 포트 = I2C1, GPS2 포트 = I2C2, UART4 포트 = I2C3.",
-    "AP-RTK-X20D": "R3 PCB 커넥터 위치 렌더(윗면 · 아랫면)입니다. USB-C 는 STM32F412 OTG_FS(MCU 서비스 · 부트로더 · DFU)이며 ZED-X20D 의 USB 가 아닙니다. 수신기는 USART2(GPS 포트 4)로 MCU 와 통신합니다. "
-                   "PC6/PC7 외부 UART 는 v1.0.1 에서 쓰지 않습니다. 첫 전원 전에 R3 회로도로 커넥터 핀 번호와 전원을 확인하고, AP-RTK dual · G5H 핀맵으로 추정하지 마십시오.",
+    "AP-RTK-X20D": "핀 정의는 R3 회로 넷리스트와 핀 단위로 대조했습니다. CAN · UART 는 1번 = GND, 4번 = 5 V 로 Pixhawk 번호(1번 = 5 V)와 반대입니다. DEBUG 는 1번 = 5 V, 6번 = GND, PPS 는 1 · 3번이 GND 입니다. "
+                   "핀 순서와 케이블은 AP-RTK dual 과 같으니 일반 1:1 Pixhawk 케이블은 양 끝 핀 배열을 확인한 뒤 쓰십시오. 전원은 CAN/UART 5 V · DEBUG 5 V · USB VBUS 어디로도 들어오며 입력마다 2 A PPTC 퓨즈와 쇼트키 다이오드가 있습니다. "
+                   "USB-C 는 STM32F412(서비스 · 부트로더 · DFU)에 연결되며 ZED-X20D 의 USB 가 아닙니다. 수신기는 USART2(GPS 포트 4)로 MCU 와 통신합니다. "
+                   "ANT1 은 헤딩 기준으로 뒤, ANT2 는 앞에 둡니다. AP-RTK dual 과 반대이며 케이블을 바꿔 끼우면 헤딩이 180° 틀어집니다. "
+                   "케이스 옆면 LED: PWR 빨강 = 전원, STAT 초록 = AP_Periph 상태, SAFE 빨강 = 세이프티, HDG 초록 = 헤딩 유효, RTK 파랑 = RTK fixed. 그림은 포트 · LED 이름을 각인한 케이스 설계 렌더입니다.",
 }
 X20D_PARAM_KO = {
     "CAN_P1_DRIVER": "CAN1 사용 — 바꾼 뒤 재부팅", "CAN_D1_PROTOCOL": "DroneCAN", "GPS1_TYPE": "DroneCAN GPS (구버전 펌웨어는 GPS_TYPE)",
@@ -271,4 +274,18 @@ PIN_KO = {
     "Motor / servo output signal, one per channel (PWM · OneShot · DShot)": "채널별 모터/서보 신호 (PWM · OneShot · DShot)",
     "Servo rail, bussed across all channels — supplied externally (e.g. BEC)": "모든 채널 공통 서보 레일 — 외부 공급 (예: BEC)",
     "Primary power input": "주 전원 입력", "Redundant power input": "보조 전원 입력", "RC input": "RC 입력", "Main outputs 1–12": "메인 출력 1–12",
+    # AP-RTK X20D
+    "DroneCAN to the flight controller · power input": "FC 와 DroneCAN · 전원 입력", "RTCM correction input · power input": "RTCM 보정 입력 · 전원 입력",
+    "SWD programming · MCU debug console": "SWD 기록 · MCU 디버그 콘솔", "Receiver timing — PPS output · EVENT input": "수신기 타이밍 — PPS 출력 · EVENT 입력",
+    "GNSS antenna inputs · 3.3 V antenna bias · ESD protected": "GNSS 안테나 입력 · 3.3 V 안테나 바이어스 · ESD 보호",
+    "5 V supply input — shared with UART pin 4": "5 V 전원 입력 — UART 4번과 공통", "5 V supply input — shared with CAN pin 4": "5 V 전원 입력 — CAN 4번과 공통",
+    "MCU transmit (PC6, USART6_TX) — not used by firmware 1.0.1": "MCU 송신 (PC6, USART6_TX) — 펌웨어 1.0.1 은 사용 안 함",
+    "RTCM corrections into the ZED-X20D UART2 (also MCU PC7, USART6_RX)": "RTCM 보정 → ZED-X20D UART2 입력 (MCU PC7 USART6_RX 에도 연결)",
+    "5 V supply input": "5 V 전원 입력", "SWD data (PA13) — bootloader programming and firmware recovery": "SWD 데이터 (PA13) — 부트로더 기록 · 펌웨어 복구",
+    "SWD clock (PA14)": "SWD 클럭 (PA14)", "Debug console receive (PB7, USART1_RX)": "디버그 콘솔 수신 (PB7, USART1_RX)",
+    "Debug console transmit (PB6, USART1_TX)": "디버그 콘솔 송신 (PB6, USART1_TX)",
+    "External event input to the receiver (EXTINT) — e.g. camera trigger time stamps": "수신기 외부 이벤트 입력 (EXTINT) — 카메라 트리거 시각 기록 등",
+    "Pulse-per-second output from the receiver (TIMEPULSE, also MCU PA7)": "수신기 초당 1펄스 출력 (TIMEPULSE, MCU PA7 에도 연결)",
+    "Heading reference antenna — mount at the rear of the vehicle": "헤딩 기준 안테나 — 기체 뒤쪽에 장착",
+    "Mount at the front — heading = direction from ANT1 to ANT2": "기체 앞쪽에 장착 — 헤딩 = ANT1 → ANT2 방향",
 }

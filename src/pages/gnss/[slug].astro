@@ -6,6 +6,7 @@ import Tabs from '../../components/Tabs.astro';
 import FirmwareTable from '../../components/FirmwareTable.astro';
 import Linkify from '../../components/Linkify.astro';
 import ManualPanel from '../../components/ManualPanel.astro';
+import PinTable from '../../components/PinTable.astro';
 import { CATEGORY_LABEL } from '../../content.config';
 
 export async function getStaticPaths() {
@@ -63,9 +64,10 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
                 ))}
               </div>
             ) : (
-              <div class="panel-empty">Pinout coming soon</div>
+              !d.pinTable && <div class="panel-empty">Pinout coming soon</div>
             )}
             {d.pinoutNotes && <div class="prose panel-notes"><p><Linkify text={d.pinoutNotes} /></p></div>}
+            <PinTable connectors={d.pinTable} />
           </div>
 
           <div class="tab-panel" data-panel="firmware">

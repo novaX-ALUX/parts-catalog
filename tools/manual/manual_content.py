@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """매뉴얼 내용 — 제품군별 쪽 구성과 한국어·영어 문구. 제품 수치는 카탈로그 md 에서만 가져온다(여기에 수치를 적지 않는다).
+모터는 매뉴얼을 만들지 않는다(사용자 결정 2026-09-15 — 카탈로그 추력 데이터 · 도면 탭으로 충분).
 
 spec_for(d, lang, work, helpers) → {"cover": Path, "pages": [(띠 제목, 본문 HTML)]}
 """
@@ -13,10 +14,6 @@ SPEC_KO = {
     # 공통
     "MCU": "MCU", "Size": "크기", "Weight": "무게", "Operating Temp": "동작 온도", "Operating Voltage": "동작 전압", "Firmware": "펌웨어",
     "Mounting Hole": "고정 구멍", "Mount Hole": "고정 구멍", "Interface": "인터페이스", "Voltage": "전압", "Power Consumption": "소비 전력",
-    # 모터
-    "Stator Dimensions": "스테이터 크기", "Slots / Poles": "슬롯 / 극", "Motor Weight": "모터 무게", "KV Value": "KV",
-    "Rated Voltage": "정격 전압", "Max Current": "최대 전류", "Max Power": "최대 출력", "Recommended Prop": "권장 프로펠러",
-    "Shaft / Thread": "축 / 나사",
     # ESC
     "Voltage Range": "입력 전압", "Constant Current": "연속 전류", "Burst Current": "순간 전류", "Capacitor": "커패시터",
     "PWM Frequency": "PWM 주파수", "Supported Protocols": "지원 프로토콜", "BDShot": "BDShot", "Current Sensor": "전류 센서",
@@ -50,15 +47,8 @@ SPEC_KO = {
 VALUE_KO = [(r"\binch\b", "인치"), (r"\bPort\b", "포트"), (r"\bCH\b", "채널"), (r"(\d+) pole pairs", r"\1 극쌍")]
 
 T = {
-    "ko": {"specs": "스펙", "basic": "· 기본 사양", "dims": "외형 및 치수", "dims_sub": "· 치수 (단위 mm)", "perf": "성능 데이터",
-           "install": "설치 및 연결", "safety": "주의사항", "detail": "&lt;자세한 매뉴얼&gt;", "bottom": "밑면 · 고정부", "side": "옆면",
-           "top": "윗면 · 프로펠러 쪽", "throttle": "스로틀", "thrust": "추력 (g)", "current": "전류 (A)", "power": "전력 (W)",
-           "eff": "효율 (g/W)", "temp": "온도 (℃)", "rpm": "회전수 (rpm)", "voltage": "전압 (V)", "prop": "프로펠러"},
-    "en": {"specs": "Specifications", "basic": "· Basic Specifications", "dims": "Dimensions", "dims_sub": "· Dimensions (mm)",
-           "perf": "Performance Data", "install": "Installation", "safety": "Safety Notes", "detail": "&lt;Detailed Manual&gt;",
-           "bottom": "Bottom · mount", "side": "Side", "top": "Top · propeller side", "throttle": "Throttle", "thrust": "Thrust (g)",
-           "current": "Current (A)", "power": "Power (W)", "eff": "Eff. (g/W)", "temp": "Temp (℃)", "rpm": "Speed (rpm)",
-           "voltage": "Voltage (V)", "prop": "Propeller"},
+    "ko": {"specs": "스펙", "basic": "· 기본 사양", "safety": "주의사항", "detail": "&lt;자세한 매뉴얼&gt;"},
+    "en": {"specs": "Specifications", "basic": "· Basic Specifications", "safety": "Safety Notes", "detail": "&lt;Detailed Manual&gt;"},
 }
 
 
@@ -74,112 +64,8 @@ def spec_value(v, lang):
     return v
 
 
-def spec_table(d, lang, keys=None):
-    rows = [s for s in d.get("specs", []) if keys is None or s["key"] in keys]
-    tr = "".join("<tr><th>%s</th><td>%s</td></tr>" % (e(SPEC_KO.get(s["key"], s["key"]) if lang == "ko" else s["key"]), e(spec_value(s["value"], lang)))
-                 for s in rows)
-    return '<table class="t">%s</table>' % tr
-
-
-def spec(d, key):
-    return next((s["value"] for s in d.get("specs", []) if s["key"] == key), None)
-
-
 def qr_block(d, lang):
     return '<div class="qr"><div class="code" data-url="%s"></div><div class="lbl">%s</div></div>' % (e(d["_url"]), T[lang]["detail"])
-
-
-def test_conditions(text, lang):
-    if not text or lang != "ko":
-        return text or ""
-    m = re.match(r"(\d+S) LiPo, (20%–100% throttle on )?(?:sea-level )?static thrust stand\. Measured values; rated specs may differ\.", text)
-    if not m:
-        return text
-    return "%s LiPo, 정지 추력 시험대 측정값%s. 정격 사양과 다를 수 있습니다." % (m.group(1), " (스로틀 20~100 %)" if m.group(2) else "")
-
-
-def rows_figure(rows, max_w=171.4, max_h=196.0, gap_px=120, row_gap=6.0):
-    """도면 보기들을 원래 줄 구성 그대로 배치 — 줄마다 쪽 폭까지 키우되 전체 높이(max_h) 안에서 가장 크게(줄 안에서는 같은 축척)."""
-    widths = [sum(v["box"][2] - v["box"][0] for v in r) + gap_px * (len(r) - 1) for r in rows]
-    heights = [max(v["box"][3] - v["box"][1] for v in r) for r in rows]
-    room = max_h - row_gap * (len(rows) - 1)
-    base = min(max_w / max(widths), room / sum(heights))
-    lo, hi = 1.0, 20.0
-    for _ in range(40):                                                   # 공통 배율 k: 줄 배율 = min(폭 한계, k × 기본)
-        k = (lo + hi) / 2
-        if sum(hh * min(max_w / ww, k * base) for ww, hh in zip(widths, heights)) <= room:
-            lo = k
-        else:
-            hi = k
-    out = []
-    for r, ww, hh in zip(rows, widths, heights):
-        s = min(max_w / ww, lo * base)
-        imgs = "".join('<img src="%s" style="width:%.2fpt;height:%.2fpt">' % (v["path"].as_uri(), (v["box"][2] - v["box"][0]) * s, (v["box"][3] - v["box"][1]) * s) for v in r)
-        out.append('<div style="display:flex;justify-content:center;align-items:center;gap:%.2fpt;height:%.2fpt;margin-bottom:%.1fpt">%s</div>'
-                   % (gap_px * s, hh * s, row_gap, imgs))
-    return "".join(out)
-
-
-# ───────────────────────── 모터 ─────────────────────────
-def motor(d, lang, work, h):
-    L = T[lang]
-    name = d["name"]
-    cover = h["white_background"](h["root"] / "public" / d["image"].lstrip("/"), work / "cover.png")
-    rows = h["split_drawing"](h["root"] / "public" / d["datasheet"].lstrip("/"), work)
-    pages = []
-    if len(rows[0]) == 3 and len(rows) > 1:                               # 표준 배치: 윗줄 = 밑면 · 옆면 · 윗면, 아랫줄 = 사선 보기
-        b, s, t = (v["path"].as_uri() for v in rows[0])
-        isos = [v for r in rows[1:] for v in r]
-        body = ('<div class="sub">%s</div>'
-                '<div class="fig" style="height:98pt"><img src="%s"></div><div class="cap">%s</div><div class="gap"></div>'
-                '<div style="display:flex;gap:10pt"><div style="flex:1"><div class="fig" style="height:78pt"><img src="%s"></div><div class="cap">%s</div></div>'
-                '<div style="flex:1"><div class="fig" style="height:78pt"><img src="%s"></div><div class="cap">%s</div></div></div>'
-                % (L["dims_sub"], s, L["side"], b, L["bottom"], t, L["top"]))
-    else:                                                                 # 그 밖: 줄 구성·축척 그대로, 마지막 줄 오른쪽 끝(2개 이상일 때) = 사선 보기
-        last = rows[-1]
-        isos = [last[-1]] if len(last) >= 2 else []
-        ortho = rows[:-1] + ([last[:-1]] if len(last) >= 2 else [last])
-        body = '<div class="sub">%s</div>%s' % (L["dims_sub"], rows_figure(ortho))
-    pages.append(("%s %s" % (name, L["dims"]), body))
-    pages.append(("%s %s" % (name, L["specs"]), '<div><div class="sub">%s</div>%s</div>' % (L["basic"], spec_table(d, lang))))
-    thrust = d.get("thrust") or []
-    if thrust:
-        cols = ["throttle", "thrust", "current", "power", "eff"]
-        has_rpm = any(r.get("rpm") not in (None, "—") for t in thrust for r in t["rows"])
-        cols += ["rpm"] if has_rpm else ["temp"]
-        blocks = ['<div class="note">%s</div>' % e(test_conditions(d.get("testConditions"), lang))]
-        for t in thrust:
-            head = "".join("<th>%s</th>" % L[c] for c in cols)
-            body_rows = "".join("<tr>%s</tr>" % "".join("<td>%s</td>" % e(r.get(c) or "—") for c in cols) for r in t["rows"])
-            esc_name = (" · " + t["esc"]) if t.get("esc") else ""
-            blocks.append('<div><div class="sub">· %s %s%s</div><table class="g"><tr>%s</tr>%s</table></div>' % (L["prop"], e(t["propeller"]), e(esc_name), head, body_rows))
-        pages.append(("%s %s" % (name, L["perf"]), "".join(blocks)))
-    volt, prop, cur = spec(d, "Rated Voltage"), spec(d, "Recommended Prop"), spec(d, "Max Current")
-    isos = "".join('<div style="flex:1"><div class="fig" style="height:60pt"><img src="%s"></div></div>' % v["path"].as_uri() for v in isos[:2])
-    if lang == "ko":
-        steps = ["<b>모터 고정</b> — 밑면 고정 구멍으로 암에 고정합니다. 나사 규격·간격은 치수 도면을 따르고, 나사 끝이 코일에 닿지 않는 길이를 씁니다.",
-                 "<b>ESC 연결</b> — 모터 선 3가닥을 ESC 출력에 연결합니다. 회전 방향이 반대이면 아무 2가닥을 서로 바꾸거나 ESC 설정에서 반전합니다.",
-                 "<b>회전 확인</b> — 프로펠러 없이 낮은 스로틀로 회전 방향과 이상 소음을 확인합니다.",
-                 "<b>프로펠러 장착</b> — 회전 방향에 맞는 프로펠러를 끼우고 너트를 단단히 조입니다." + ((" 권장 프로펠러: %s." % e(spec_value(prop, lang))) if prop else "")]
-        notes = ["정격 전압을 넘기지 마십시오." + ((" 정격: %s." % e(volt)) if volt else ""),
-                 "ESC는 모터 최대 전류보다 여유 있는 정격을 쓰십시오." + ((" 최대 전류: %s." % e(cur)) if cur else ""),
-                 "연결·설정·점검 중에는 프로펠러를 반드시 분리하십시오.",
-                 "운용 직후 모터는 뜨거울 수 있으니 식은 뒤 만지십시오.",
-                 "자석에 금속 가루·나사가 붙지 않게 하고, 축 휨·베어링 소음이 있으면 사용을 멈추십시오."]
-    else:
-        steps = ["<b>Mounting</b> — Fix the motor to the arm through the bottom mounting holes. Follow the screw size and spacing on the drawing and use screws that do not reach the windings.",
-                 "<b>ESC wiring</b> — Connect the three motor wires to the ESC outputs. To reverse the rotation, swap any two wires or reverse it in the ESC settings.",
-                 "<b>Spin check</b> — Without a propeller, run at low throttle and check the direction and for abnormal noise.",
-                 "<b>Propeller</b> — Fit a propeller matching the rotation and tighten the nut firmly." + ((" Recommended: %s." % e(prop)) if prop else "")]
-        notes = ["Do not exceed the rated voltage." + ((" Rated: %s." % e(volt)) if volt else ""),
-                 "Use an ESC rated with margin above the motor maximum current." + ((" Max current: %s." % e(cur)) if cur else ""),
-                 "Always remove the propeller while wiring, configuring or bench testing.",
-                 "The motor can be hot right after operation; let it cool before touching.",
-                 "Keep metal debris away from the magnets; stop using the motor if the shaft is bent or the bearings are noisy."]
-    body = '<div style="display:flex;gap:8pt;margin-bottom:5pt">%s</div>%s' % (isos, steps_html(steps))
-    pages.append(("%s %s" % (name, L["install"]), body))
-    pages.append(("%s %s" % (name, L["safety"]), notes_html(notes) + qr_block(d, lang)))
-    return {"cover": cover, "pages": pages}
 
 
 def steps_html(steps):
@@ -232,13 +118,16 @@ def product(d, lang, work, h):
                   for s in d.get("specs", []))
     if trs:
         pages.append((title(L["specs"]), '<div><div class="sub">%s</div><table class="t">%s</table></div>' % (L["basic"], trs)))
+    photos = set(d.get("gallery") or [])                                   # 갤러리에도 있는 그림 = 제품 사진·렌더 → 돌리지 않음
     for src in (d.get("pinoutImages") or ([d["pinoutImage"]] if d.get("pinoutImage") else [])):
         sub = L["dim_sub"] if "dimension" in src else L["pin_sub"]
         path = h["fit"](h["root"] / "public" / src.lstrip("/"), 1800)
         w, hh = image_size(path)
-        if w and hh and w / hh > 1.12:                                      # 가로로 긴 그림은 90° 돌려 쪽 높이를 씀(읽을 때 책을 돌림)
+        if w and hh and w / hh > 1.12 and src not in photos:                # 가로로 긴 도면은 90° 돌려 쪽 높이를 씀(읽을 때 책을 돌림)
             s = min(205.0 / w, 171.4 / hh)
             fig = '<div class="rot"><img src="%s" style="width:%.1fpt;height:%.1fpt"></div>' % (path.as_uri(), w * s, hh * s)
+        elif w and hh and src in photos:
+            fig = '<div class="fig" style="height:%.1fpt"><img src="%s"></div>' % (min(205.0, 171.4 * hh / w), path.as_uri())
         else:
             fig = '<div class="fig" style="height:205pt"><img src="%s"></div>' % path.as_uri()
         pages.append((title(L["pinout"]), '<div><div class="sub">%s</div>%s</div>' % (sub, fig)))
@@ -274,10 +163,10 @@ def product(d, lang, work, h):
     pages.append((title(L["safety"]), notes_html(MP.CAT_NOTES(d["_cat"], slug, d, lang)) + qr_block(d, lang)))
     return {"cover": cover, "pages": pages}
 
-BUILDERS = {"motor": motor, "fc": product, "esc": product, "gnss": product, "camera": product}
+BUILDERS = {"fc": product, "esc": product, "gnss": product, "camera": product}
 
 
 def spec_for(d, lang, work, helpers):
     if d["_cat"] not in BUILDERS:
-        raise NotImplementedError("제품군 %s 매뉴얼 구성은 아직 없음" % d["_cat"])
+        raise NotImplementedError("제품군 %s 는 매뉴얼을 만들지 않음" % d["_cat"])
     return BUILDERS[d["_cat"]](d, lang, Path(work), helpers)

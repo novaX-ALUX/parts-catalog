@@ -1,7 +1,7 @@
 ---
 name: AP-RTK X20D
 tagline: Dual-Antenna RTK GNSS with u-blox ZED-X20D
-image: /images/products/gnss_AP-RTK-X20D_R3_top_isometric.png
+image: /images/products/gnss_AP-RTK-X20D.png
 order: 22
 manuals:
   - { label: "한국어", file: /manuals/gnss_AP-RTK-X20D_manual_ko.pdf }
@@ -15,17 +15,58 @@ specs:
   - { key: Heading, value: "Receiver-computed ANT1-to-ANT2 heading; UBX-NAV-DAHEADING v2" }
   - { key: Update Rate, value: "Firmware requests 5 Hz navigation at 230400 baud; end-to-end CAN rate requires measurement" }
   - { key: Comm. Protocol, value: "DroneCAN — position, ardupilot.gnss.Heading and separate magnetometer data" }
-  - { key: I/O Ports, value: "2× MMCX antenna · CAN · USB-C (MCU) · external receiver UART" }
+  - { key: I/O Ports, value: "2× MMCX antenna · CAN · UART (RTCM input) · DEBUG (SWD + console) · PPS/EVENT · USB-C (MCU)" }
   - { key: PCB, value: "R3 · 33.00 × 45.17 mm · 4 layers · 0.8 mm" }
   - { key: Firmware, value: "AP_Periph · novaX 1.0.1 engineering release · board ID 6205" }
   - { key: Validation Status, value: "Windows GCC 10.2.1 build verified; first-article hardware and flight qualification pending" }
 description: |
-  AP-RTK X20D uses one u-blox ZED-X20D all-band receiver and two antennas for RTK positioning and heading. The STM32 forwards the receiver's position and heading plus separate RM3100 compass measurements over DroneCAN to the flight controller; yaw fusion belongs to the flight controller, not the peripheral MCU. Images show the actual R3 PCB CAD model, not a finished enclosure. Firmware 1.0.1 is supplied for engineering evaluation, not as production or flight-qualified firmware.
+  AP-RTK X20D uses one u-blox ZED-X20D all-band receiver and two antennas for RTK positioning and heading. The STM32 forwards the receiver's position and heading plus separate RM3100 compass measurements over DroneCAN to the flight controller; yaw fusion belongs to the flight controller, not the peripheral MCU. Product images are renders of the enclosure design fitted with the R3 PCB, with engraved port and LED names; the gallery also shows the R3 PCB CAD renders. Firmware 1.0.1 is supplied for engineering evaluation, not as production or flight-qualified firmware.
 pinoutImages:
-  - /images/products/gnss_AP-RTK-X20D_R3_top.png
-  - /images/products/gnss_AP-RTK-X20D_R3_bottom.png
+  - /images/products/gnss_AP-RTK-X20D_ports.png
+  - /images/products/gnss_AP-RTK-X20D_leds.png
 pinoutNotes: |
-  R3 PCB connector-location renders, top and bottom. USB-C connects to STM32F412 OTG_FS for MCU service / bootloader / DFU; it is not the ZED-X20D USB port. The receiver communicates with the MCU through USART2 (GPS port index 4). PC6/PC7 external UART MCU TX/monitor is not implemented in v1.0.1. Use the R3 schematic to verify connector pin numbering and supply before first power-on; do not infer the pinout from AP-RTK dual or G5H.
+  Pin definitions below are checked pin by pin against the R3 schematic netlist. CAN and UART: pin 1 = GND and pin 4 = 5 V, the reverse of the Pixhawk numbering (pin 1 = 5 V). DEBUG: pin 1 = 5 V and pin 6 = GND. PPS: pins 1 and 3 = GND. Pin order and cables follow AP-RTK dual; check both ends before using a generic 1:1 Pixhawk cable. Power can come from the CAN/UART 5 V pin, the DEBUG 5 V pin or USB VBUS, each through its own 2 A PPTC fuse and Schottky diode. USB-C is wired to the STM32F412 (service, bootloader, DFU), not to the ZED-X20D; the receiver talks to the MCU over USART2 (GPS port 4). ANT1 is the heading reference at the rear and ANT2 goes at the front, the reverse of AP-RTK dual; swapped cables turn the heading by 180°. Status LEDs on the side of the case: PWR red = power, STAT green = AP_Periph status, SAFE red = safety, HDG green = heading valid, RTK blue = RTK fixed. Images are renders of the case design with the engraved port and LED names.
+pinTable:
+  - name: CAN
+    type: JST-GH 4P
+    mapping: DroneCAN to the flight controller · power input
+    pins:
+      - { pin: 1, signal: GND, function: "Ground" }
+      - { pin: 2, signal: CAN_L, function: "CAN bus low" }
+      - { pin: 3, signal: CAN_H, function: "CAN bus high" }
+      - { pin: 4, signal: 5V, function: "5 V supply input — shared with UART pin 4" }
+  - name: UART
+    type: JST-GH 4P
+    mapping: RTCM correction input · power input
+    pins:
+      - { pin: 1, signal: GND, function: "Ground" }
+      - { pin: 2, signal: TX, function: "MCU transmit (PC6, USART6_TX) — not used by firmware 1.0.1" }
+      - { pin: 3, signal: RX, function: "RTCM corrections into the ZED-X20D UART2 (also MCU PC7, USART6_RX)" }
+      - { pin: 4, signal: 5V, function: "5 V supply input — shared with CAN pin 4" }
+  - name: DEBUG
+    type: JST-GH 6P
+    mapping: SWD programming · MCU debug console
+    pins:
+      - { pin: 1, signal: 5V, function: "5 V supply input" }
+      - { pin: 2, signal: SWDIO, function: "SWD data (PA13) — bootloader programming and firmware recovery" }
+      - { pin: 3, signal: SWCLK, function: "SWD clock (PA14)" }
+      - { pin: 4, signal: RX, function: "Debug console receive (PB7, USART1_RX)" }
+      - { pin: 5, signal: TX, function: "Debug console transmit (PB6, USART1_TX)" }
+      - { pin: 6, signal: GND, function: "Ground" }
+  - name: PPS
+    type: JST-GH 4P
+    mapping: Receiver timing — PPS output · EVENT input
+    pins:
+      - { pin: 1, signal: GND, function: "Ground" }
+      - { pin: 2, signal: EVENT, function: "External event input to the receiver (EXTINT) — e.g. camera trigger time stamps" }
+      - { pin: 3, signal: GND, function: "Ground" }
+      - { pin: 4, signal: PPS, function: "Pulse-per-second output from the receiver (TIMEPULSE, also MCU PA7)" }
+  - name: ANT1 · ANT2
+    type: MMCX
+    mapping: GNSS antenna inputs · 3.3 V antenna bias · ESD protected
+    pins:
+      - { pin: ANT1, signal: RF_IN_1, function: "Heading reference antenna — mount at the rear of the vehicle" }
+      - { pin: ANT2, signal: RF_IN_2, function: "Mount at the front — heading = direction from ANT1 to ANT2" }
 firmware:
   - kind: "AP_Periph (DroneCAN OTA)"
     file: /firmware/gnss/AP-RTK-X20D/AP-RTK_X20D-v1.0.1.bin
@@ -72,6 +113,9 @@ configNotes: |
   4. First-article checks — Confirm factory receiver startup, RTK corrections, live position, yaw at known headings, loss/reacquisition, RM3100 axes, power and all update/recovery paths on a bench before any flight use.
   5. Receiver reference — u-blox ZED-X20D official product information: https://www.u-blox.com/en/product/zed-x20d-module
 gallery:
+  - /images/products/gnss_AP-RTK-X20D.png
+  - /images/products/gnss_AP-RTK-X20D_ports.png
+  - /images/products/gnss_AP-RTK-X20D_leds.png
   - /images/products/gnss_AP-RTK-X20D_R3_top_isometric.png
   - /images/products/gnss_AP-RTK-X20D_R3_bottom_isometric.png
   - /images/products/gnss_AP-RTK-X20D_R3_top.png

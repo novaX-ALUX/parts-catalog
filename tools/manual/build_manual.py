@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """제품 사용자 매뉴얼 PDF(한국어·영어) — 카탈로그 md(제품 데이터 정본) → 제품군별 쪽 구성 → HTML → Chrome PDF → Manual 탭 미리보기 PNG.
 
-실행: python tools/manual/build_manual.py motor/AM-2810 [gnss/AP-RTK-X20D ...] [--lang ko,en]
+실행: python tools/manual/build_manual.py fc/AF-H7E [gnss/AP-RTK-X20D ...] [--lang ko,en]   (모터는 매뉴얼 없음)
 출력: public/manuals/<제품군>_<slug>_manual_<lang>.pdf (+ 같은 이름 .png), 작업물 tools/manual/.build/<slug>/
 서식 = AP-RTK dual 사용자 매뉴얼 260714 실측(PyMuPDF): 판형 198.425 × 274.961 pt · 제목 띠 #231F20 (x 10.3, y 11.0, 177.8 × 18.9 pt)
        본문 Pretendard Light 7.8 pt · 소제목 Bold 8.8 pt · 표 머리칸 #DCDDDE, 선 0.3 pt · 쪽번호 Light 6.9 pt #77787B
        표지 GmarketSans Bold 23.5 / Medium 17.6 pt · 뒷표지 novaX 로고 = AF-F7 mini 매뉴얼 8쪽 채움 경로(벡터 그대로, #939599)
 글꼴: tools/manual/.fonts/ (Pretendard OFL · GmarketSans, 저장소에 넣지 않음 — README.md 의 받는 곳 참고)
-쪽 구성: manual_content.py · 제품별 문구: manual_products.py · 그림: 모터 = 제원 도면 원본 선, 그 밖 = 원격 PC AI 먹선(photo_lineart.py → art/)
+쪽 구성: manual_content.py · 제품별 문구: manual_products.py · 그림: 원격 PC AI 먹선(photo_lineart.py → art/)
 """
 import argparse
 import html
@@ -131,45 +131,6 @@ def white_background(src, dst, long_side=1200):
     return dst
 
 
-def split_drawing(src, out_dir, gap=90):
-    """제원 도면 PNG → 보기별 조각(잉크 덩어리 상자)을 줄 단위로. 반환: [[{"box": (x0, y0, x1, y1), "path"}...] 줄...] 위→아래, 왼→오른."""
-    for old in Path(out_dir).glob("view_*.png"):
-        old.unlink()
-    im = cv2.imread(str(src), cv2.IMREAD_GRAYSCALE)
-    ink = (im < 200).astype(np.uint8)
-    merged = cv2.dilate(ink, np.ones((gap, gap), np.uint8))
-    n, lab, st, _ = cv2.connectedComponentsWithStats(merged)
-    pad = gap // 2
-    boxes = []
-    for i in range(1, n):
-        if st[i, cv2.CC_STAT_AREA] <= 4000:
-            continue
-        x, y, w, h = (int(v) for v in st[i, :4])
-        boxes.append((max(x + pad - 20, 0), max(y + pad - 20, 0), min(x + w - pad + 20, im.shape[1]), min(y + h - pad + 20, im.shape[0])))
-    rows = []
-    for b in sorted(boxes, key=lambda b: (b[1] + b[3]) / 2):              # 세로 범위가 (작은 쪽 높이의 30 % 넘게) 겹치면 한 줄
-        for r in rows:
-            ov = min(r["y1"], b[3]) - max(r["y0"], b[1])
-            if ov > 0.3 * min(r["y1"] - r["y0"], b[3] - b[1]):
-                r["boxes"].append(b)
-                r["y0"], r["y1"] = min(r["y0"], b[1]), max(r["y1"], b[3])
-                break
-        else:
-            rows.append({"y0": b[1], "y1": b[3], "boxes": [b]})
-    out, k = [], 0
-    for r in rows:
-        line = []
-        for (x0, y0, x1, y1) in sorted(r["boxes"]):
-            crop = im[y0:y1, x0:x1]
-            crop = np.where(crop < 250, np.clip(crop.astype(np.int32) - 60, 0, 255), 255).astype(np.uint8)   # 가는 회색 선을 인쇄용으로 진하게
-            p = Path(out_dir) / ("view_%d.png" % k)
-            k += 1
-            cv2.imwrite(str(p), crop)
-            line.append({"box": (x0, y0, x1, y1), "path": p})
-        out.append(line)
-    return out
-
-
 def esc(s):
     return html.escape(str(s))
 
@@ -281,7 +242,7 @@ def build(key, lang, fonts_url, logo):
     d = load_product(key)
     work = HERE / ".build" / d["_slug"]
     work.mkdir(parents=True, exist_ok=True)
-    spec = MC.spec_for(d, lang, work, helpers={"white_background": white_background, "split_drawing": split_drawing, "root": ROOT,
+    spec = MC.spec_for(d, lang, work, helpers={"white_background": white_background, "root": ROOT,
                                                "fit": lambda p, max_px=1400: fit_image(p, work, max_px)})
     cover_img = '<div class="cover-img"><img src="%s"></div>' % spec["cover"].as_uri() if spec.get("cover") else ""
     pages = ['<section class="page"><div class="cover-title">%s</div><div class="cover-sub">User Guide</div>%s</section>' % (esc(d["name"]), cover_img)]

@@ -4,7 +4,6 @@ import Layout from '../../layouts/Layout.astro';
 import SpecTable from '../../components/SpecTable.astro';
 import ThrustChart from '../../components/ThrustChart.astro';
 import Tabs from '../../components/Tabs.astro';
-import ManualPanel from '../../components/ManualPanel.astro';
 import { CATEGORY_LABEL } from '../../content.config';
 import { maxThrust } from '../../lib/scale';
 
@@ -54,7 +53,6 @@ const hasCol = (rows: any[], key: string) => rows.some((r) => r[key] && r[key] !
         <Tabs tabs={[
           {id:'thrust', label:'Thrust Data'},
           {id:'drawing', label:'Drawing'},
-          {id:'manual', label:'Manual'},
           {id:'gallery', label:'Gallery'}
         ]}>
           <div class="tab-panel active" data-panel="thrust">
@@ -118,10 +116,6 @@ const hasCol = (rows: any[], key: string) => rows.some((r) => r[key] && r[key] !
             ) : (
               <div class="panel-empty">Drawing coming soon</div>
             )}
-          </div>
-
-          <div class="tab-panel" data-panel="manual">
-            <ManualPanel manuals={d.manuals} name={d.name} />
           </div>
 
           <div class="tab-panel" data-panel="gallery">

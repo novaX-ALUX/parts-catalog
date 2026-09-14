@@ -44,8 +44,8 @@ test('X20D is a separate R3 engineering product with its own heading contract', 
   const x20 = product('gnss', 'AP-RTK-X20D');
   assert.equal(x20.name, 'AP-RTK X20D');
   assert.equal(x20.order, 22);
-  assert.match(x20.image, /X20D_R3_top_isometric\.png$/);
-  assert.equal(x20.gallery.length, 4);
+  assert.match(x20.image, /gnss_AP-RTK-X20D\.png$/, 'card image = case render');
+  assert.ok(x20.gallery.some((g) => /X20D_R3_top_isometric\.png$/.test(g)), 'gallery keeps the R3 PCB renders');
   assert.match(spec(x20, 'Update Rate'), /requires measurement/);
   assert.match(x20.configNotes, /ANT1 \/ RF_IN_1 at the rear; ANT2 \/ RF_IN_2 at the front/);
   assert.equal(x20.configParams.find(p => p.name === 'GPS1_MB_TYPE').value, '0');
@@ -59,6 +59,16 @@ test('X20D is a separate R3 engineering product with its own heading contract', 
     assert.match(fw.sha256, /^[0-9a-f]{64}$/);
     assert.equal(fw.method, undefined, 'Do not enable an unqualified browser-flash target');
   }
+});
+
+test('X20D pin table matches the R3 netlist (CAN/UART/PPS pin 1 = GND, DEBUG pin 1 = 5 V)', () => {
+  const table = product('gnss', 'AP-RTK-X20D').pinTable;
+  const signals = (name) => table.find((c) => c.name === name).pins.map((p) => p.signal);
+  assert.deepEqual(signals('CAN'), ['GND', 'CAN_L', 'CAN_H', '5V']);
+  assert.deepEqual(signals('UART'), ['GND', 'TX', 'RX', '5V']);
+  assert.deepEqual(signals('DEBUG'), ['5V', 'SWDIO', 'SWCLK', 'RX', 'TX', 'GND']);
+  assert.deepEqual(signals('PPS'), ['GND', 'EVENT', 'GND', 'PPS']);
+  assert.deepEqual(signals('ANT1 · ANT2'), ['RF_IN_1', 'RF_IN_2']);
 });
 
 test('catalog status flags: G5H withdrawn, X20D and AF-H7E Lite announced as coming soon', () => {
