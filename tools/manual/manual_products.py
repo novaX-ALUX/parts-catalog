@@ -243,7 +243,7 @@ PINOUT_NOTES_KO = {
                    "RC IN 2번 핀에 SBUS · PPM · DSM 수신기를 바로 연결합니다(프로토콜 자동 인식, FC 메인 MCU 직결이라 IO 보드가 필요 없음). 커넥터 전원은 5 V 라 3.3 V 전용 DSM 위성 수신기는 3.3 V 변환 케이블이 필요합니다. "
                    "보드에는 커넥터 없이 microSD 슬롯(로그) · 부저 · RGB 상태 LED 가 있습니다. PWM 헤더의 + 레일은 FC 가 전원을 주지 않습니다. "
                    "헤더 13번째 칸 SB 는 PWM 채널이 아니라 SBUS 출력입니다 — USART6(SERIAL8)에서 서보 채널 1–16 을 선 하나로 내보내고 신호 반전은 STM32H7 안에서 하므로, SBUS 서보 · SBUS→PWM 디코더 · 짐벌을 일반 서보 선으로 꽂고 전원은 서보 레일에서 받습니다. "
-                   "DShot 은 M1–M6 에서 되고, M7–M8 은 DMA 없는 타이머라 PWM · OneShot 만 되며, M9–M12 의 MCU 핀은 아직 확정 전입니다. "
+                   "출력은 타이머 묶음(M1–M4 · M5 M6 M9 M10 · M7–M8 · M11–M12)마다 주기 · 프로토콜을 함께 쓰고, DShot 은 DMA 없는 타이머인 M7–M8 만 빼고 모든 묶음에서 됩니다(M7–M8 은 PWM · OneShot). "
                    "AF-H7E 와 같이 PWM 신호 줄(S)이 가장 뒤쪽이며, 케이스 빗살 홈 때문에 서보 플러그는 S 가 뒤로 가야만 꽂히고, POWER 1 · POWER 2 · RC IN 과 PWM 헤더 사이는 벽으로 나뉩니다. "
                    "핀맵 그림은 개념 캐리어를 위에서 본 것입니다(옆 커넥터는 아랫면에 달려 가장자리로 꽂힘). POWER 1 · 2 는 AF-H7E 와 같은 Molex Micro-Lock Plus 이며 1번 핀 방향은 확인 중입니다.",
     "AF-H7-nano": "핀맵은 일반 H7 보드가 아니라 novaX AF-H7_nano 기준입니다. PWM1–10 은 모터/서보 출력, PWM11 은 WS2812 LED 선입니다. GPS 커넥터는 USART3(SERIAL3, PD8/PD9), ELRS/RC 커넥터는 USART6(SERIAL6, PC6/PC7), UART7/8 은 예비 패드이고 UART4 는 DJI O3 MSP 용입니다. "
@@ -274,7 +274,7 @@ PIN_KO = {
     "SWD data — bootloader programming and firmware recovery": "SWD 데이터 — 부트로더 기록 · 펌웨어 복구", "SWD clock": "SWD 클럭",
     "5 V from USB — configuration and firmware update on the bench": "USB 5 V — 벤치 설정 · 펌웨어 갱신", "USB data +": "USB 데이터 +", "USB data −": "USB 데이터 −",
     "Configuration channel (device role)": "설정 채널 (장치 역할)",
-    "Motor / servo output signal, one per channel (PWM · OneShot; DShot on M1–M6)": "채널별 모터/서보 신호 (PWM · OneShot, DShot 은 M1–M6)",
+    "Motor / servo output signal, one per channel (PWM · OneShot · DShot; M7–M8 without DShot)": "채널별 모터/서보 신호 (PWM · OneShot · DShot, M7–M8 은 DShot 불가)",
     "SERIAL8 · USART6 · SBus servo out": "SERIAL8 · USART6 · SBUS 서보 출력",
     "SBUS output — servo channels 1–16 on one wire (SERIAL8_PROTOCOL 15, SERIAL8_OPTIONS 2 inverts TX inside the MCU)": "SBUS 출력 — 서보 채널 1–16 을 선 하나로 (SERIAL8_PROTOCOL 15, SERIAL8_OPTIONS 2 로 MCU 안에서 송신 반전)",
     "Servo rail, bussed across all channels — supplied externally (e.g. BEC)": "모든 채널 공통 서보 레일 — 외부 공급 (예: BEC)",

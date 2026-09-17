@@ -12,7 +12,7 @@ pinoutImage: /images/products/fc_AF-H7E-Lite_pinout.png
 pinoutNotes: |
   Preliminary pin definition — AF-H7E Lite is in development and connectors may change before release. On every JST connector pin 1 is the supply pin and the last pin is GND, following the Pixhawk connector standard. UART n maps to ArduPilot SERIALn: UART 1–2 default to MAVLink telemetry and UART 3–4 default to GPS. GPS modules connect to any UART or over DroneCAN; there is no dedicated GPS/safety port and no safety switch. RC IN takes an SBUS, PPM or DSM receiver directly on pin 2 (protocol auto-detected, wired to the flight-controller MCU, no IO board needed); the connector supplies 5 V, so a 3.3 V-only DSM satellite receiver needs a 3.3 V adapter. On-board without a connector: microSD card slot (logging), buzzer and RGB status LED.
 
-  The + rail of the PWM header is not powered by the flight controller. The 13th header column, SB, is an SBUS output, not a PWM channel: it carries servo channels 1–16 on one wire from USART6 (SERIAL8) with the signal inversion done inside the STM32H7, so SBUS servos, SBUS-to-PWM decoders and gimbals plug in with a standard servo lead and take power from the servo rail. DShot is available on M1–M6; M7–M8 run on a timer without DMA (PWM and OneShot only), and the MCU pins for M9–M12 are still to be confirmed.
+  The + rail of the PWM header is not powered by the flight controller. The 13th header column, SB, is an SBUS output, not a PWM channel: it carries servo channels 1–16 on one wire from USART6 (SERIAL8) with the signal inversion done inside the STM32H7, so SBUS servos, SBUS-to-PWM decoders and gimbals plug in with a standard servo lead and take power from the servo rail. Outputs share rate and protocol within the timer groups M1–M4, M5 · M6 · M9 · M10, M7–M8 and M11–M12; DShot works on every group except M7–M8, whose timer has no DMA (PWM and OneShot only).
 
   As on AF-H7E, the PWM signal row (S) is the rearmost row: the case has a keyed comb behind it so servo plugs only fit with S at the rear, and a wall separates POWER 1 · POWER 2 · RC IN from the PWM header. The pinout image is a top view of the concept carrier: side connectors are mounted on the bottom side and plug in from the edges, and each table lists pins in the order they sit when seen from above. POWER 1 and POWER 2 use the same Molex Micro-Lock Plus connector as AF-H7E; their pin-1 end is still to be confirmed.
 pinTable:
@@ -159,7 +159,7 @@ pinTable:
     type: 2.54 mm 3 × 13 pin header · columns 1–12
     mapping: Main outputs 1–12
     pins:
-      - { pin: S, signal: M1 … M12, function: "Motor / servo output signal, one per channel (PWM · OneShot; DShot on M1–M6)" }
+      - { pin: S, signal: M1 … M12, function: "Motor / servo output signal, one per channel (PWM · OneShot · DShot; M7–M8 without DShot)" }
       - { pin: +, signal: V_SERVO, function: "Servo rail, bussed across all channels — supplied externally (e.g. BEC)" }
       - { pin: −, signal: GND, function: "Ground" }
   - name: SB (SBUS OUT)
