@@ -106,6 +106,10 @@ test('AF-H7E Lite pin table follows the Pixhawk connector convention and ArduPil
     assert.ok(!names.some((n) => n.startsWith(gone)), `${gone} is not on the Lite`);
   }
   assert.ok(names.includes('POWER 1') && names.includes('POWER 2'), 'dual power inputs');
+  // RC IN = AF-H7E (V6X J21) 5-pin pinout: 5 V · RC signal · RSSI · switched 3.3 V for DSM satellites · GND.
+  const rc = table.find((c) => c.name === 'RC IN');
+  assert.equal(rc.type, 'JST-GH 5P');
+  assert.deepEqual(rc.pins.map((p) => p.signal), ['VCC', 'RC_IN', 'RSSI', 'VCC_3V3', 'GND']);
   // 3-pin header = 13 columns: M1–M12 PWM + SB (SBUS out from USART6 / SERIAL8) — never labelled M13.
   const sb = table.find((c) => c.name.startsWith('SB'));
   assert.ok(sb && /SERIAL8/.test(sb.mapping) && /USART6/.test(sb.mapping), 'SB = SBUS out on SERIAL8 (USART6)');

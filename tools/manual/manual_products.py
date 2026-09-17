@@ -240,7 +240,7 @@ def CAT_NOTES(cat, slug, d, lang):
 PINOUT_NOTES_KO = {
     "AF-H7E-Lite": "잠정 핀 정의입니다 — AF-H7E Lite 는 개발 중이라 출시 전에 커넥터가 바뀔 수 있습니다. 모든 JST 커넥터는 Pixhawk 표준처럼 1번 핀이 전원, 마지막 핀이 GND 입니다. "
                    "UART n 은 ArduPilot SERIALn 이며 UART 1–2 는 MAVLink 텔레메트리, UART 3–4 는 GPS 가 기본입니다. GPS 는 아무 UART 나 DroneCAN 으로 연결하며 전용 GPS/세이프티 포트와 세이프티 스위치는 없습니다. "
-                   "RC IN 2번 핀에 SBUS · PPM · DSM 수신기를 바로 연결합니다(프로토콜 자동 인식, FC 메인 MCU 직결이라 IO 보드가 필요 없음). 커넥터 전원은 5 V 라 3.3 V 전용 DSM 위성 수신기는 3.3 V 변환 케이블이 필요합니다. "
+                   "RC IN(5핀, AF-H7E 와 같은 배열) 2번 핀에 SBUS · PPM · DSM 수신기를 바로 연결합니다(프로토콜 자동 인식, IO 보드 불필요). 1번 핀은 5 V, 4번 핀은 DSM 위성 수신기용 3.3 V 이며 바인드 때 FC 가 껐다 켭니다. "
                    "보드에는 커넥터 없이 microSD 슬롯(로그) · 부저 · RGB 상태 LED 가 있습니다. PWM 헤더의 + 레일은 FC 가 전원을 주지 않습니다. "
                    "헤더 13번째 칸 SB 는 PWM 채널이 아니라 SBUS 출력입니다 — USART6(SERIAL8)에서 서보 채널 1–16 을 선 하나로 내보내고 신호 반전은 STM32H7 안에서 하므로, SBUS 서보 · SBUS→PWM 디코더 · 짐벌을 일반 서보 선으로 꽂고 전원은 서보 레일에서 받습니다. "
                    "출력은 타이머 묶음(M1–M4 · M5 M6 M9 M10 · M7–M8 · M11–M12)마다 주기 · 프로토콜을 함께 쓰고, DShot 은 DMA 없는 타이머인 M7–M8 만 빼고 모든 묶음에서 됩니다(M7–M8 은 PWM · OneShot). "
@@ -268,7 +268,8 @@ PIN_KO = {
     "I2C clock — external compass, rangefinder, airspeed …": "I2C 클럭 — 외장 나침반 · 거리계 · 대기속도계 …", "I2C data": "I2C 데이터",
     "5 V output to CAN peripherals (not a power input)": "CAN 주변장치용 5 V 출력 (전원 입력 아님)", "CAN bus high": "CAN 버스 High", "CAN bus low": "CAN 버스 Low",
     "5 V receiver supply": "수신기 5 V 전원", "SBUS / PPM / DSM receiver input (protocol auto-detected)": "SBUS / PPM / DSM 수신기 입력 (자동 인식)",
-    "RSSI input (analog or PWM)": "RSSI 입력 (아날로그 또는 PWM)", "Ethernet transmit pair +": "이더넷 송신 +", "Ethernet transmit pair −": "이더넷 송신 −",
+    "Analog RSSI input (0–3.3 V)": "아날로그 RSSI 입력 (0–3.3 V)",
+    "Switched 3.3 V supply for DSM / Spektrum satellite receivers (power-cycled to bind)": "DSM / Spektrum 위성 수신기용 3.3 V 전원 (바인드 때 FC 가 껐다 켬)", "Ethernet transmit pair +": "이더넷 송신 +", "Ethernet transmit pair −": "이더넷 송신 −",
     "Ethernet receive pair +": "이더넷 수신 +", "Ethernet receive pair −": "이더넷 수신 −", "3.3 V reference for the debug probe": "디버그 프로브용 3.3 V 기준",
     "Debug console transmit (FC → probe)": "디버그 콘솔 송신 (FC → 프로브)", "Debug console receive (probe → FC)": "디버그 콘솔 수신 (프로브 → FC)",
     "SWD data — bootloader programming and firmware recovery": "SWD 데이터 — 부트로더 기록 · 펌웨어 복구", "SWD clock": "SWD 클럭",
