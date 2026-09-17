@@ -9,7 +9,12 @@ manuals:
 comingSoon: true
 specs: []
 pinoutImage: /images/products/fc_AF-H7E-Lite_pinout.png
-pinoutNotes: 'Preliminary pin definition — AF-H7E Lite is in development and connectors may change before release. On every JST connector pin 1 is the supply pin and the last pin is GND, following the Pixhawk connector standard. UART n maps to ArduPilot SERIALn: UART 1–2 default to MAVLink telemetry and UART 3–4 default to GPS. GPS modules connect to any UART or over DroneCAN; there is no dedicated GPS/safety port and no safety switch. On-board without a connector: microSD card slot (logging), buzzer and RGB status LED. The + rail of the PWM header is not powered by the flight controller. As on AF-H7E, the PWM signal row (S) is the rearmost row: the case has a keyed comb behind it so servo plugs only fit with S at the rear, and a wall separates POWER 1 · POWER 2 · RC IN from the PWM header. The pinout image is a top view of the concept carrier: side connectors are mounted on the bottom side and plug in from the edges, and each table lists pins in the order they sit when seen from above. POWER 1 and POWER 2 use the same Molex Micro-Lock Plus connector as AF-H7E; their pin-1 end is still to be confirmed.'
+pinoutNotes: |
+  Preliminary pin definition — AF-H7E Lite is in development and connectors may change before release. On every JST connector pin 1 is the supply pin and the last pin is GND, following the Pixhawk connector standard. UART n maps to ArduPilot SERIALn: UART 1–2 default to MAVLink telemetry and UART 3–4 default to GPS. GPS modules connect to any UART or over DroneCAN; there is no dedicated GPS/safety port and no safety switch. On-board without a connector: microSD card slot (logging), buzzer and RGB status LED.
+
+  The + rail of the PWM header is not powered by the flight controller. The 13th header column, SB, is an SBUS output, not a PWM channel: it carries servo channels 1–16 on one wire from USART6 (SERIAL8) with the signal inversion done inside the STM32H7, so SBUS servos, SBUS-to-PWM decoders and gimbals plug in with a standard servo lead and take power from the servo rail. DShot is available on M1–M6; M7–M8 run on a timer without DMA (PWM and OneShot only), and the MCU pins for M9–M12 are still to be confirmed.
+
+  As on AF-H7E, the PWM signal row (S) is the rearmost row: the case has a keyed comb behind it so servo plugs only fit with S at the rear, and a wall separates POWER 1 · POWER 2 · RC IN from the PWM header. The pinout image is a top view of the concept carrier: side connectors are mounted on the bottom side and plug in from the edges, and each table lists pins in the order they sit when seen from above. POWER 1 and POWER 2 use the same Molex Micro-Lock Plus connector as AF-H7E; their pin-1 end is still to be confirmed.
 pinTable:
   - name: POWER 1
     type: Molex Micro-Lock Plus 6P (1.25 mm) · same as AF-H7E
@@ -151,10 +156,17 @@ pinTable:
       - { pin: "A5 B5", signal: CC1 / CC2, function: "Configuration channel (device role)" }
       - { pin: "A1 B1 A12 B12", signal: GND, function: "Ground" }
   - name: PWM OUT M1–M12
-    type: 2.54 mm 3 × 12 pin header
+    type: 2.54 mm 3 × 13 pin header · columns 1–12
     mapping: Main outputs 1–12
     pins:
-      - { pin: S, signal: M1 … M12, function: "Motor / servo output signal, one per channel (PWM · OneShot · DShot)" }
+      - { pin: S, signal: M1 … M12, function: "Motor / servo output signal, one per channel (PWM · OneShot; DShot on M1–M6)" }
+      - { pin: +, signal: V_SERVO, function: "Servo rail, bussed across all channels — supplied externally (e.g. BEC)" }
+      - { pin: −, signal: GND, function: "Ground" }
+  - name: SB (SBUS OUT)
+    type: 2.54 mm 3 × 13 pin header · column 13, next to M12
+    mapping: SERIAL8 · USART6 · SBus servo out
+    pins:
+      - { pin: S, signal: SBUS_OUT, function: "SBUS output — servo channels 1–16 on one wire (SERIAL8_PROTOCOL 15, SERIAL8_OPTIONS 2 inverts TX inside the MCU)" }
       - { pin: +, signal: V_SERVO, function: "Servo rail, bussed across all channels — supplied externally (e.g. BEC)" }
       - { pin: −, signal: GND, function: "Ground" }
 gallery:

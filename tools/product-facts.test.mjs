@@ -106,4 +106,9 @@ test('AF-H7E Lite pin table follows the Pixhawk connector convention and ArduPil
     assert.ok(!names.some((n) => n.startsWith(gone)), `${gone} is not on the Lite`);
   }
   assert.ok(names.includes('POWER 1') && names.includes('POWER 2'), 'dual power inputs');
+  // 3-pin header = 13 columns: M1–M12 PWM + SB (SBUS out from USART6 / SERIAL8) — never labelled M13.
+  const sb = table.find((c) => c.name.startsWith('SB'));
+  assert.ok(sb && /SERIAL8/.test(sb.mapping) && /USART6/.test(sb.mapping), 'SB = SBUS out on SERIAL8 (USART6)');
+  assert.ok(sb.pins.some((p) => p.signal === 'SBUS_OUT'), 'SB signal pin');
+  assert.ok(!names.some((n) => /M13/.test(n)), 'the 13th column is SB, not M13');
 });
