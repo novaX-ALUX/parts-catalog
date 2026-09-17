@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import yaml from 'js-yaml';
@@ -77,7 +78,8 @@ test('catalog status flags: G5H withdrawn, X20D and AF-H7E Lite announced as com
   const lite = product('fc', 'AF-H7E-Lite');
   assert.equal(lite.comingSoon, true);
   assert.equal(lite.order, product('fc', 'AF-H7E').order + 1, 'Lite card sits right after AF-H7E');
-  assert.ok(!lite.firmware, 'no firmware is published for an unreleased board');
+  // Firmware for a board still in development is published (2026-09-17, user request) but must say it is preliminary.
+  assert.ok(lite.firmware.every((fw) => /Preliminary/.test(fw.notes)), 'unreleased-board firmware is labelled preliminary');
 });
 
 test('AF-H7E Lite pin table follows the Pixhawk connector convention and ArduPilot defaults', () => {
@@ -115,4 +117,18 @@ test('AF-H7E Lite pin table follows the Pixhawk connector convention and ArduPil
   assert.ok(sb && /SERIAL8/.test(sb.mapping) && /USART6/.test(sb.mapping), 'SB = SBUS out on SERIAL8 (USART6)');
   assert.ok(sb.pins.some((p) => p.signal === 'SBUS_OUT'), 'SB signal pin');
   assert.ok(!names.some((n) => /M13/.test(n)), 'the 13th column is SB, not M13');
+});
+
+test('AF-H7E Lite firmware ships Copter and Plane for board ID 6207 from its own release tag', () => {
+  const lite = product('fc', 'AF-H7E-Lite');
+  assert.equal(lite.firmware.length, 4);
+  for (const fw of lite.firmware) {
+    assert.match(fw.file, /\/releases\/download\/AF-H7E_Lite-v0\.1\.0\/AF-H7E_Lite-v0\.1\.0-(Copter|Plane)(\.apj|_with_bl\.hex)$/);
+    assert.equal(fw.webPath, '/firmware/' + fw.file.split('/').pop());
+    const bytes = readFileSync(new URL(`../public${fw.webPath}`, import.meta.url));
+    assert.equal(createHash('sha256').update(bytes).digest('hex'), fw.sha256);
+    if (fw.webPath.endsWith('.apj')) assert.equal(JSON.parse(bytes.toString()).board_id, 6207);
+  }
+  assert.match(lite.firmwareNotes, /Preliminary/);
+  assert.match(spec(lite, 'MCU'), /STM32H753/);
 });

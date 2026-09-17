@@ -24,7 +24,7 @@ SPEC_KO = {
     "RC Input": "RC 입력", "Supported F/W": "지원 펌웨어", "GNSS": "GNSS", "Compass": "나침반", "GPS Port": "GPS 포트",
     "Output Voltage": "출력 전압", "Blackbox": "블랙박스", "Servo Output": "서보 출력", "RAM / Flash": "RAM / Flash",
     "Secondary IMU": "보조 IMU", "Magnetometer": "나침반", "Servo Rail": "서보 레일", "RSSI Input": "RSSI 입력", "UART": "UART",
-    "I²C": "I²C", "CAN": "CAN", "ADC": "ADC", "Ethernet": "이더넷",
+    "I²C": "I²C", "CAN": "CAN", "ADC": "ADC", "Ethernet": "이더넷", "Power Input": "전원 입력",
     # GNSS
     "Chipset": "칩셋", "Satellite Systems": "지원 위성 시스템", "Antenna Band": "안테나 대역", "Antenna Type": "안테나 형식",
     "Single-Point Accuracy": "단독 측위 정확도", "Cold Start": "콜드 스타트", "Hot Start": "핫 스타트", "Update Rate": "갱신 속도",
