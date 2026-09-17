@@ -10,7 +10,7 @@ comingSoon: true
 specs: []
 pinoutImage: /images/products/fc_AF-H7E-Lite_pinout.png
 pinoutNotes: |
-  Preliminary pin definition — AF-H7E Lite is in development and connectors may change before release. On every JST connector pin 1 is the supply pin and the last pin is GND, following the Pixhawk connector standard. UART n maps to ArduPilot SERIALn: UART 1–2 default to MAVLink telemetry and UART 3–4 default to GPS. GPS modules connect to any UART or over DroneCAN; there is no dedicated GPS/safety port and no safety switch. On-board without a connector: microSD card slot (logging), buzzer and RGB status LED.
+  Preliminary pin definition — AF-H7E Lite is in development and connectors may change before release. On every JST connector pin 1 is the supply pin and the last pin is GND, following the Pixhawk connector standard. UART n maps to ArduPilot SERIALn: UART 1–2 default to MAVLink telemetry and UART 3–4 default to GPS. GPS modules connect to any UART or over DroneCAN; there is no dedicated GPS/safety port and no safety switch. RC IN takes an SBUS, PPM or DSM receiver directly on pin 2 (protocol auto-detected, wired to the flight-controller MCU, no IO board needed); the connector supplies 5 V, so a 3.3 V-only DSM satellite receiver needs a 3.3 V adapter. On-board without a connector: microSD card slot (logging), buzzer and RGB status LED.
 
   The + rail of the PWM header is not powered by the flight controller. The 13th header column, SB, is an SBUS output, not a PWM channel: it carries servo channels 1–16 on one wire from USART6 (SERIAL8) with the signal inversion done inside the STM32H7, so SBUS servos, SBUS-to-PWM decoders and gimbals plug in with a standard servo lead and take power from the servo rail. DShot is available on M1–M6; M7–M8 run on a timer without DMA (PWM and OneShot only), and the MCU pins for M9–M12 are still to be confirmed.
 
@@ -122,10 +122,10 @@ pinTable:
       - { pin: 4, signal: GND, function: "Ground" }
   - name: RC IN
     type: JST-GH 4P
-    mapping: RC input
+    mapping: RC input · SBUS / PPM / DSM (auto-detected)
     pins:
       - { pin: 1, signal: VCC, function: "5 V receiver supply" }
-      - { pin: 2, signal: RC_IN, function: "S.Bus / PPM / DSM receiver input (protocol auto-detected)" }
+      - { pin: 2, signal: RC_IN, function: "SBUS / PPM / DSM receiver input (protocol auto-detected)" }
       - { pin: 3, signal: RSSI, function: "RSSI input (analog or PWM)" }
       - { pin: 4, signal: GND, function: "Ground" }
   - name: ETHERNET

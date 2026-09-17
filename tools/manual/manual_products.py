@@ -240,6 +240,7 @@ def CAT_NOTES(cat, slug, d, lang):
 PINOUT_NOTES_KO = {
     "AF-H7E-Lite": "잠정 핀 정의입니다 — AF-H7E Lite 는 개발 중이라 출시 전에 커넥터가 바뀔 수 있습니다. 모든 JST 커넥터는 Pixhawk 표준처럼 1번 핀이 전원, 마지막 핀이 GND 입니다. "
                    "UART n 은 ArduPilot SERIALn 이며 UART 1–2 는 MAVLink 텔레메트리, UART 3–4 는 GPS 가 기본입니다. GPS 는 아무 UART 나 DroneCAN 으로 연결하며 전용 GPS/세이프티 포트와 세이프티 스위치는 없습니다. "
+                   "RC IN 2번 핀에 SBUS · PPM · DSM 수신기를 바로 연결합니다(프로토콜 자동 인식, FC 메인 MCU 직결이라 IO 보드가 필요 없음). 커넥터 전원은 5 V 라 3.3 V 전용 DSM 위성 수신기는 3.3 V 변환 케이블이 필요합니다. "
                    "보드에는 커넥터 없이 microSD 슬롯(로그) · 부저 · RGB 상태 LED 가 있습니다. PWM 헤더의 + 레일은 FC 가 전원을 주지 않습니다. "
                    "헤더 13번째 칸 SB 는 PWM 채널이 아니라 SBUS 출력입니다 — USART6(SERIAL8)에서 서보 채널 1–16 을 선 하나로 내보내고 신호 반전은 STM32H7 안에서 하므로, SBUS 서보 · SBUS→PWM 디코더 · 짐벌을 일반 서보 선으로 꽂고 전원은 서보 레일에서 받습니다. "
                    "DShot 은 M1–M6 에서 되고, M7–M8 은 DMA 없는 타이머라 PWM · OneShot 만 되며, M9–M12 의 MCU 핀은 아직 확정 전입니다. "
@@ -266,7 +267,7 @@ PIN_KO = {
     "Clear to send — hardware flow control input": "CTS — 하드웨어 흐름 제어 입력", "Request to send — hardware flow control output": "RTS — 하드웨어 흐름 제어 출력",
     "I2C clock — external compass, rangefinder, airspeed …": "I2C 클럭 — 외장 나침반 · 거리계 · 대기속도계 …", "I2C data": "I2C 데이터",
     "5 V output to CAN peripherals (not a power input)": "CAN 주변장치용 5 V 출력 (전원 입력 아님)", "CAN bus high": "CAN 버스 High", "CAN bus low": "CAN 버스 Low",
-    "5 V receiver supply": "수신기 5 V 전원", "S.Bus / PPM / DSM receiver input (protocol auto-detected)": "S.Bus / PPM / DSM 수신기 입력 (자동 감지)",
+    "5 V receiver supply": "수신기 5 V 전원", "SBUS / PPM / DSM receiver input (protocol auto-detected)": "SBUS / PPM / DSM 수신기 입력 (자동 인식)",
     "RSSI input (analog or PWM)": "RSSI 입력 (아날로그 또는 PWM)", "Ethernet transmit pair +": "이더넷 송신 +", "Ethernet transmit pair −": "이더넷 송신 −",
     "Ethernet receive pair +": "이더넷 수신 +", "Ethernet receive pair −": "이더넷 수신 −", "3.3 V reference for the debug probe": "디버그 프로브용 3.3 V 기준",
     "Debug console transmit (FC → probe)": "디버그 콘솔 송신 (FC → 프로브)", "Debug console receive (probe → FC)": "디버그 콘솔 수신 (프로브 → FC)",
@@ -277,7 +278,7 @@ PIN_KO = {
     "SERIAL8 · USART6 · SBus servo out": "SERIAL8 · USART6 · SBUS 서보 출력",
     "SBUS output — servo channels 1–16 on one wire (SERIAL8_PROTOCOL 15, SERIAL8_OPTIONS 2 inverts TX inside the MCU)": "SBUS 출력 — 서보 채널 1–16 을 선 하나로 (SERIAL8_PROTOCOL 15, SERIAL8_OPTIONS 2 로 MCU 안에서 송신 반전)",
     "Servo rail, bussed across all channels — supplied externally (e.g. BEC)": "모든 채널 공통 서보 레일 — 외부 공급 (예: BEC)",
-    "Primary power input": "주 전원 입력", "Redundant power input": "보조 전원 입력", "RC input": "RC 입력", "Main outputs 1–12": "메인 출력 1–12",
+    "Primary power input": "주 전원 입력", "Redundant power input": "보조 전원 입력", "RC input · SBUS / PPM / DSM (auto-detected)": "RC 입력 · SBUS / PPM / DSM (자동 인식)", "Main outputs 1–12": "메인 출력 1–12",
     # AP-RTK X20D
     "DroneCAN to the flight controller · power input": "FC 와 DroneCAN · 전원 입력", "RTCM correction input · power input": "RTCM 보정 입력 · 전원 입력",
     "SWD programming · MCU debug console": "SWD 기록 · MCU 디버그 콘솔", "Receiver timing — PPS output · EVENT input": "수신기 타이밍 — PPS 출력 · EVENT 입력",
