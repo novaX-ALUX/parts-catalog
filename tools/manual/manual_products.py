@@ -51,7 +51,7 @@ KO_VALUE = {
         "S.Bus, PPM, DSM / Spektrum (with DSM bind)": "S.Bus, PPM, DSM / Spektrum (DSM 바인드 지원)", "Analog": "아날로그",
         "6 serial ports (2 with flow control) + debug console": "시리얼 6개 (흐름제어 2개) + 디버그 콘솔",
         "2 ports (I2C A, I2C B) + power-module bus on POWER 1 · 2": "포트 2개 (I2C A, I2C B) + POWER 1 · 2 전원 모듈 버스",
-        "100 Mbps x 1 Port": "100 Mbps × 1 포트", "43.0 × 62.5 × 29.2 mm (concept case)": "43.0 × 62.5 × 29.2 mm (개념 케이스)",
+        "100 Mbps x 1 Port": "100 Mbps × 1 포트", "42.7 × 64.5 × 29.2 mm (concept case)": "42.7 × 64.5 × 29.2 mm (개념 케이스)",
         "novaX ArduPilot (Copter and Plane releases)": "novaX ArduPilot (Copter · Plane 배포)"},
     "AP-M10": {
         "u-blox M10 Series": "u-blox M10 시리즈", "L1 Band Only": "L1 대역 전용", "Built-in Ceramic Patch": "내장 세라믹 패치",
@@ -118,7 +118,7 @@ EXTRA = {
                "en": ["Supply the servo rail (0 – 9.9 V) from an external BEC.", "Copter and Plane share board ID 6202 — pick the image by file name."]},
     "AF-H7E-Lite": {"ko": ["개발 중인 제품입니다. 핀 정의는 출시 전에 바뀔 수 있으니 최신 카탈로그를 확인하십시오.", "PWM 서보 레일(+)은 외부 BEC 로 공급합니다.",
                            "DroneCAN 전원 모듈(14S · 200 A 등)은 CAN 1 · 2 로 측정하고(BATT_MONITOR 8), 5 V 는 분기 케이블로 POWER 1 에 넣습니다(CAN 커넥터의 5 V 는 출력).",
-                           "전원 커넥터를 뺄 때는 뒷벽 창으로 잠금을 누르고 뽑습니다. 잠금을 누르지 않고 당기면 커넥터가 기판에서 떨어질 수 있습니다.",
+                           "전원 커넥터를 뺄 때는 뒷벽 쪽 잠금을 위에서 누르고 뽑습니다. 잠금을 누르지 않고 당기면 커넥터가 기판에서 떨어질 수 있습니다.",
                            "펌웨어 v0.1.0 은 빌드만 확인한 사전 배포판입니다. Copter 와 Plane 은 같은 보드 ID(6207)이므로 파일 이름으로 골라 올립니다."],
                     "en": ["Product in development — the pin definition may change before release; check the latest catalog.", "Supply the PWM servo rail (+) from an external BEC.",
                            "Firmware v0.1.0 is a preliminary, build-verified release. Copter and Plane share board ID 6207 — pick the image by file name."]},
@@ -257,7 +257,7 @@ PINOUT_NOTES_KO = {
                    "보드에는 커넥터 없이 microSD 슬롯(로그) · 부저 · RGB 상태 LED 가 있습니다. PWM 헤더의 + 레일은 FC 가 전원을 주지 않습니다. "
                    "헤더 13번째 칸 SB 는 PWM 채널이 아니라 SBUS 출력입니다 — USART6(SERIAL8)에서 서보 채널 1–16 을 선 하나로 내보내고 신호 반전은 STM32H7 안에서 하므로, SBUS 서보 · SBUS→PWM 디코더 · 짐벌을 일반 서보 선으로 꽂고 전원은 서보 레일에서 받습니다. "
                    "출력은 타이머 묶음(M1–M4 · M5 M6 M9 M10 · M7–M8 · M11–M12)마다 주기 · 프로토콜을 함께 쓰고, DShot 은 DMA 없는 타이머인 M7–M8 만 빼고 모든 묶음에서 됩니다(M7–M8 은 PWM · OneShot). "
-                   "POWER 1 · 2 는 맨 뒤 윗면이고 잠금이 뒷벽을 향해 있어 바깥에서 눌러 뽑습니다. RC IN · UART 4 · 6 은 그 아랫면에서 뒤로 꽂습니다. PWM 헤더는 센서 모듈 1.5 mm 뒤이며 신호 줄(S)이 가장 뒤라, 빗살 홈 때문에 서보 플러그는 S 가 뒤로 가야 꽂힙니다. "
+                   "POWER 1 · 2 는 맨 뒤 윗면이고 잠금이 뒷벽을 향해 있어 위에서 눌러 뽑습니다. RC IN · UART 4 · 6 은 그 아랫면에서 뒤로 꽂습니다. PWM 헤더는 센서 모듈 1.5 mm 뒤이며 신호 줄(S)이 가장 뒤라, 앞턱이 키를 막아 서보 플러그는 S 가 뒤로 가야 꽂힙니다. "
                    "핀맵 그림은 개념 캐리어를 위에서 본 것입니다. POWER 1 · 2 는 AF-H7E 와 같은 Molex Micro-Lock Plus 입니다.",
     "AF-H7-nano": "핀맵은 일반 H7 보드가 아니라 novaX AF-H7_nano 기준입니다. PWM1–10 은 모터/서보 출력, PWM11 은 WS2812 LED 선입니다. GPS 커넥터는 USART3(SERIAL3, PD8/PD9), ELRS/RC 커넥터는 USART6(SERIAL6, PC6/PC7), UART7/8 은 예비 패드이고 UART4 는 DJI O3 MSP 용입니다. "
                   "배터리 입력은 2S–8S 를 받는 4핀 커넥터이며, 보드 5 V / 2.5 A 레귤레이터가 FC · 수신기 · 저전력 주변장치에 전원을 줍니다. 서보 레일은 조정되지 않으므로 BEC 나 모터 PDB 에서 직접 공급하십시오.",

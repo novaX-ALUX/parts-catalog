@@ -41,7 +41,7 @@ specs:
   - key: Ethernet
     value: 100 Mbps x 1 Port
   - key: Size
-    value: 43.0 × 62.5 × 29.2 mm (concept case)
+    value: 42.7 × 64.5 × 29.2 mm (concept case)
   - key: Supported F/W
     value: novaX ArduPilot (Copter and Plane releases)
 description: AF-H7E Lite keeps the AF-H7E STM32H753 compute module and sensor module on a compact carrier without the IO co-processor. All 12 PWM outputs and an SBUS output come straight from the flight-controller MCU, with dual CAN, 100 Mbps Ethernet, redundant power inputs and a 5-pin RC input that takes AF-H7E cables. In development - the pin definition may change before release.
@@ -51,7 +51,7 @@ pinoutNotes: |
 
   The + rail of the PWM header is not powered by the flight controller. The 13th header column, SB, is an SBUS output, not a PWM channel: it carries servo channels 1–16 on one wire from USART6 (SERIAL8) with the signal inversion done inside the STM32H7, so SBUS servos, SBUS-to-PWM decoders and gimbals plug in with a standard servo lead and take power from the servo rail. Outputs share rate and protocol within the timer groups M1–M4, M5 · M6 · M9 · M10, M7–M8 and M11–M12; DShot works on every group except M7–M8, whose timer has no DMA (PWM and OneShot only).
 
-  POWER 1 and POWER 2 sit on the top side at the rear edge with their latch facing the rear wall, so the plug is released from outside the case through the wall opening; RC IN, UART 4 and UART 6 sit under them on the bottom side and plug in from the rear like the side connectors. The PWM header sits 1.5 mm behind the sensor module: as on AF-H7E the signal row (S) is the rearmost row and the case has a keyed comb behind it, so servo plugs only fit with S at the rear. The pinout image is a top view of the concept carrier: side connectors are mounted on the bottom side and plug in from the edges, and each table lists pins in the order they sit when seen from above. POWER 1 and POWER 2 use the same Molex Micro-Lock Plus connector as AF-H7E; their pin-1 end is still to be confirmed. POWER 1 and POWER 2 take I2C (INA2xx) power modules; a DroneCAN power module (for example 14S / 200 A) reports over CAN 1 or CAN 2 (BATT_MONITOR 8) and needs a split cable that feeds its 5 V into POWER 1, because the CAN connectors supply 5 V rather than accept it.
+  POWER 1 and POWER 2 sit on the top side at the rear edge with their latch facing the rear wall; the rear wall is no higher than the roof, so the latch is pressed from above with nothing in the way; RC IN, UART 4 and UART 6 sit under them on the bottom side and plug in from the rear like the side connectors. The PWM header sits 1.5 mm behind the sensor module: as on AF-H7E the signal row (S) is the rearmost row, and the lip in front of the header blocks the key of a reversed plug, so servo plugs only fit with S at the rear. The pinout image is a top view of the concept carrier: side connectors are mounted on the bottom side and plug in from the edges, and each table lists pins in the order they sit when seen from above. POWER 1 and POWER 2 use the same Molex Micro-Lock Plus connector as AF-H7E; their pin-1 end is still to be confirmed. POWER 1 and POWER 2 take I2C (INA2xx) power modules; a DroneCAN power module (for example 14S / 200 A) reports over CAN 1 or CAN 2 (BATT_MONITOR 8) and needs a split cable that feeds its 5 V into POWER 1, because the CAN connectors supply 5 V rather than accept it.
 pinTable:
   - name: POWER 1
     type: Molex Micro-Lock Plus 6P (1.25 mm) · same as AF-H7E
