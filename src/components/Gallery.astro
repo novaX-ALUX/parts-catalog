@@ -1,0 +1,74 @@
+---
+/**
+ * Product gallery — grid of images; click (or Enter) opens a full-screen viewer with
+ * previous / next (buttons, arrow keys, swipe) and Esc / backdrop to close.
+ * Shared by every product page (fc · esc · gnss · camera · motor).
+ * gallery items are a path or { src, caption }; without a gallery the product image is shown.
+ */
+type Item = string | { src: string; caption?: string };
+interface Props { gallery?: Item[]; image?: string; name: string }
+const { gallery, image, name } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const items = (gallery && gallery.length > 0 ? gallery : image ? [image] : [])
+  .map((g) => (typeof g === 'string' ? { src: g, caption: undefined } : g));
+---
+{items.length > 0 ? (
+  <div class="gallery" data-gallery>
+    <div class="gallery-grid">
+      {items.map((g, i) => (
+        <figure class="gallery-item">
+          <button type="button" class="cell gallery-open" data-index={i} aria-label={`${g.caption ?? name} — view larger`}>
+            <img src={`${base}${g.src}`} alt={g.caption ? `${name} — ${g.caption}` : name} loading="lazy" />
+          </button>
+          {g.caption && <figcaption>{g.caption}</figcaption>}
+        </figure>
+      ))}
+    </div>
+    <dialog class="gallery-lightbox" aria-label={`${name} gallery`}>
+      <div class="lb-stage">
+        <div class="lb-frame"><img class="lb-img" alt="" /></div>
+        <div class="lb-bar"><span class="lb-caption"></span><span class="lb-count"></span></div>
+      </div>
+      <button type="button" class="lb-btn lb-prev" aria-label="Previous image">‹</button>
+      <button type="button" class="lb-btn lb-next" aria-label="Next image">›</button>
+      <button type="button" class="lb-btn lb-close" aria-label="Close">×</button>
+    </dialog>
+  </div>
+) : (
+  <div class="panel-empty">Gallery coming soon</div>
+)}
+<script>
+  document.querySelectorAll<HTMLElement>('[data-gallery]').forEach((root) => {
+    const dlg = root.querySelector<HTMLDialogElement>('.gallery-lightbox')!;
+    const stage = dlg.querySelector<HTMLElement>('.lb-stage')!;
+    const img = dlg.querySelector<HTMLImageElement>('.lb-img')!;
+    const cap = dlg.querySelector<HTMLElement>('.lb-caption')!;
+    const cnt = dlg.querySelector<HTMLElement>('.lb-count')!;
+    const cells = [...root.querySelectorAll<HTMLButtonElement>('.gallery-open')];
+    let cur = 0;
+    function show(i: number) {
+      cur = (i + cells.length) % cells.length;
+      const src = cells[cur].querySelector('img')!;
+      img.src = src.src;
+      img.alt = src.alt;
+      cap.textContent = cells[cur].closest('figure')?.querySelector('figcaption')?.textContent ?? '';
+      cnt.textContent = cells.length > 1 ? `${cur + 1} / ${cells.length}` : '';
+    }
+    cells.forEach((c, i) => c.addEventListener('click', () => { show(i); dlg.showModal(); }));
+    dlg.querySelector('.lb-prev')!.addEventListener('click', () => show(cur - 1));
+    dlg.querySelector('.lb-next')!.addEventListener('click', () => show(cur + 1));
+    dlg.querySelector('.lb-close')!.addEventListener('click', () => dlg.close());
+    dlg.addEventListener('click', (e) => { if (e.target === dlg || e.target === stage) dlg.close(); });
+    dlg.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') show(cur - 1);
+      if (e.key === 'ArrowRight') show(cur + 1);
+    });
+    let x0 = 0;
+    dlg.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+    dlg.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - x0;
+      if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1));
+    });
+    if (cells.length < 2) dlg.querySelectorAll<HTMLElement>('.lb-prev, .lb-next').forEach((b) => { b.hidden = true; });
+  });
+</script>

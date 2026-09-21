@@ -208,9 +208,13 @@ pinTable:
       - { pin: +, signal: V_SERVO, function: "Servo rail, bussed across all channels — supplied externally (e.g. BEC)" }
       - { pin: −, signal: GND, function: "Ground" }
 gallery:
-  - /images/products/fc_AF-H7E-Lite.png
-  - /images/products/fc_AF-H7E-Lite_flat.png
-  - /images/products/fc_AF-H7E-Lite_rear.png
+  - { src: /images/products/fc_AF-H7E-Lite_iso.png, caption: Isometric }
+  - { src: /images/products/fc_AF-H7E-Lite_front.png, caption: Front }
+  - { src: /images/products/fc_AF-H7E-Lite_back.png, caption: Back }
+  - { src: /images/products/fc_AF-H7E-Lite_left.png, caption: Left }
+  - { src: /images/products/fc_AF-H7E-Lite_right.png, caption: Right }
+  - { src: /images/products/fc_AF-H7E-Lite_top.png, caption: Top }
+  - { src: /images/products/fc_AF-H7E-Lite_bottom.png, caption: Bottom }
 firmware:
   - kind: "ArduPilot Copter (.apj package)"
     file: https://github.com/novaX-ALUX/fc/releases/download/AF-H7E_Lite-v0.1.0/AF-H7E_Lite-v0.1.0-Copter.apj

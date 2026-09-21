@@ -365,6 +365,47 @@ img { display: block; max-width: 100%; height: auto; }
   aspect-ratio: 4 / 3; display: grid; place-items: center;
 }
 .gallery-grid img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+.gallery-item { display: grid; gap: 8px; }
+.gallery-item figcaption {
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  font-weight: 600; color: var(--ink-4); text-align: center;
+}
+.gallery-grid .gallery-open { border: none; width: 100%; font-family: inherit; cursor: zoom-in; transition: box-shadow 0.15s; }
+.gallery-grid .gallery-open:hover { box-shadow: var(--shadow-md); }
+.gallery-grid .gallery-open:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* Gallery viewer (click to enlarge) */
+.gallery-lightbox {
+  position: fixed; inset: 0; width: 100vw; height: 100vh; max-width: none; max-height: none;
+  margin: 0; padding: 0; border: none;
+  background: color-mix(in srgb, var(--ink) 97%, transparent);   /* 대화창 자체에 — 옛 브라우저의 ::backdrop 은 :root 변수를 못 물려받는다 */
+}
+.gallery-lightbox::backdrop { background: transparent; }
+.gallery-lightbox .lb-stage {
+  position: absolute; inset: 0; display: grid; grid-template-rows: minmax(0, 1fr) auto;
+  place-items: center; gap: 14px; padding: 64px 80px 20px;
+}
+.gallery-lightbox .lb-frame {
+  background: var(--paper); border-radius: var(--radius); padding: 24px; isolation: isolate;
+  max-width: 100%; max-height: 100%; display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+}
+.gallery-lightbox .lb-img {
+  max-width: calc(100vw - 208px); max-height: calc(100vh - 150px); width: auto; height: auto;
+  object-fit: contain; mix-blend-mode: multiply;
+}
+.gallery-lightbox .lb-bar {
+  display: flex; gap: 18px; color: #fff; opacity: 0.8; font-size: 12px;
+  letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600;
+}
+.gallery-lightbox .lb-btn {
+  position: absolute; width: 44px; height: 44px; border: none; border-radius: var(--radius);
+  background: rgba(255,255,255,0.08); color: #fff; font-family: inherit; font-size: 26px; line-height: 1;
+  cursor: pointer; transition: background 0.15s;
+}
+.gallery-lightbox .lb-btn:hover { background: rgba(255,255,255,0.12); }
+.gallery-lightbox .lb-prev { left: 16px; top: 50%; transform: translateY(-50%); }
+.gallery-lightbox .lb-next { right: 16px; top: 50%; transform: translateY(-50%); }
+.gallery-lightbox .lb-close { right: 16px; top: 16px; }
 
 /* Portrait PCB renders must fit the allotted image area, not expand its grid row. */
 .card .imgwrap, .detail-body .imgwrap, .gallery-grid .cell {
@@ -432,6 +473,9 @@ img { display: block; max-width: 100%; height: auto; }
 
   /* Gallery */
   .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  .gallery-lightbox .lb-stage { padding: 64px 12px 72px; }
+  .gallery-lightbox .lb-img { max-width: calc(100vw - 72px); max-height: calc(100vh - 200px); }
+  .gallery-lightbox .lb-prev, .gallery-lightbox .lb-next { top: auto; bottom: 16px; transform: none; }
 
   /* Footer */
   .site-footer { padding: 20px 0; margin-top: 40px; }

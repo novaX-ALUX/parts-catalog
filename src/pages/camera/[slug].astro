@@ -5,6 +5,7 @@ import SpecTable from '../../components/SpecTable.astro';
 import Tabs from '../../components/Tabs.astro';
 import Linkify from '../../components/Linkify.astro';
 import ManualPanel from '../../components/ManualPanel.astro';
+import Gallery from '../../components/Gallery.astro';
 import { CATEGORY_LABEL } from '../../content.config';
 
 export async function getStaticPaths() {
@@ -14,7 +15,6 @@ export async function getStaticPaths() {
 const { item } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const d = item.data;
-const galleryImgs = d.gallery && d.gallery.length > 0 ? d.gallery : (d.image ? [d.image] : []);
 const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
   ? d.pinoutImages
   : (d.pinoutImage ? [d.pinoutImage] : []);
@@ -70,15 +70,7 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
           </div>
 
           <div class="tab-panel" data-panel="gallery">
-            {galleryImgs.length > 0 ? (
-              <div class="gallery-grid">
-                {galleryImgs.map((g) => (
-                  <div class="cell"><img src={`${base}${g}`} alt={d.name} /></div>
-                ))}
-              </div>
-            ) : (
-              <div class="panel-empty">Gallery coming soon</div>
-            )}
+            <Gallery gallery={d.gallery} image={d.image} name={d.name} />
           </div>
         </Tabs>
       </div>

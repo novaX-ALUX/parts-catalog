@@ -4,6 +4,7 @@ import Layout from '../../layouts/Layout.astro';
 import SpecTable from '../../components/SpecTable.astro';
 import ThrustChart from '../../components/ThrustChart.astro';
 import Tabs from '../../components/Tabs.astro';
+import Gallery from '../../components/Gallery.astro';
 import { CATEGORY_LABEL } from '../../content.config';
 import { maxThrust } from '../../lib/scale';
 
@@ -14,7 +15,6 @@ export async function getStaticPaths() {
 const { item } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const d = item.data;
-const galleryImgs = d.gallery && d.gallery.length > 0 ? d.gallery : (d.image ? [d.image] : []);
 const hasThrust = d.thrust && d.thrust.length > 0;
 // One Y-axis max shared by every propeller chart so larger thrust always draws taller.
 const sharedThrustMax = maxThrust(d.thrust);
@@ -119,15 +119,7 @@ const hasCol = (rows: any[], key: string) => rows.some((r) => r[key] && r[key] !
           </div>
 
           <div class="tab-panel" data-panel="gallery">
-            {galleryImgs.length > 0 ? (
-              <div class="gallery-grid">
-                {galleryImgs.map((g) => (
-                  <div class="cell"><img src={`${base}${g}`} alt={d.name} /></div>
-                ))}
-              </div>
-            ) : (
-              <div class="panel-empty">Gallery coming soon</div>
-            )}
+            <Gallery gallery={d.gallery} image={d.image} name={d.name} />
           </div>
         </Tabs>
       </div>

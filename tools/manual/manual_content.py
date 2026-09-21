@@ -118,7 +118,8 @@ def product(d, lang, work, h):
                   for s in d.get("specs", []))
     if trs:
         pages.append((title(L["specs"]), '<div><div class="sub">%s</div><table class="t">%s</table></div>' % (L["basic"], trs)))
-    photos = set(d.get("gallery") or [])                                   # 갤러리에도 있는 그림 = 제품 사진·렌더 → 돌리지 않음
+    photos = {g if isinstance(g, str) else g["src"] for g in (d.get("gallery") or [])}   # 갤러리에도 있는 그림 = 제품 사진·렌더 → 돌리지 않음
+                                                                           # (갤러리 항목 = 경로 또는 {src, caption})
     for src in (d.get("pinoutImages") or ([d["pinoutImage"]] if d.get("pinoutImage") else [])):
         sub = L["dim_sub"] if "dimension" in src else L["pin_sub"]
         path = h["fit"](h["root"] / "public" / src.lstrip("/"), 1800)

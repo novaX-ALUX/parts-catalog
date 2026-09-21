@@ -102,7 +102,10 @@ const detailSchema = baseSchema.extend({
     z.object({ src: z.string(), caption: z.string().optional() })
   ])).optional(),
   configParams: z.array(configParam).optional(),
-  gallery: z.array(z.string()).optional(),
+  gallery: z.array(z.union([                       // path, or { src, caption } (e.g. isometric + six views)
+    z.string(),
+    z.object({ src: z.string(), caption: z.string().optional() })
+  ])).optional(),
   // User manuals shown in the Manual tab, one per language. `file` is a PDF under public/;
   // its page overview image sits next to it with the same name and a .png extension.
   manuals: z.array(z.object({ label: z.string(), file: z.string() })).optional(),
