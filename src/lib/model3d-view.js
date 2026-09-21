@@ -84,7 +84,8 @@ export function mountModel(root) {
     resetView();
     status.hidden = true;
   }, (ev) => {
-    if (ev.total) status.textContent = `Loading 3D model… ${Math.round((100 * ev.loaded) / ev.total)} %`;
+    // GitHub Pages gzips the .glb: `total` is the compressed length while `loaded` counts inflated bytes.
+    if (ev.total && ev.loaded <= ev.total) status.textContent = `Loading 3D model… ${Math.round((100 * ev.loaded) / ev.total)} %`;
   }, () => {
     status.textContent = '3D model could not be loaded.';
   });
