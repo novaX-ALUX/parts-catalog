@@ -41,7 +41,7 @@ specs:
   - key: Ethernet
     value: 100 Mbps x 1 Port
   - key: Size
-    value: 43.0 × 63.4 × 29.2 mm (concept case)
+    value: 43.0 × 62.5 × 29.2 mm (concept case)
   - key: Supported F/W
     value: novaX ArduPilot (Copter and Plane releases)
 description: AF-H7E Lite keeps the AF-H7E STM32H753 compute module and sensor module on a compact carrier without the IO co-processor. All 12 PWM outputs and an SBUS output come straight from the flight-controller MCU, with dual CAN, 100 Mbps Ethernet, redundant power inputs and a 5-pin RC input that takes AF-H7E cables. In development - the pin definition may change before release.

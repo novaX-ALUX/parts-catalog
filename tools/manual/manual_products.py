@@ -51,7 +51,7 @@ KO_VALUE = {
         "S.Bus, PPM, DSM / Spektrum (with DSM bind)": "S.Bus, PPM, DSM / Spektrum (DSM 바인드 지원)", "Analog": "아날로그",
         "6 serial ports (2 with flow control) + debug console": "시리얼 6개 (흐름제어 2개) + 디버그 콘솔",
         "2 ports (I2C A, I2C B) + power-module bus on POWER 1 · 2": "포트 2개 (I2C A, I2C B) + POWER 1 · 2 전원 모듈 버스",
-        "100 Mbps x 1 Port": "100 Mbps × 1 포트", "43.0 × 63.4 × 29.2 mm (concept case)": "43.0 × 63.4 × 29.2 mm (개념 케이스)",
+        "100 Mbps x 1 Port": "100 Mbps × 1 포트", "43.0 × 62.5 × 29.2 mm (concept case)": "43.0 × 62.5 × 29.2 mm (개념 케이스)",
         "novaX ArduPilot (Copter and Plane releases)": "novaX ArduPilot (Copter · Plane 배포)"},
     "AP-M10": {
         "u-blox M10 Series": "u-blox M10 시리즈", "L1 Band Only": "L1 대역 전용", "Built-in Ceramic Patch": "내장 세라믹 패치",
