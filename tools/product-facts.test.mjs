@@ -112,6 +112,7 @@ test('AF-H7E Lite pin table follows the Pixhawk connector convention and ArduPil
   const rc = table.find((c) => c.name === 'RC IN');
   // 2026-09-21: RC IN / UART 4 / UART 6 은 맨 뒤 아랫면에서 뒤로 꽂고, 그 윗면이 POWER 1 · 2(잠금이 뒷벽 쪽)다.
   assert.equal(rc.type, 'JST-GH 5P · rear edge');
+  for (const n of ['UART 4', 'UART 6']) assert.match(table.find((c) => c.name === n).type, /· rear edge$/, `${n} sits on the rear edge with RC IN`);
   assert.deepEqual(rc.pins.map((p) => p.signal), ['VCC', 'RC_IN', 'RSSI', 'VCC_3V3', 'GND']);
   // 3-pin header = 13 columns: M1–M12 PWM + SB (SBUS out from USART6 / SERIAL8) — never labelled M13.
   const sb = table.find((c) => c.name.startsWith('SB'));
