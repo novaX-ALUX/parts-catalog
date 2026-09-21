@@ -134,3 +134,19 @@ test('AF-H7E Lite firmware ships Copter and Plane for board ID 6207 from its own
   assert.match(lite.firmwareNotes, /Preliminary/);
   assert.match(spec(lite, 'MCU'), /STM32H753/);
 });
+
+test('APMU-12S 100A: coming soon, power-port pins from the V2 board, INA228 address set explicitly', () => {
+  const p = product('pmu', 'APMU-12S-100A');
+  assert.equal(p.comingSoon, true);
+  assert.match(spec(p, 'Continuous Current'), /target.*not yet rated/, '100 A is the next-version target, not a V2 rating');
+  const signals = (name) => p.pinTable.find((c) => c.name === name).pins.map((x) => x.signal);
+  assert.deepEqual(signals('POWER I2C'), ['5V', '5V', 'SCL', 'SDA', 'GND', 'GND']);
+  assert.deepEqual(signals('POWER ANALOG'), ['5V', '5V', 'CURRENT', 'VOLTAGE', 'GND', 'GND']);
+  const param = (name) => p.configParams.filter((c) => c.name === name).map((c) => c.value);
+  // With BATT_I2C_ADDR 0 ArduPilot probes only 0x41/0x44/0x45 (AP_BattMonitor_INA2xx); this INA228 sits at 0x40.
+  assert.deepEqual(param('BATT_I2C_ADDR'), ['64']);
+  assert.deepEqual(param('BATT_SHUNT'), ['0.0003']);
+  assert.ok(Number(param('BATT_MAX_AMPS')[0]) >= 100, 'INA228 full scale covers the 100 A target');
+  assert.deepEqual(param('BATT_VOLT_MULT'), ['21.0']);
+  assert.deepEqual(param('BATT_AMP_PERVLT'), ['55.56']);
+});

@@ -1,0 +1,136 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import SpecTable from '../../components/SpecTable.astro';
+import Tabs from '../../components/Tabs.astro';
+import Linkify from '../../components/Linkify.astro';
+import ManualPanel from '../../components/ManualPanel.astro';
+import PinTable from '../../components/PinTable.astro';
+import { CATEGORY_LABEL } from '../../content.config';
+
+// Power modules have no MCU, so there is no Firmware tab.
+export async function getStaticPaths() {
+  const items = (await getCollection('pmu')).filter((i) => !i.data.hidden);
+  return items.map((item) => ({ params: { slug: item.id }, props: { item } }));
+}
+const { item } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const d = item.data;
+const galleryImgs = d.gallery && d.gallery.length > 0 ? d.gallery : (d.image ? [d.image] : []);
+const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
+  ? d.pinoutImages
+  : (d.pinoutImage ? [d.pinoutImage] : []);
+---
+<Layout title={`${d.name} — novaX Catalog`} activeCategory="pmu">
+  <section class="detail-hero">
+    <div class="container">
+      <div class="crumbs"><a href={`${base}/#pmu`}>{CATEGORY_LABEL.pmu}</a></div>
+      <div class="meta">Product · Catalog 2026</div>
+      <h1>{d.name}{d.comingSoon && <span class="soon">Coming Soon</span>}</h1>
+      {d.tagline && <div class="tag">{d.tagline}</div>}
+    </div>
+  </section>
+
+  <section class="detail-body">
+    <div class="container">
+      <div class="row">
+        {d.image && (
+          <div class="imgwrap"><img src={`${base}${d.image}`} alt={d.name} /></div>
+        )}
+        <div class="right-col">
+          {d.description && (
+            <div class="spec-card">
+              <div class="head">Description</div>
+              <div class="prose"><p>{d.description}</p></div>
+            </div>
+          )}
+          <SpecTable specs={d.specs} />
+        </div>
+      </div>
+
+      <div class="tabs-section">
+        <Tabs tabs={[
+          {id:'pinout', label:'Pinout'},
+          {id:'config', label:'Configuration'},
+          {id:'manual', label:'Manual'},
+          {id:'gallery', label:'Gallery'}
+        ]}>
+          <div class="tab-panel active" data-panel="pinout">
+            {pinoutImgs.length > 0 ? (
+              <div class="panel-images">
+                {pinoutImgs.map((src) => (
+                  <div class="panel-image"><img src={`${base}${src}`} alt={`${d.name} pinout`} /></div>
+                ))}
+              </div>
+            ) : (
+              !d.pinTable && <div class="panel-empty">Pinout coming soon</div>
+            )}
+            {d.pinoutNotes && <div class="prose panel-notes"><p><Linkify text={d.pinoutNotes} /></p></div>}
+            <PinTable connectors={d.pinTable} />
+          </div>
+
+          <div class="tab-panel" data-panel="config">
+            {(d.configImages && d.configImages.length > 0) && (
+              <div class="panel-images" style="margin-bottom: 24px;">
+                {d.configImages.map((img, i) => {
+                  const src = typeof img === 'string' ? img : img.src;
+                  const caption = typeof img === 'string' ? undefined : img.caption;
+                  return (
+                    <figure class="config-figure">
+                      <div class="panel-image"><img src={`${base}${src}`} alt={`${d.name} configuration figure ${i + 1}`} /></div>
+                      <figcaption><strong>Figure {i + 1}</strong>{caption ? ` — ${caption}` : ''}</figcaption>
+                    </figure>
+                  );
+                })}
+              </div>
+            )}
+            {(d.configParams && d.configParams.length > 0) && (
+              <table class="cfg-table">
+                <thead>
+                  <tr><th>Parameter</th><th>Value</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                  {d.configParams.map((p, i) => {
+                    const prev = i > 0 ? d.configParams![i - 1].section : undefined;
+                    const showSection = p.section && p.section !== prev;
+                    return (
+                      <Fragment>
+                        {showSection && (
+                          <tr class="cfg-section"><td colspan="3">{p.section}</td></tr>
+                        )}
+                        <tr>
+                          <td><code>{p.name}</code></td>
+                          <td><code>{p.value}</code></td>
+                          <td>{p.note ?? ''}</td>
+                        </tr>
+                      </Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
+            {d.configNotes
+              ? <div class="prose panel-notes"><p class="cfg-steps"><Linkify text={d.configNotes} /></p></div>
+              : (!d.configImages && !d.configParams && <div class="panel-empty">Configuration notes coming soon</div>)}
+          </div>
+
+          <div class="tab-panel" data-panel="manual">
+            <ManualPanel manuals={d.manuals} name={d.name} />
+          </div>
+
+          <div class="tab-panel" data-panel="gallery">
+            {galleryImgs.length > 0 ? (
+              <div class="gallery-grid">
+                {galleryImgs.map((g) => (
+                  <div class="cell"><img src={`${base}${g}`} alt={d.name} /></div>
+                ))}
+              </div>
+            ) : (
+              <div class="panel-empty">Gallery coming soon</div>
+            )}
+          </div>
+        </Tabs>
+      </div>
+    </div>
+  </section>
+</Layout>

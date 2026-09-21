@@ -115,6 +115,13 @@ collections:
     slug: "{{slug}}"
     fields: *base_fields
 
+  - name: pmu
+    label: Power Modules
+    folder: src/content/pmu
+    create: true
+    slug: "{{slug}}"
+    fields: *base_fields
+
   - name: camera
     label: Cameras & Gimbals
     folder: src/content/camera

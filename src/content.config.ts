@@ -128,6 +128,11 @@ const camera = defineCollection({
   schema: detailSchema
 });
 
+const pmu = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/pmu' }),
+  schema: detailSchema
+});
+
 const motor = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/motor' }),
   schema: detailSchema.extend({
@@ -136,14 +141,15 @@ const motor = defineCollection({
   })
 });
 
-export const collections = { fc, esc, gnss, camera, motor };
+export const collections = { fc, esc, gnss, camera, motor, pmu };
 
 export const CATEGORY_LABEL: Record<string, string> = {
   fc: 'Flight Controllers',
   gnss: 'GNSS',
   esc: 'ESC',
+  pmu: 'Power Modules',
   motor: 'Motors',
   camera: 'Cameras & Gimbals'
 };
 
-export const CATEGORY_ORDER = ['fc', 'gnss', 'esc', 'motor', 'camera'] as const;
+export const CATEGORY_ORDER = ['fc', 'gnss', 'esc', 'pmu', 'motor', 'camera'] as const;
