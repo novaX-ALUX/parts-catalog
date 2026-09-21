@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import test from 'node:test';
 import yaml from 'js-yaml';
 
@@ -149,4 +149,27 @@ test('APMU-12S 100A: coming soon, power-port pins from the V2 board, INA228 addr
   assert.ok(Number(param('BATT_MAX_AMPS')[0]) >= 100, 'INA228 full scale covers the 100 A target');
   assert.deepEqual(param('BATT_VOLT_MULT'), ['21.0']);
   assert.deepEqual(param('BATT_AMP_PERVLT'), ['55.56']);
+});
+
+test('every PMU product is registered completely (name, card, specs, pin table, 3D model)', () => {
+  const files = readdirSync(new URL('../src/content/pmu/', import.meta.url)).filter((f) => f.endsWith('.md'));
+  assert.ok(files.length >= 1, 'the PMU category has products');
+  const config = readFileSync(new URL('../src/content.config.ts', import.meta.url), 'utf8');
+  assert.match(config, /pmu: 'PMU'/, 'category label is PMU');
+  for (const f of files) {
+    const p = product('pmu', f.replace(/\.md$/, ''));
+    // Family naming rule APMU-<cells>S_<continuous A>A, shown with a space on the page.
+    assert.match(p.name, /^APMU-\d+S \d+A$/, `${f} name`);
+    assert.equal(f.replace(/\.md$/, ''), p.name.replace(' ', '-'), `${f} file name follows the product name`);
+    assert.match(p.image, new RegExp(`^/images/products/pmu_${f.replace(/\.md$/, '')}\.png$`), `${f} card image`);
+    for (const key of ['Battery Input', 'Continuous Current', 'Validation Status']) assert.ok(spec(p, key), `${f} spec ${key}`);
+    assert.ok(p.pinTable?.some((c) => /^POWER /.test(c.name)), `${f} lists its FC power port(s)`);
+    if (p.model3d) {
+      assert.equal(p.model3d, `/models/pmu/${f.replace(/\.md$/, '.glb')}`, `${f} 3D model path`);
+      const glb = readFileSync(new URL(`../public${p.model3d}`, import.meta.url));
+      assert.equal(glb.subarray(0, 4).toString(), 'glTF', `${f} 3D model is a glTF binary`);
+      assert.ok(glb.length < 5e6, `${f} 3D model stays under 5 MB for the web`);
+    }
+  }
+  assert.ok(product('pmu', 'APMU-12S-100A').model3d, 'APMU-12S 100A has its 3D PCBA');
 });

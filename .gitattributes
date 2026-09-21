@@ -7,3 +7,6 @@ public/firmware/** binary
 
 # Manual PDFs and their page previews must be stored byte-exact too (Illustrator PDFs can look like text).
 public/manuals/** binary
+
+# 3D models (glTF binary) for the product 3D tab.
+public/models/** binary

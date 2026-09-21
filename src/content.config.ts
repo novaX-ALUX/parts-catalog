@@ -105,7 +105,9 @@ const detailSchema = baseSchema.extend({
   gallery: z.array(z.string()).optional(),
   // User manuals shown in the Manual tab, one per language. `file` is a PDF under public/;
   // its page overview image sits next to it with the same name and a .png extension.
-  manuals: z.array(z.object({ label: z.string(), file: z.string() })).optional()
+  manuals: z.array(z.object({ label: z.string(), file: z.string() })).optional(),
+  // Rotatable 3D model (glTF binary under public/models/, meshopt allowed) shown in the 3D tab.
+  model3d: z.string().regex(/^\/models\/[^?#%]+\.glb$/).optional()
 });
 
 const fc = defineCollection({
@@ -147,7 +149,7 @@ export const CATEGORY_LABEL: Record<string, string> = {
   fc: 'Flight Controllers',
   gnss: 'GNSS',
   esc: 'ESC',
-  pmu: 'Power Modules',
+  pmu: 'PMU',
   motor: 'Motors',
   camera: 'Cameras & Gimbals'
 };

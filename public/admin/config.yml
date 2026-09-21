@@ -91,6 +91,12 @@ _base_fields: &base_fields
       - { label: Value, name: value, widget: string }
       - { label: Description, name: note, widget: string, required: false }
       - { label: Section, name: section, widget: string, required: false, hint: "같은 Section 값끼리 표에서 그룹 소제목으로 묶임 (예: Position offset)" }
+  - label: 3D Model
+    name: model3d
+    widget: string
+    required: false
+    pattern: ['^/models/[^\\?#%]+\.glb$','public/models/ 아래 .glb 파일의 /models/... 경로를 입력하세요.']
+    hint: "3D 탭에서 돌려보는 모델(예: PCBA). 제품 저장소 3D 스크립트로 만든 웹용 .glb 를 public/models/{family}/{slug}.glb 에 git 으로 올린 뒤 경로만 적기"
   - { label: Gallery, name: gallery, widget: list, required: false, field: { label: Image, name: image, widget: image }, hint: "Gallery 탭 이미지들" }
 
 collections:
@@ -116,7 +122,7 @@ collections:
     fields: *base_fields
 
   - name: pmu
-    label: Power Modules
+    label: PMU
     folder: src/content/pmu
     create: true
     slug: "{{slug}}"

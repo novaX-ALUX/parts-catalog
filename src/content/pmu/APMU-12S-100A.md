@@ -2,6 +2,7 @@
 name: APMU-12S 100A
 tagline: 12S Power Distribution & Monitoring Board — 6 Battery Outputs, 12 V · 5–10 V · 5 V Rails
 image: /images/products/pmu_APMU-12S-100A.png
+model3d: /models/pmu/APMU-12S-100A.glb
 order: 10
 comingSoon: true
 specs:

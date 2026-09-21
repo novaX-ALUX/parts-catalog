@@ -6,6 +6,7 @@ import Tabs from '../../components/Tabs.astro';
 import Linkify from '../../components/Linkify.astro';
 import ManualPanel from '../../components/ManualPanel.astro';
 import PinTable from '../../components/PinTable.astro';
+import Model3D from '../../components/Model3D.astro';
 import { CATEGORY_LABEL } from '../../content.config';
 
 // Power modules have no MCU, so there is no Firmware tab.
@@ -51,6 +52,7 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
       <div class="tabs-section">
         <Tabs tabs={[
           {id:'pinout', label:'Pinout'},
+          ...(d.model3d ? [{id:'model3d', label:'3D PCBA'}] : []),
           {id:'config', label:'Configuration'},
           {id:'manual', label:'Manual'},
           {id:'gallery', label:'Gallery'}
@@ -68,6 +70,12 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
             {d.pinoutNotes && <div class="prose panel-notes"><p><Linkify text={d.pinoutNotes} /></p></div>}
             <PinTable connectors={d.pinTable} />
           </div>
+
+          {d.model3d && (
+            <div class="tab-panel" data-panel="model3d">
+              <Model3D src={d.model3d} name={d.name} />
+            </div>
+          )}
 
           <div class="tab-panel" data-panel="config">
             {(d.configImages && d.configImages.length > 0) && (
