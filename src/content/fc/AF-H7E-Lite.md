@@ -51,7 +51,7 @@ pinoutNotes: |
 
   The + rail of the PWM header is not powered by the flight controller. The 13th header column, SB, is an SBUS output, not a PWM channel: it carries servo channels 1–16 on one wire from USART6 (SERIAL8) with the signal inversion done inside the STM32H7, so SBUS servos, SBUS-to-PWM decoders and gimbals plug in with a standard servo lead and take power from the servo rail. Outputs share rate and protocol within the timer groups M1–M4, M5 · M6 · M9 · M10, M7–M8 and M11–M12; DShot works on every group except M7–M8, whose timer has no DMA (PWM and OneShot only).
 
-  As on AF-H7E, the PWM signal row (S) is the rearmost row: the case has a keyed comb behind it so servo plugs only fit with S at the rear, and a wall separates POWER 1 · POWER 2 · RC IN from the PWM header. The pinout image is a top view of the concept carrier: side connectors are mounted on the bottom side and plug in from the edges, and each table lists pins in the order they sit when seen from above. POWER 1 and POWER 2 use the same Molex Micro-Lock Plus connector as AF-H7E; their pin-1 end is still to be confirmed. POWER 1 and POWER 2 take I2C (INA2xx) power modules; a DroneCAN power module (for example 14S / 200 A) reports over CAN 1 or CAN 2 (BATT_MONITOR 8) and needs a split cable that feeds its 5 V into POWER 1, because the CAN connectors supply 5 V rather than accept it.
+  POWER 1 and POWER 2 sit on the top side at the rear edge with their latch facing the rear wall, so the plug is released from outside the case through the wall opening; RC IN, UART 4 and UART 6 sit under them on the bottom side and plug in from the rear like the side connectors. The PWM header sits 1.5 mm behind the sensor module: as on AF-H7E the signal row (S) is the rearmost row and the case has a keyed comb behind it, so servo plugs only fit with S at the rear. The pinout image is a top view of the concept carrier: side connectors are mounted on the bottom side and plug in from the edges, and each table lists pins in the order they sit when seen from above. POWER 1 and POWER 2 use the same Molex Micro-Lock Plus connector as AF-H7E; their pin-1 end is still to be confirmed. POWER 1 and POWER 2 take I2C (INA2xx) power modules; a DroneCAN power module (for example 14S / 200 A) reports over CAN 1 or CAN 2 (BATT_MONITOR 8) and needs a split cable that feeds its 5 V into POWER 1, because the CAN connectors supply 5 V rather than accept it.
 pinTable:
   - name: POWER 1
     type: Molex Micro-Lock Plus 6P (1.25 mm) · same as AF-H7E
@@ -158,7 +158,7 @@ pinTable:
       - { pin: 3, signal: CAN_L, function: "CAN bus low" }
       - { pin: 4, signal: GND, function: "Ground" }
   - name: RC IN
-    type: JST-GH 5P
+    type: JST-GH 5P · rear edge
     mapping: RC input · SBUS / PPM / DSM (auto-detected)
     pins:
       - { pin: 1, signal: VCC, function: "5 V receiver supply" }
