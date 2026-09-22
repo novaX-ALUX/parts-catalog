@@ -160,6 +160,13 @@ test('APMU-12S 120A: coming soon, FC port and button pins from the schematic, IN
   assert.deepEqual(signals('POWER I2C'), ['5V', '5V', 'SCL', 'SDA', 'GND', 'GND']);
   assert.deepEqual(signals('BUTTON'), ['BTN', 'GND', 'LED_A', 'LED1', 'LED2', 'LED3', 'LED4']);
   assert.deepEqual(signals('ESC OUT ×5'), ['OUT', 'GND']);
+  // J1201 / J1202 / J1203 and J302-J308 of the SKiDL truth (circuits/apmu_nav.py, apmu_sense.build_can).
+  assert.deepEqual(signals('NAV LEFT'), ['5V_LED', '5V_LED', 'WHITE', 'RED']);
+  assert.deepEqual(signals('NAV RIGHT'), ['5V_LED', '5V_LED', 'WHITE', 'BLUE']);
+  assert.deepEqual(signals('NAV PWM IN'), ['PWM', 'GND']);
+  assert.deepEqual(signals('CAN ×7'), ['5V', 'CAN_H', 'CAN_L', 'GND']);
+  assert.match(spec(p, 'Navigation Lights'), /59 times a minute.*40–100 per minute/, 'blink rate inside 14 CFR 25.1401');
+  assert.ok(!p.pinTable.some((c) => c.name === 'LED 5V'), 'the LED 5 V XT30 gave its place to the light plugs');
   const param = (name) => p.configParams.filter((c) => c.name === name).map((c) => c.value);
   assert.deepEqual(param('BATT_MONITOR'), ['21']);
   assert.deepEqual(param('BATT_I2C_ADDR'), ['64']);
