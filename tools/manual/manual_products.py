@@ -37,7 +37,7 @@ KO_VALUE = {
         "USB-C (Firmware & Power)": "USB-C (펌웨어 · 전원)", "10 motor/servo channels + 1 WS2812 LED channel": "모터/서보 10채널 + WS2812 LED 1채널",
         "novaX ArduPilot (released); Betaflight board configuration available": "novaX ArduPilot (배포) · Betaflight 보드 설정 제공"},
     "AF-H7E": {
-        "BMI088 (Accel/Gyro)": "BMI088 (가속도/자이로)", "4.75 – 5.7 V (Rated 5 V)": "4.75 – 5.7 V (정격 5 V)",
+        "Built-in heater on the IMU board, held at 45 °C (BRD_HEAT_TARG)": "IMU 보드 내장 히터 — 45 °C 로 유지 (BRD_HEAT_TARG)", "BMI088 (Accel/Gyro)": "BMI088 (가속도/자이로)", "4.75 – 5.7 V (Rated 5 V)": "4.75 – 5.7 V (정격 5 V)",
         "8 FMU + 8 IOMCU channels": "FMU 8 + IOMCU 8 채널", "Analog / PWM": "아날로그 / PWM",
         "7 peripheral serial interfaces + dedicated IOMCU link": "주변장치 시리얼 7개 + IOMCU 전용 링크",
         "4 configured buses including internal sensors; 3 exposed on multifunction ports": "내부 센서 포함 4개 버스 · 다기능 포트에 3개",
@@ -45,13 +45,14 @@ KO_VALUE = {
         "99 g (Core 43g + Baseboard 56g)": "99 g (코어 43 g + 베이스보드 56 g)",
         "novaX ArduPilot (Copter and Plane releases)": "novaX ArduPilot (Copter · Plane 배포)", "100 Mbps x 1 Port": "100 Mbps × 1 포트"},
     "AF-H7E-Lite": {
-        "ICM-20649 (optional)": "ICM-20649 (선택 실장)", "RM3100 (optional; use an external compass when not fitted)": "RM3100 (선택 실장 — 없으면 외장 나침반)",
+        "Built-in heater on the IMU board, held at 45 °C (BRD_HEAT_TARG)": "IMU 보드 내장 히터 — 45 °C 로 유지 (BRD_HEAT_TARG)", "ICM-20649 (optional)": "ICM-20649 (선택 실장)", "RM3100 (optional; use an external compass when not fitted)": "RM3100 (선택 실장 — 없으면 외장 나침반)",
         "4.75 – 5.7 V (Rated 5 V)": "4.75 – 5.7 V (정격 5 V)", "POWER 1 + POWER 2 (redundant, I2C power modules)": "POWER 1 + POWER 2 (이중화, I2C 전원 모듈)",
         "12 FMU channels (DShot except M7–M8) + SBUS out": "FMU 12채널 (M7–M8 제외 DShot) + SBUS 출력",
         "S.Bus, PPM, DSM / Spektrum (with DSM bind)": "S.Bus, PPM, DSM / Spektrum (DSM 바인드 지원)", "Analog": "아날로그",
         "6 serial ports (2 with flow control) + debug console": "시리얼 6개 (흐름제어 2개) + 디버그 콘솔",
         "2 ports (I2C A, I2C B) + power-module bus on POWER 1 · 2": "포트 2개 (I2C A, I2C B) + POWER 1 · 2 전원 모듈 버스",
         "100 Mbps x 1 Port": "100 Mbps × 1 포트", "42.7 × 63.2 × 29.2 mm (concept case)": "42.7 × 63.2 × 29.2 mm (개념 케이스)",
+        "16 × 30 mm / M3 (4 blind holes in the base, 3 mm thread)": "16 × 30 mm / M3 (바닥 막힌 구멍 4개, 나사산 3 mm)",
         "novaX ArduPilot (Copter and Plane releases)": "novaX ArduPilot (Copter · Plane 배포)"},
     "AP-M10": {
         "u-blox M10 Series": "u-blox M10 시리즈", "L1 Band Only": "L1 대역 전용", "Built-in Ceramic Patch": "내장 세라믹 패치",

@@ -16,6 +16,8 @@ specs:
     value: BMI088 (Accel/Gyro)
   - key: Secondary IMU
     value: ICM-42688-P, ICM-20649
+  - key: IMU Heater
+    value: Built-in heater on the IMU board, held at 45 °C (BRD_HEAT_TARG)
   - key: Magnetometer
     value: RM3100
   - key: Barometer
@@ -52,7 +54,7 @@ specs:
     value: novaX ArduPilot (Copter and Plane releases)
   - key: Ethernet
     value: 100 Mbps x 1 Port
-description: AF-H7E is a modular STM32H753 flight controller based on the Pixhawk FMUv6x architecture. The CUAV variant configures BMI088, ICM-42688-P and ICM-20649 IMUs, an RM3100 compass and two ICP-20100 barometers. Eight FMU outputs and eight IOMCU outputs provide 16 channels. Seven peripheral serial interfaces, a dedicated IOMCU link, four I2C buses including internal sensors, and two CAN buses are configured. Published firmware here is novaX ArduPilot Copter and Plane; PX4 compatibility is not verified by this catalog.
+description: AF-H7E is a modular STM32H753 flight controller based on the Pixhawk FMUv6x architecture. The CUAV variant configures BMI088, ICM-42688-P and ICM-20649 IMUs, an RM3100 compass and two ICP-20100 barometers. A heater on the IMU board holds the sensors at 45 °C (BRD_HEAT_TARG), keeping gyro and accelerometer bias steady from a cold start to a hot day; the RM3100 compass reading is corrected for the heater current. Eight FMU outputs and eight IOMCU outputs provide 16 channels. Seven peripheral serial interfaces, a dedicated IOMCU link, four I2C buses including internal sensors, and two CAN buses are configured. Published firmware here is novaX ArduPilot Copter and Plane; PX4 compatibility is not verified by this catalog.
 pinoutImage: /images/products/cuav-pixhawk6x-connectors.png
 pinoutImages:
   - /images/products/fc_AF-H7E_dimensions.png

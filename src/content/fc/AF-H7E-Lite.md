@@ -16,6 +16,8 @@ specs:
     value: ICM-42688-P, BMI088
   - key: Secondary IMU
     value: ICM-20649 (optional)
+  - key: IMU Heater
+    value: Built-in heater on the IMU board, held at 45 °C (BRD_HEAT_TARG)
   - key: Magnetometer
     value: RM3100 (optional; use an external compass when not fitted)
   - key: Barometer
@@ -42,9 +44,11 @@ specs:
     value: 100 Mbps x 1 Port
   - key: Size
     value: 42.7 × 63.2 × 29.2 mm (concept case)
+  - key: Mount Hole
+    value: 16 × 30 mm / M3 (4 blind holes in the base, 3 mm thread)
   - key: Supported F/W
     value: novaX ArduPilot (Copter and Plane releases)
-description: AF-H7E Lite keeps the AF-H7E STM32H753 compute module and sensor module on a compact carrier without the IO co-processor. All 12 PWM outputs and an SBUS output come straight from the flight-controller MCU, with dual CAN, 100 Mbps Ethernet, redundant power inputs and a 5-pin RC input that takes AF-H7E cables. In development - the pin definition may change before release.
+description: AF-H7E Lite keeps the AF-H7E STM32H753 compute module and sensor module on a compact carrier without the IO co-processor. All 12 PWM outputs and an SBUS output come straight from the flight-controller MCU, with dual CAN, 100 Mbps Ethernet, redundant power inputs and a 5-pin RC input that takes AF-H7E cables. A heater on the IMU board holds the sensors at 45 °C (BRD_HEAT_TARG), keeping gyro and accelerometer bias steady from a cold start to a hot day; the RM3100 compass reading is corrected for the heater current. Four M3 blind holes in the base (16 × 30 mm) let it screw down onto a mounting plate instead of being taped. In development - the pin definition may change before release.
 pinoutImage: /images/products/fc_AF-H7E-Lite_pinout.png
 pinoutNotes: |
   Preliminary pin definition — AF-H7E Lite is in development and connectors may change before release. On every JST connector pin 1 is the supply pin and the last pin is GND, following the Pixhawk connector standard. UART n maps to ArduPilot SERIALn: UART 1–2 default to MAVLink telemetry and UART 3–4 default to GPS. GPS modules connect to any UART or over DroneCAN; there is no dedicated GPS/safety port and no safety switch. RC IN is a 5-pin connector with the same pinout as AF-H7E and takes an SBUS, PPM or DSM receiver directly on pin 2 (protocol auto-detected, wired to the flight-controller MCU, no IO board needed); pin 1 supplies 5 V and pin 4 a switched 3.3 V for DSM / Spektrum satellite receivers, which the flight controller power-cycles to bind them. On-board without a connector: microSD card slot (logging), buzzer and RGB status LED.

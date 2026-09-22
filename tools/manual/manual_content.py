@@ -23,7 +23,7 @@ SPEC_KO = {
     "IMU": "IMU", "Barometer": "기압계", "Gimbal": "짐벌", "USB Input": "USB 입력", "PWM Output": "PWM 출력", "Serial Ports": "시리얼 포트",
     "RC Input": "RC 입력", "Supported F/W": "지원 펌웨어", "GNSS": "GNSS", "Compass": "나침반", "GPS Port": "GPS 포트",
     "Output Voltage": "출력 전압", "Blackbox": "블랙박스", "Servo Output": "서보 출력", "RAM / Flash": "RAM / Flash",
-    "Secondary IMU": "보조 IMU", "Magnetometer": "나침반", "Servo Rail": "서보 레일", "RSSI Input": "RSSI 입력", "UART": "UART",
+    "Secondary IMU": "보조 IMU", "IMU Heater": "IMU 히터", "Magnetometer": "나침반", "Servo Rail": "서보 레일", "RSSI Input": "RSSI 입력", "UART": "UART",
     "I²C": "I²C", "CAN": "CAN", "ADC": "ADC", "Ethernet": "이더넷", "Power Input": "전원 입력",
     # GNSS
     "Chipset": "칩셋", "Satellite Systems": "지원 위성 시스템", "Antenna Band": "안테나 대역", "Antenna Type": "안테나 형식",
