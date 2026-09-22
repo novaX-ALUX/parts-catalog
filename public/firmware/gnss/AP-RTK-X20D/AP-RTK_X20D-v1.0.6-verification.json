@@ -1,0 +1,127 @@
+{
+  "board": "AP-RTK_X20D",
+  "board_id": 6205,
+  "version": "1.0.6",
+  "qualification": "engineering; bench hardware 2026-09-22 passed (heading through the flight controller moving-baseline path); outdoor RTK/heading/compass qualification and flight pending",
+  "supersedes": "1.0.5: the node now sends ardupilot.gnss.RelPosHeading (ZED-X20D ANT1 -> ANT2 baseline: heading, length, down) instead of ardupilot.gnss.Heading, so the flight controller computes yaw with GPSx_MB_TYPE = 1 and GPSx_MB_OFS exactly as for AP-RTK dual (ANT1 = Master, ANT2 = Slave, ANT1 at the front). GPS_MOVING_BASELINE is enabled on the node; CFG-NAVSPG-DAHEADING_OFFSET stays 0. Bootloader unchanged.",
+  "product_string": "novaX AP-RTK X20D v1.0.6",
+  "upstream_numeric_version": "1.8.0-dev",
+  "compiler": "Windows arm-none-eabi-gcc.exe 10.2.1 (10-2020-q4-major); Cygwin, no WSL",
+  "ardupilot_base_commit": "0b7e848e2f3b1a5aa89448f549c261906c2f11c6",
+  "source_patches": {
+    "source/ardupilot-x20d-driver.patch": "X20D GPS driver (UART fixes, 230400 move, Flash save, DAHEADING -> RelPosHeading state), print_vprintf, USB AF10 generator fix",
+    "source/ardupilot-bootloader-usb-before-erase.patch": "bootloader: hold the first CAN update read until USB enumeration has settled",
+    "source/ardupilot-0b7e848e2f-v1.0.2.patch": "the base commit itself (not on GitHub)"
+  },
+  "build_tree_other_uncommitted_files": {
+    "note": "tracked files modified by other work in the shared tree at build time; not part of the patches above. Recorded by path and sha256 so the exact tree can be identified; some are compiled into AP_Periph or the bootloader.",
+    "files": {
+      "Tools/AP_Bootloader/AP_Bootloader.cpp": "0dd0388a0ed1a5e074e0bebfe838f50043321134909f15000dd6beddeeb0a7f8",
+      "Tools/AP_Bootloader/bl_protocol.cpp": "7ffec79f50456a39d3ebdacca5d6de9f16d77e9d1fdde65147d8facdd04d4f0b",
+      "Tools/novax/README.md": "9528d6064e8830f51bd08f49bcb3b8ad454aa5073d6b643a22781e0f7bdc22e1",
+      "Tools/novax/build_ap.sh": "4572b7dfdb607da176f4ae619483a94fa18cf8d75bd99ab93738f66f5eaf9d8b",
+      "Tools/novax/install_toolchain.sh": "006247437917be430921142eb3aa9c4b66d9eb7aea33110ebc3d601a63c50cba",
+      "Tools/novax/package_fw.sh": "af169aa228f7699ff76544f0c9df496fca124ead74110fce17ed92774d8929cd",
+      "Tools/novax/test_build_guards.py": "179960c40cb786b1857d023fe956c4598e4aa130cf41894a570231f1a351bb03",
+      "Tools/novax/toolchain.sh": "e769c5374ee604450b09b5bf45ae2fbf22a8e88209d1d7e0019d810d32c4a03d",
+      "libraries/AP_HAL_ChibiOS/Util.cpp": "0488bf701c1d914c64a7d309dda61b83f2444074f0010ffd9b86fb810c8bdba3",
+      "libraries/AP_HAL_ChibiOS/hwdef/common/board.c": "b471bf6fec7a0b6b2f16b8132316c0364dbeddf095419db112ce297466726c89",
+      "libraries/AP_HAL_ChibiOS/hwdef/common/flash.c": "ae6fd3bc52931249bc6573cb7d1d7660e710b22d4c68d1b4eb66d992ff712f51",
+      "libraries/AP_HAL_ChibiOS/hwdef/common/flash.h": "60a46df6df6e966276992c57781bcd0e029391d33c3926b78cd4b9c9a2a617c0",
+      "libraries/AP_Mount/AP_Mount.cpp": "847c2feeba78c8fa8eb0da5937f5df6974218468b7737f203f3eb10d7f1c08bf",
+      "libraries/AP_Mount/AP_Mount.h": "21fdd4b12c433f7f822daadfbbb859b9f187b30066cb04f55f9c8a562d04d8bb",
+      "libraries/AP_Mount/AP_Mount_Backend.cpp": "9859540754cf9bb259fd4abdeed685fb3b780c0915ded0f6e25b5c2113a0df5c",
+      "libraries/AP_Mount/AP_Mount_Backend.h": "8c5319b766098e8f514286d2f25dd2c32f0d00f3135b8c241c4b67ffc83c62ca",
+      "libraries/AP_Mount/AP_Mount_Gremsy.cpp": "fd53dc97b8058a25cd981f67825f056b2af069a5a6f0187a64f55e9d1b4fcafb",
+      "libraries/AP_Mount/AP_Mount_Gremsy.h": "87795dc9bd046b3bce8d599640243a485364da59335508e8ed54bac0c5076384",
+      "libraries/AP_Mount/AP_Mount_Params.cpp": "86bc0c24aaa0ded0e64f025eb742d27331c0e4c5db92254954b72f3bad4dd0ca",
+      "libraries/AP_Mount/AP_Mount_Params.h": "a7279db8b6245285b3e776f05852fe715f21ba54ea7949e57043347fce9a4038",
+      "libraries/AP_Mount/AP_Mount_config.h": "f5f76c7da2b25451518e7c238eae6e56162a27403b5901eb0860cb28d93b6b33",
+      "libraries/GCS_MAVLink/GCS.h": "924f335d913c50332a596a7c23ab72165db73ffb972bbe5fb762a5fdffa6046e",
+      "libraries/GCS_MAVLink/GCS_MAVLink.cpp": "9aa9b6915e9359bfb164ffa8f5131333dae753a8c5d0b44aba61a52023e49734",
+      "libraries/GCS_MAVLink/GCS_Signing.cpp": "0a12027ad7186078658d2a936407eaf33e2531716d2aba84e9b6d54b39d8a7e8",
+      "libraries/GCS_MAVLink/MAVLink_routing.cpp": "5b07a0da1cad7e714c57fade9a7290cada1759eaa2b437ca4ea6bb02165e84c6",
+      "libraries/GCS_MAVLink/MAVLink_routing.h": "68aeee23236aa28bb45a0be610d49a5b55462ecf1e813f307dece2ca2668ea96"
+    },
+    "changed_since_v1.0.5": []
+  },
+  "bootloader_sha256": "de02a3541f80478cc3ce040783b02bf1bea68dd87f4082658bb96ed16c7a3b1a",
+  "bootloader_note": "USB AF10 fix plus the USB-settle wait before the first CAN update erase; AP-RTK_X20D_bl.elf is this build",
+  "product_files": {
+    "VERSION": "3dd81e3d2bbe930a0c98531afa6c35bd862ee8a08458ec0d7d1b51138d7b3a3c",
+    "ardupilot/hwdef.dat": "4f9ba97bb299b4b950bb41fa441b23de9258b26fb2b5dff4a56013049914af93",
+    "ardupilot/hwdef-bl.dat": "8e7483171df8ef9dda04a3c8beea6fbdfdd05a609d8e685b64932d9367ffca15"
+  },
+  "host_checks": {
+    "verify_fw_full_runs": "212/212 x 3",
+    "new_checks": [
+      "DAHEADING_relpos_for_FC_moving_baseline",
+      "DAHEADING_invalid_keeps_relpos_stale"
+    ]
+  },
+  "files": [
+    {
+      "name": "AP-RTK_X20D-v1.0.6.apj",
+      "bytes": 206852,
+      "sha256": "cb5dd563e7402711ab647a65e19e84fa42de9965196d94ab82c38868ed6d35b8"
+    },
+    {
+      "name": "AP-RTK_X20D-v1.0.6.bin",
+      "bytes": 206632,
+      "sha256": "a3cebac9e31272eb0211065c70c1568d9af6bc13549abb8e1cc6bc519ed315b1"
+    },
+    {
+      "name": "AP-RTK_X20D-v1.0.6.hex",
+      "bytes": 581261,
+      "sha256": "a642371b23cb72be7615c1dea7963adeed0ffb38ccfa28a2149be6f340ac04e0"
+    },
+    {
+      "name": "AP-RTK_X20D-v1.0.6_with_bl.hex",
+      "bytes": 748560,
+      "sha256": "2ead38ac0865ab67d1c5db27fcaf67ccad5aa4f86a657feb463f38429619d5de"
+    },
+    {
+      "name": "AP-RTK_X20D_bl.bin",
+      "bytes": 29232,
+      "sha256": "de02a3541f80478cc3ce040783b02bf1bea68dd87f4082658bb96ed16c7a3b1a"
+    },
+    {
+      "name": "AP-RTK_X20D_bl.elf",
+      "bytes": 173720,
+      "sha256": "fce41f748dc32eb6e8643b9886eb8e751af9019474eff799987e587da9975f5c"
+    },
+    {
+      "name": "AP-RTK_X20D_bl.hex",
+      "bytes": 82266,
+      "sha256": "308542437bef555cc701866813e93d9f1937194d5af3ada80a28616a28f76234"
+    },
+    {
+      "name": "manifest_AP-RTK_X20D-v1.0.6.txt",
+      "bytes": 505,
+      "sha256": "9f60fa9d1eda968288a7072e7fe27aa2a32d6b47a31a9b5fb3b49763b33daf8f"
+    }
+  ],
+  "source_files": [
+    {
+      "name": "source/ardupilot-0b7e848e2f-v1.0.2.patch",
+      "bytes": 6905,
+      "sha256": "a1af49953cb7052a00789f8221d48dca8cd60d1f812de56822eeb6b9be1eedee"
+    },
+    {
+      "name": "source/ardupilot-bootloader-usb-before-erase.patch",
+      "bytes": 2448,
+      "sha256": "57bcd0b78d64f2ee6374dfd95eec4001f63ba17d63aeb12acec4d57ab77e1729"
+    },
+    {
+      "name": "source/ardupilot-x20d-driver.patch",
+      "bytes": 49271,
+      "sha256": "560b3a9ab757e26c75f93575389e1cd334543ba9eb8d658311fb2d04a1f3ba3c"
+    }
+  ],
+  "bench_hardware_checks_2026_09_22_v1.0.6": [
+    "flashed over USB (serial_update.py, 6.1 s, CRC 0x4e103d11 OK); boot text \"novaX AP-RTK X20D v1.0.6 (0b7e848e)\"",
+    "node GPS_RAW_INT over USB: DGPS, 28 satellites, 5.00 Hz, receiver heading (ANT1 -> ANT2) 73.8 deg",
+    "flight controller AF-F7 mini (ArduPlane 4.6.3, CAN1 DroneCAN, node 118) with the AP-RTK dual parameter set: GPS1_MB_TYPE = 1, GPS1_MB_OFS_X = 0.60 (not the 0.40 m antenna separation) -> GPS_RAW_INT.yaw 65535 (RelPosHeading received, rejected by the 20 % length check)",
+    "GPS1_MB_OFS_X = 0.40 (measured, ANT1 in front, equal height) -> GPS_RAW_INT.yaw 254.1-254.4 deg = 73.8 + 180 (AP_GPS_Backend::calculate_moving_base_yaw); vehicle compass about 260 deg (uncalibrated)"
+  ]
+}

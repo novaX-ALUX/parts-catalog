@@ -48,28 +48,31 @@ test('X20D is a separate R3 engineering product with its own heading contract', 
   assert.match(x20.image, /gnss_AP-RTK-X20D\.png$/, 'card image = case render');
   assert.ok(x20.gallery.some((g) => /X20D_R3_top_isometric\.png$/.test(g)), 'gallery keeps the R3 PCB renders');
   assert.match(spec(x20, 'Update Rate'), /requires measurement/);
-  assert.match(x20.configNotes, /ANT1 \/ RF_IN_1 at the rear; ANT2 \/ RF_IN_2 at the front/);
-  assert.equal(x20.configParams.find(p => p.name === 'GPS1_MB_TYPE').value, '0');
+  // firmware v1.0.6+: same antenna layout and autopilot parameters as AP-RTK dual (RelPosHeading, GPS1_MB_OFS)
+  assert.match(x20.configNotes, /ANT1 Master at the front, ANT2 Slave at the rear/);
+  assert.match(x20.configNotes, /firmware v1\.0\.6/);
+  const pv = (p) => p.configParams.map((c) => [c.name, c.value]);
+  assert.deepEqual(pv(x20), pv(product('gnss', 'AP-RTK-dual')), 'X20D uses the AP-RTK dual parameter set');
   assert.match(x20.firmwareNotes, /engineering release/);
   assert.match(x20.firmwareNotes, /6205/);
   assert.match(x20.firmwareNotes, /upstream AP_Periph numeric version remains 1\.8/);
   assert.equal(x20.firmware.length, 4);
   for (const fw of x20.firmware) {
-    assert.equal(fw.version, '1.0.1');
-    assert.match(fw.file, /^\/firmware\/gnss\/AP-RTK-X20D\/AP-RTK_X20D-v1\.0\.1/);
+    assert.equal(fw.version, '1.0.6');
+    assert.match(fw.file, /^\/firmware\/gnss\/AP-RTK-X20D\/AP-RTK_X20D-v1\.0\.6/);
     assert.match(fw.sha256, /^[0-9a-f]{64}$/);
     assert.equal(fw.method, undefined, 'Do not enable an unqualified browser-flash target');
   }
 });
 
-test('X20D pin table matches the R3 netlist (CAN/UART/PPS pin 1 = GND, DEBUG pin 1 = 5 V)', () => {
-  const table = product('gnss', 'AP-RTK-X20D').pinTable;
-  const signals = (name) => table.find((c) => c.name === name).pins.map((p) => p.signal);
-  assert.deepEqual(signals('CAN'), ['GND', 'CAN_L', 'CAN_H', '5V']);
-  assert.deepEqual(signals('UART'), ['GND', 'TX', 'RX', '5V']);
-  assert.deepEqual(signals('DEBUG'), ['5V', 'SWDIO', 'SWCLK', 'RX', 'TX', 'GND']);
-  assert.deepEqual(signals('PPS'), ['GND', 'EVENT', 'GND', 'PPS']);
-  assert.deepEqual(signals('ANT1 · ANT2'), ['RF_IN_1', 'RF_IN_2']);
+test('X20D pinout matches the R3 netlist in the AP-RTK dual form (pin N → pin 1; CAN/UART/PPS pin 1 = GND, DEBUG pin 1 = 5 V)', () => {
+  const x20 = product('gnss', 'AP-RTK-X20D');
+  assert.match(x20.pinoutImage, /gnss_AP-RTK-X20D_pinout\.png$/);
+  assert.equal(x20.pinTable, undefined, 'same Pinout tab form as AP-RTK dual: drawing + one-line notes');
+  for (const pins of ['① UART (5V · RX · TX · GND)', '② CAN (5V · CAN_H · CAN_L · GND)',
+                      '③ DEBUG (GND · TX · RX · SWCLK · SWDIO · 5V)', '④ PPS (PPS · GND · EVENT · GND)']) {
+    assert.ok(x20.pinoutNotes.includes(pins), pins);
+  }
 });
 
 test('catalog status flags: G5H withdrawn, X20D and AF-H7E Lite announced as coming soon', () => {
