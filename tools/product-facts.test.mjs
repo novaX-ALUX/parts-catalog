@@ -151,6 +151,24 @@ test('APMU-12S 100A: coming soon, power-port pins from the V2 board, INA228 addr
   assert.deepEqual(param('BATT_AMP_PERVLT'), ['55.56']);
 });
 
+test('APMU-12S 120A: coming soon, FC port and button pins from the schematic, INA228 at 0x40 on a 0.1 mΩ shunt', () => {
+  const p = product('pmu', 'APMU-12S-120A');
+  assert.equal(p.comingSoon, true);
+  assert.match(spec(p, 'Continuous Current'), /target.*to be confirmed/, '120 A is a design target until the thermal test');
+  const signals = (name) => p.pinTable.find((c) => c.name === name).pins.map((x) => x.signal);
+  // J301 / J901 pin order of the SKiDL truth (pmu/APMU-12S_120A hardware/circuits).
+  assert.deepEqual(signals('POWER I2C'), ['5V', '5V', 'SCL', 'SDA', 'GND', 'GND']);
+  assert.deepEqual(signals('BUTTON'), ['BTN', 'GND', 'LED_A', 'LED1', 'LED2', 'LED3', 'LED4']);
+  assert.deepEqual(signals('ESC OUT ×5'), ['OUT', 'GND']);
+  const param = (name) => p.configParams.filter((c) => c.name === name).map((c) => c.value);
+  assert.deepEqual(param('BATT_MONITOR'), ['21']);
+  assert.deepEqual(param('BATT_I2C_ADDR'), ['64']);
+  assert.deepEqual(param('BATT_SHUNT'), ['0.0001']);
+  // INA228 ADCRANGE 0 (±163.84 mV) over 0.1 mΩ reads ±1638 A; BATT_MAX_AMPS sets ArduPilot's reporting full scale.
+  assert.ok(Number(param('BATT_MAX_AMPS')[0]) >= 120, 'reporting full scale covers the 120 A target');
+  assert.deepEqual(p.gallery.map((g) => g.caption), ['Isometric', 'Front', 'Back', 'Left', 'Right', 'Top', 'Bottom']);
+});
+
 test('every PMU product is registered completely (name, card, specs, pin table, 3D model)', () => {
   const files = readdirSync(new URL('../src/content/pmu/', import.meta.url)).filter((f) => f.endsWith('.md'));
   assert.ok(files.length >= 1, 'the PMU category has products');
@@ -172,4 +190,5 @@ test('every PMU product is registered completely (name, card, specs, pin table, 
     }
   }
   assert.ok(product('pmu', 'APMU-12S-100A').model3d, 'APMU-12S 100A has its 3D PCBA');
+  assert.ok(product('pmu', 'APMU-12S-120A').model3d, 'APMU-12S 120A has its 3D PCBA');
 });
