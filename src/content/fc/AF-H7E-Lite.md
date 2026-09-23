@@ -35,7 +35,7 @@ specs:
   - key: RSSI Input
     value: Analog
   - key: UART
-    value: 6 serial ports (TELEM 1–4, GPS 1–2) + debug console
+    value: 6 serial ports (TELEM 1 · 2, GPS 1 · 2, SERIAL4, SERIAL6) + debug console
   - key: Serial Mapping
     value: SERIAL1 = UART7 · SERIAL2 = UART5 · SERIAL3 = USART1 · SERIAL4 = UART8 · SERIAL5 = USART2 · SERIAL6 = UART4 · SERIAL7 = USART3 · SERIAL8 = USART6 (USB = SERIAL0)
   - key: GPS
@@ -57,7 +57,7 @@ pinoutImage: /images/products/fc_AF-H7E-Lite_pinout.png
 pinoutNotes: |
   Preliminary pin definition — AF-H7E Lite is in development and connectors may change before release. On every JST connector pin 1 is the supply pin and the last pin is GND, following the Pixhawk connector standard.
 
-  Each serial port is engraved with its ArduPilot number under the port name, such as TELEM 1 with SERIAL1 | UART7 below it. Connector names, serial numbers and MCU peripherals are three different things: TELEM 3 is SERIAL4 on MCU UART8, and TELEM 4 is SERIAL6 on MCU UART4. The Serial Mapping row in the specifications lists all of them, taken from SERIAL_ORDER in the board definition. TELEM 1 and TELEM 2 default to MAVLink telemetry.
+  Each serial port is engraved with its ArduPilot number under the port name, such as TELEM 1 with SERIAL1 | UART7 below it. Only the ports we recommend for a purpose carry a name — the ones with an electronic fuse (TELEM 1 · 2, GPS 1 · 2, RC IN). The general-purpose rear ports are simply marked SERIAL4 and SERIAL6 with their MCU peripheral underneath. Connector names, serial numbers and MCU peripherals are three different things: the rear 4-pin port marked SERIAL4 runs on MCU UART8, and SERIAL6 on MCU UART4. The Serial Mapping row in the specifications lists all of them, taken from SERIAL_ORDER in the board definition. TELEM 1 and TELEM 2 default to MAVLink telemetry.
 
   GPS 1 and GPS 2 are 6-pin Pixhawk GPS ports (UART + I2C on one cable) placed on the left and right edges at the same height, so a redundant pair sits symmetrically on the airframe; each also works as a plain serial port. I2C A and I2C B are separate 4-pin ports for devices that only speak I2C (airspeed, rangefinder, external compass, LED); I2C A shares its bus with GPS 1 and I2C B with GPS 2, and further devices can be daisy-chained on a splitter cable as long as their addresses differ. There is no GPS/safety port and no safety switch.
 
@@ -67,7 +67,7 @@ pinoutNotes: |
 
   The + rail of the PWM header is not powered by the flight controller. The 13th header column, SB, is an SBUS output, not a PWM channel: it carries servo channels 1–16 on one wire from USART6 (SERIAL8) with the signal inversion done inside the STM32H7, so SBUS servos, SBUS-to-PWM decoders and gimbals plug in with a standard servo lead and take power from the servo rail. Outputs share rate and protocol within the timer groups M1–M4, M5 · M6 · M9 · M10, M7–M8 and M11–M12; DShot works on every group except M7–M8, whose timer has no DMA (PWM and OneShot only).
 
-  POWER 1 and POWER 2 sit on the top side at the rear edge with their latch facing the rear wall; the rear wall is no higher than the roof, so the latch is pressed from above with nothing in the way; RC IN, TELEM 3 and TELEM 4 sit under them on the bottom side and plug in from the rear like the side connectors. The PWM header sits 2.3 mm behind the sensor module, with a 1 mm aluminium lip in between: as on AF-H7E the signal row (S) is the rearmost row and the case has a keyed comb behind it (the key slots are closed at the back), so servo plugs only fit with S at the rear. The pinout image is a top view of the concept carrier: side connectors are mounted on the bottom side and plug in from the edges, and each table lists pins in the order they sit when seen from above. POWER 1 and POWER 2 use the same Molex Micro-Lock Plus connector as AF-H7E; their pin-1 end is still to be confirmed. POWER 1 and POWER 2 take I2C (INA2xx) power modules; a DroneCAN power module (for example 14S / 200 A) reports over CAN 1 or CAN 2 (BATT_MONITOR 8) and needs a split cable that feeds its 5 V into POWER 1, because the CAN connectors supply 5 V rather than accept it.
+  POWER 1 and POWER 2 sit on the top side at the rear edge with their latch facing the rear wall; the rear wall is no higher than the roof, so the latch is pressed from above with nothing in the way; RC IN, SERIAL4 and SERIAL6 sit under them on the bottom side and plug in from the rear like the side connectors. The PWM header sits 2.3 mm behind the sensor module, with a 1 mm aluminium lip in between: as on AF-H7E the signal row (S) is the rearmost row and the case has a keyed comb behind it (the key slots are closed at the back), so servo plugs only fit with S at the rear. The pinout image is a top view of the concept carrier: side connectors are mounted on the bottom side and plug in from the edges, and each table lists pins in the order they sit when seen from above. POWER 1 and POWER 2 use the same Molex Micro-Lock Plus connector as AF-H7E; their pin-1 end is still to be confirmed. POWER 1 and POWER 2 take I2C (INA2xx) power modules; a DroneCAN power module (for example 14S / 200 A) reports over CAN 1 or CAN 2 (BATT_MONITOR 8) and needs a split cable that feeds its 5 V into POWER 1, because the CAN connectors supply 5 V rather than accept it.
 pinTable:
   - name: POWER 1
     type: Molex Micro-Lock Plus 6P (1.25 mm) · same as AF-H7E
@@ -119,7 +119,7 @@ pinTable:
       - { pin: 4, signal: SCL, function: "I2C clock — compass in the GPS module (bus shared with I2C A)" }
       - { pin: 5, signal: SDA, function: "I2C data" }
       - { pin: 6, signal: GND, function: "Ground" }
-  - name: TELEM 3
+  - name: SERIAL4
     type: JST-GH 4P · rear edge
     mapping: SERIAL4 · UART8 · default GPS
     pins:
@@ -137,7 +137,7 @@ pinTable:
       - { pin: 4, signal: SCL, function: "I2C clock — compass in the GPS module (bus shared with I2C B)" }
       - { pin: 5, signal: SDA, function: "I2C data" }
       - { pin: 6, signal: GND, function: "Ground" }
-  - name: TELEM 4
+  - name: SERIAL6
     type: JST-GH 4P · rear edge
     mapping: SERIAL6 · UART4
     pins:

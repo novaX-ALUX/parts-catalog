@@ -91,10 +91,11 @@ test('AF-H7E Lite pin table follows the Pixhawk connector convention and ArduPil
   assert.equal(new Set(names).size, names.length, 'connector names are unique');
   // UART n is ArduPilot SERIALn. SERIAL3 · SERIAL5 come out as the 6-pin GPS 1 · GPS 2 ports (UART + I2C).
   // 커넥터 이름은 픽스호크 관례(TELEM n · GPS n). MCU 페리페럴 번호와 겹치지 않게 이름에 UART 를 쓰지 않는다.
-  const serialPort = { 1: 'TELEM 1', 2: 'TELEM 2', 3: 'GPS 1', 4: 'TELEM 3', 5: 'GPS 2', 6: 'TELEM 4' };
+  // 이름은 우리가 용도를 권장하는 포트(전자식 퓨즈)만 TELEM · GPS 로, 범용 포트는 SERIALn 그대로(2026-09-23 사용자)
+  const serialPort = { 1: 'TELEM 1', 2: 'TELEM 2', 3: 'GPS 1', 4: 'SERIAL4', 5: 'GPS 2', 6: 'SERIAL6' };
   // 각 포트 mapping 은 "SERIALn · <MCU 페리페럴> …" 로 적어 hwdef 와 대조된다(2026-09-23 박재량 요청)
-  const peripheral = { 'TELEM 1': 'UART7', 'TELEM 2': 'UART5', 'GPS 1': 'USART1', 'TELEM 3': 'UART8',
-                       'GPS 2': 'USART2', 'TELEM 4': 'UART4', DEBUG: 'USART3' };
+  const peripheral = { 'TELEM 1': 'UART7', 'TELEM 2': 'UART5', 'GPS 1': 'USART1', SERIAL4: 'UART8',
+                       'GPS 2': 'USART2', SERIAL6: 'UART4', DEBUG: 'USART3' };
   for (const [name, per] of Object.entries(peripheral)) {
     assert.ok(table.find((c) => c.name === name).mapping.includes(per), `${name} names its MCU peripheral (${per})`);
   }
@@ -102,7 +103,7 @@ test('AF-H7E Lite pin table follows the Pixhawk connector convention and ArduPil
     assert.match(table.find((c) => c.name === name).mapping, new RegExp(`^SERIAL${n} `), `${name} = SERIAL${n}`);
   }
   for (const n of [1, 2]) assert.match(table.find((c) => c.name === `TELEM ${n}`).mapping, /MAVLink2/);
-  for (const n of ['GPS 1', 'GPS 2', 'TELEM 3']) assert.match(table.find((c) => c.name === n).mapping, /GPS/);
+  for (const n of ['GPS 1', 'GPS 2', 'SERIAL4']) assert.match(table.find((c) => c.name === n).mapping, /GPS/);
   // GPS 1 · 2 are Pixhawk 6-pin GPS ports: UART plus the I2C bus shared with the matching I2C port.
   for (const [gps, i2c] of [['GPS 1', 'I2C A'], ['GPS 2', 'I2C B']]) {
     const c = table.find((x) => x.name === gps);
@@ -133,7 +134,7 @@ test('AF-H7E Lite pin table follows the Pixhawk connector convention and ArduPil
   const rc = table.find((c) => c.name === 'RC IN');
   // 2026-09-21: RC IN / UART 4 / UART 6 은 맨 뒤 아랫면에서 뒤로 꽂고, 그 윗면이 POWER 1 · 2(잠금이 뒷벽 쪽)다.
   assert.equal(rc.type, 'JST-GH 5P · rear edge');
-  for (const n of ['TELEM 3', 'TELEM 4']) assert.match(table.find((c) => c.name === n).type, /· rear edge$/, `${n} sits on the rear edge with RC IN`);
+  for (const n of ['SERIAL4', 'SERIAL6']) assert.match(table.find((c) => c.name === n).type, /· rear edge$/, `${n} sits on the rear edge with RC IN`);
   assert.deepEqual(rc.pins.map((p) => p.signal), ['VCC', 'RC_IN', 'RSSI', 'VCC_3V3', 'GND']);
   // 3-pin header = 13 columns: M1–M12 PWM + SB (SBUS out from USART6 / SERIAL8) — never labelled M13.
   const sb = table.find((c) => c.name.startsWith('SB'));
