@@ -1,16 +1,18 @@
 ---
-name: APMU-12S 120A
-tagline: 12S Power Management Unit — 120 A Switched ESC Bus with Precharge, 5 V · 7.4 V · 12 V · 16 V · 24 V Rails
-image: /images/products/pmu_APMU-12S-120A.png
-model3d: /models/pmu/APMU-12S-120A.glb
+name: APMU-12S 140A
+tagline: 12S Power Management Unit — 140 A (1 min) Switched ESC Bus with Precharge, 5 V · 7.4 V · 12 V · 16 V · 24 V Rails
+image: /images/products/pmu_APMU-12S-140A.png
+model3d: /models/pmu/APMU-12S-140A.glb
 order: 11
 comingSoon: true
 specs:
   - { key: Battery Input, value: "12S LiPo / LiHV (36–52.2 V) · Amass AS150U male, right angle on the top edge (AS150UPW-M) — 70 A rated, 140 A for 1 min" }
-  - { key: Continuous Current, value: "120 A design target (25 °C, still air, 3 oz copper, finned aluminium heat-sink case) — to be confirmed by thermal test" }
+  - { key: Peak Current (1 min), value: "140 A — the number in the name. Set by the AS150U battery connector's 1-minute rating (Amass spec, main contacts 140 A, 1 min, < 80 °C); the board itself would take 294 A for a minute. At 140 A for a minute the PCB reaches 55 °C and the FET junctions 57 °C (calculated)" }
+  - { key: Continuous Current, value: "70–75 A — again the AS150U battery connector (70 A UL1977 with 8 AWG, 4 h < 60 °C; 75 A max, ΔT < 85 °C). The board's own copper and FETs allow 125 A continuous with the finned aluminium heat-sink case; the hover design point is 120 A (PCB 53 °C). To be confirmed by thermal test" }
   - { key: Main Switch, value: "10 × Infineon IAUT300N10S5N015 (100 V) driven by ADI LTC7001 — switched by the button circuit, no firmware" }
   - { key: Precharge, value: "ESC capacitors are charged through 10 Ω to 70 % of the battery voltage before the main switch closes; a short or overload stops it — up to 7.5 mF total ESC capacitance" }
   - { key: ESC Outputs, value: "5× XT90 female (Amass XT90PW-F) — switched battery voltage, 30 A each (UL1977), 60 A for 1 min" }
+  - { key: ESC Direct-Solder Holes, value: "The four side outputs (ESC1–ESC4) also have a pair of Ø5.3 mm plated holes under the XT90 housing, + and −, the same hole as the AS150U power pins — solder the ESC wire straight to the board when no XT90 is fitted, so on a VTOL the heavy cable branches at the wing tip instead of at the PMU. Use the connector or the holes, not both" }
   - { key: Servo Output, value: "7.4 V · 20 A · XT60 female (TI LM5146) — on with the main switch" }
   - { key: Payload Outputs, value: "16 V · 10 A and 24 V · 10 A · XT30 female (TI LM5146) — on with the main switch; 24 V needs a battery above 36 V" }
   - { key: Aux 12 V Output, value: "12 V · 0.5 A · XT30 female (TI TPS560430, fed from the 24 V rail) — on with the main switch" }
@@ -22,11 +24,11 @@ specs:
   - { key: PCB, value: "200 × 100 mm · 4 layers · 1.6 mm · 3 oz outer / 2 oz inner · parts on the top only (bottom = heat-sink face) · 4× M3, 4 mm from the edges" }
   - { key: Validation Status, value: "Design stage — schematic verified, PCB in routing; not yet built or tested" }
 description: |
-  APMU-12S 120A is the power management unit for a 12S VTOL: the battery plugs into a board-mounted AS150U connector on the top edge, passes a 0.1 mΩ current shunt and a main switch of ten 100 V MOSFETs, and leaves on five board-mounted XT90 connectors for the lift and cruise ESCs — two on each side and one at the bottom. The switch has no microcontroller and no firmware — a small circuit of logic chips turns it on and off from the button: tap, then press and hold for about two seconds while the four LEDs fill (on) or empty (off). A single long press, a stuck button or a pulled button cable change nothing. Before the switch closes, the ESC capacitors are charged through a 10 Ω path to 70 % of the battery voltage, so connecting a battery or switching on never sparks, and a shorted or overloaded output stops the precharge instead of closing the switch. Five TI LM5146 converters supply the servos (7.4 V, 20 A), payloads (16 V and 24 V, 10 A each), navigation lights (5 V, 5 A) and the flight controller (5 V, 4.5 A), and a TI TPS560430 makes a 12 V, 0.5 A auxiliary rail from the 24 V rail; everything but the flight-controller rail follows the main switch, the flight-controller rail is always on while the battery is connected. The navigation lights plug straight into the board: a white strobe with a red (left) or blue (right) position light, the two strobes flashing together once a second, all switched on and off by one servo PWM line from the flight controller — again without a microcontroller. A passive seven-plug CAN hub shares the flight controller's CAN bus with the ESCs, GPS and other CAN devices. The flight controller reads battery voltage and current directly from a TI INA228 on its power-port I2C. Coming soon: 120 A continuous is the design target with the finned aluminium heat-sink case and is not yet measured. Images are renders of the CAD design, not photos of a built board.
+  APMU-12S 140A is the power management unit for a 12S VTOL: the battery plugs into a board-mounted AS150U connector on the top edge, passes a 0.1 mΩ current shunt and a main switch of ten 100 V MOSFETs, and leaves on five board-mounted XT90 connectors for the lift and cruise ESCs — two on each side and one at the bottom. The switch has no microcontroller and no firmware — a small circuit of logic chips turns it on and off from the button: tap, then press and hold for about two seconds while the four LEDs fill (on) or empty (off). A single long press, a stuck button or a pulled button cable change nothing. Before the switch closes, the ESC capacitors are charged through a 10 Ω path to 70 % of the battery voltage, so connecting a battery or switching on never sparks, and a shorted or overloaded output stops the precharge instead of closing the switch. Five TI LM5146 converters supply the servos (7.4 V, 20 A), payloads (16 V and 24 V, 10 A each), navigation lights (5 V, 5 A) and the flight controller (5 V, 4.5 A), and a TI TPS560430 makes a 12 V, 0.5 A auxiliary rail from the 24 V rail; everything but the flight-controller rail follows the main switch, the flight-controller rail is always on while the battery is connected. The navigation lights plug straight into the board: a white strobe with a red (left) or blue (right) position light, the two strobes flashing together once a second, all switched on and off by one servo PWM line from the flight controller — again without a microcontroller. A passive seven-plug CAN hub shares the flight controller's CAN bus with the ESCs, GPS and other CAN devices. The flight controller reads battery voltage and current directly from a TI INA228 on its power-port I2C. Coming soon: the 140 A in the name is what the board will take for one minute, which is where the AS150U battery connector runs out; continuously the same connector allows 70-75 A, while the copper and the ten MOSFETs would carry 120 A all day with the finned aluminium heat-sink case. None of it is measured yet. Images are renders of the CAD design, not photos of a built board.
 pinoutImages:
-  - /images/products/pmu_APMU-12S-120A_pinout.png
+  - /images/products/pmu_APMU-12S-140A_pinout.png
 pinoutNotes: |
-  Top view: the battery connector (AS150U) and the 24 V, 16 V and 7.4 V outputs on the top edge, the 12 V output on the left edge, two ESC outputs on each side and one at the bottom, next to the NAV LEFT, BUTTON, NAV RIGHT and NAV PWM plugs; the seven CAN plugs are at the top right beside the FC power port. On every XT connector the flat side of the housing is positive, as marked on the board (+ / −). The AUTO-ON plug is a JST-GH 7P housing with pins 1 and 2 looped: with it in place the unit switches on when the battery is connected, and pulling it out later changes nothing. Holding the button while connecting the battery also switches the unit on.
+  Top view: the battery connector (AS150U) and the 24 V, 16 V and 7.4 V outputs on the top edge, the 12 V output on the left edge, two ESC outputs on each side and one at the bottom, next to the NAV LEFT, BUTTON, NAV RIGHT and NAV PWM plugs; the seven CAN plugs are at the top right beside the FC power port. On every XT connector the flat side of the housing is positive, as marked on the board (+ / −). The AUTO-ON plug is a JST-GH 7P housing with pins 1 and 2 looped: with it in place the unit switches on when the battery is connected, and pulling it out later changes nothing. Holding the button while connecting the battery also switches the unit on. Under each of the four side XT90 housings (ESC1-ESC4) there is a pair of 5.3 mm holes marked + and -: if the XT90 is not fitted, the ESC wire is soldered straight into them.
 pinTable:
   - name: BATTERY IN
     type: AS150U male, right angle (J101)
@@ -126,11 +128,11 @@ configParams:
 configNotes: |
   After the first power-up compare the reported voltage and current with a meter and fine-tune BATT_SHUNT. The navigation lights need a servo PWM signal (not a relay / GPIO level): a steady level cannot switch them off. The INA228 measures up to about ±1600 A across the 0.1 mΩ shunt; BATT_MAX_AMPS only sets the reporting full scale and resolution.
 gallery:
-  - { src: /images/products/pmu_APMU-12S-120A_iso.png, caption: Isometric }
-  - { src: /images/products/pmu_APMU-12S-120A_front.png, caption: Front }
-  - { src: /images/products/pmu_APMU-12S-120A_back.png, caption: Back }
-  - { src: /images/products/pmu_APMU-12S-120A_left.png, caption: Left }
-  - { src: /images/products/pmu_APMU-12S-120A_right.png, caption: Right }
-  - { src: /images/products/pmu_APMU-12S-120A_top.png, caption: Top }
-  - { src: /images/products/pmu_APMU-12S-120A_bottom.png, caption: Bottom }
+  - { src: /images/products/pmu_APMU-12S-140A_iso.png, caption: Isometric }
+  - { src: /images/products/pmu_APMU-12S-140A_front.png, caption: Front }
+  - { src: /images/products/pmu_APMU-12S-140A_back.png, caption: Back }
+  - { src: /images/products/pmu_APMU-12S-140A_left.png, caption: Left }
+  - { src: /images/products/pmu_APMU-12S-140A_right.png, caption: Right }
+  - { src: /images/products/pmu_APMU-12S-140A_top.png, caption: Top }
+  - { src: /images/products/pmu_APMU-12S-140A_bottom.png, caption: Bottom }
 ---

@@ -174,12 +174,15 @@ test('APMU-12S 100A: coming soon, power-port pins from the V2 board, INA228 addr
   assert.deepEqual(param('BATT_AMP_PERVLT'), ['55.56']);
 });
 
-test('APMU-12S 120A: coming soon, FC port and button pins from the schematic, INA228 at 0x40 on a 0.1 mΩ shunt', () => {
-  const p = product('pmu', 'APMU-12S-120A');
+test('APMU-12S 140A: coming soon, FC port and button pins from the schematic, INA228 at 0x40 on a 0.1 mΩ shunt', () => {
+  const p = product('pmu', 'APMU-12S-140A');
   assert.equal(p.comingSoon, true);
-  assert.match(spec(p, 'Continuous Current'), /target.*to be confirmed/, '120 A is a design target until the thermal test');
+  assert.match(spec(p, 'Peak Current (1 min)'), /140 A — the number in the name/, 'the name is the one-minute rating');
+  assert.match(spec(p, 'Continuous Current'), /70–75 A.*AS150U/, 'continuous is set by the battery connector');
+  assert.match(spec(p, 'Continuous Current'), /to be confirmed by thermal test/i, 'still unmeasured');
+  assert.match(spec(p, 'ESC Direct-Solder Holes'), /Ø5\.3 mm plated holes under the XT90 housing/, 'wire can be soldered straight to the board');
   const signals = (name) => p.pinTable.find((c) => c.name === name).pins.map((x) => x.signal);
-  // J301 / J901 pin order of the SKiDL truth (pmu/APMU-12S_120A hardware/circuits).
+  // J301 / J901 pin order of the SKiDL truth (pmu/APMU-12S_140A hardware/circuits).
   assert.deepEqual(signals('POWER I2C'), ['5V', '5V', 'SCL', 'SDA', 'GND', 'GND']);
   assert.deepEqual(signals('BUTTON'), ['BTN', 'GND', 'LED_A', 'LED1', 'LED2', 'LED3', 'LED4']);
   assert.deepEqual(signals('ESC OUT ×5'), ['OUT', 'GND']);
@@ -195,7 +198,7 @@ test('APMU-12S 120A: coming soon, FC port and button pins from the schematic, IN
   assert.deepEqual(param('BATT_I2C_ADDR'), ['64']);
   assert.deepEqual(param('BATT_SHUNT'), ['0.0001']);
   // INA228 ADCRANGE 0 (±163.84 mV) over 0.1 mΩ reads ±1638 A; BATT_MAX_AMPS sets ArduPilot's reporting full scale.
-  assert.ok(Number(param('BATT_MAX_AMPS')[0]) >= 120, 'reporting full scale covers the 120 A target');
+  assert.ok(Number(param('BATT_MAX_AMPS')[0]) >= 140, 'reporting full scale covers the 140 A one-minute rating');
   assert.deepEqual(p.gallery.map((g) => g.caption), ['Isometric', 'Front', 'Back', 'Left', 'Right', 'Top', 'Bottom']);
 });
 
@@ -220,7 +223,7 @@ test('every PMU product is registered completely (name, card, specs, pin table, 
     }
   }
   assert.ok(product('pmu', 'APMU-12S-100A').model3d, 'APMU-12S 100A has its 3D PCBA');
-  assert.ok(product('pmu', 'APMU-12S-120A').model3d, 'APMU-12S 120A has its 3D PCBA');
+  assert.ok(product('pmu', 'APMU-12S-140A').model3d, 'APMU-12S 140A has its 3D PCBA');
 });
 
 // 2026-09-23 박재량: "uart 로만 써 있어 serial 몇 번인지 알 수가 없다" → FC 카탈로그마다 Serial Mapping 을 적는다.
