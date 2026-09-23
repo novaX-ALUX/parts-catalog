@@ -32,22 +32,22 @@ pinoutImages:
   - /images/products/fc_F4_nano_v2_pinout_bottom.png
 firmware:
   - kind: "ArduPilot (.apj package)"
-    file: /firmware/AF-F4_nano_v2-v1.0.11.apj
-    version: "1.0.11"
-    date: "2026-08-31"
-    size: "687 KB"
-    sha256: "02390d6f631f9897a18927ecca8c37a514ee7fff26b62838186ec80a9f43140c"
-    notes: "ArduPilot Copter app. v1.0.11 pins the external MAX-M10S module's internal LNA to NORMAL (full gain): the u-blox default differs by module firmware (SPG 5.10 = NORMAL, SPG 5.20 = LOWGAIN). v1.0.10 fixes signing-timestamp flash writes that caused GPS UART overruns and stalled loops; signing remains available. v1.0.9 added BRAKE mode, EKF3 wind estimation, corrected board orientation and an 8 KB log buffer. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater → Firmware Update."
+    file: /firmware/AF-F4_nano_v2-v1.0.12.apj
+    version: "1.0.12"
+    date: "2026-09-23"
+    size: "688 KB"
+    sha256: "86adf85f8dc9d2d70d8103e8190a4b3756a57c0ca2cac242c957009a2fabcc8c"
+    notes: "ArduPilot Copter app. v1.0.12 bakes in the T10 field-validated common parameter set (2026-09-22): maximum lean angle 30 deg to 20 deg, arming 22.2 V with 21 / 20.4 V low and critical thresholds, SRTL_POINTS disabled, motor output order SERVO1-4 = Motor 4/3/2/1 with DShot ESC telemetry and BLHeli passthrough, and a 105 Hz harmonic notch. Per-airframe calibration (accel, gyro, compass, level trim) is deliberately not baked and must be performed after flashing. v1.0.11 pins the external MAX-M10S module's internal LNA to NORMAL (full gain): the u-blox default differs by module firmware (SPG 5.10 = NORMAL, SPG 5.20 = LOWGAIN). v1.0.10 fixes signing-timestamp flash writes that caused GPS UART overruns and stalled loops; signing remains available. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater -> Firmware Update."
     method: ardupilot
-    webPath: /firmware/AF-F4_nano_v2-v1.0.11.apj
+    webPath: /firmware/AF-F4_nano_v2-v1.0.12.apj
   - kind: "Bootloader + App (merged HEX · DFU / SWD)"
-    file: /firmware/AF-F4_nano_v2-v1.0.11_with_bl.hex
-    version: "1.0.11"
-    date: "2026-08-31"
+    file: /firmware/AF-F4_nano_v2-v1.0.12_with_bl.hex
+    version: "1.0.12"
+    date: "2026-09-23"
     size: "2.2 MB"
-    sha256: "a4e8665612361da09804f1007cd1f54eacd975fc59afd6fd9b6091bca026410e"
+    sha256: "fcfebe5ce749ce1ade49c24e67f5ace8a36de19f85acec45eda5c1ce2e8e9b86"
     notes: "Bootloader + application combined image based at 0x08000000. Flash via the catalog Web Updater → DFU Recovery (🛠 Enter DFU works buttonless on this board) or SWD/ST-Link for a blank/bricked board."
     method: dfu
-    webPath: /firmware/AF-F4_nano_v2-v1.0.11_with_bl.hex
+    webPath: /firmware/AF-F4_nano_v2-v1.0.12_with_bl.hex
 firmwareNotes: 'Every published image is downloadable here; the build sources stay in the private FC repository.'
 ---
