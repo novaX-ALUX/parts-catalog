@@ -10,7 +10,7 @@ manuals:
   - { label: English, file: /manuals/fc_AF-H7-nano_manual_en.pdf }
 firmware:
   - kind: "ArduPilot (.apj package)"
-    file: https://github.com/novaX-ALUX/fc/releases/download/AF-H7_nano-v1.2.3/AF-H7_nano-v1.2.3.apj
+    file: /firmware/AF-H7_nano-v1.2.3.apj
     version: "1.2.3"
     date: "2026-07-11"
     size: "1.3 MB"
@@ -19,7 +19,7 @@ firmware:
     method: ardupilot
     webPath: /firmware/AF-H7_nano-v1.2.3.apj
   - kind: "Bootloader + App (merged HEX · DFU / SWD)"
-    file: https://github.com/novaX-ALUX/fc/releases/download/AF-H7_nano-v1.2.3/AF-H7_nano-v1.2.3_with_bl.hex
+    file: /firmware/AF-H7_nano-v1.2.3_with_bl.hex
     version: "1.2.3"
     date: "2026-07-11"
     size: "5.2 MB"
@@ -51,5 +51,5 @@ pinoutNotes: |
 
   VBat input is routed through a 4-pin connector accepting 2S–8S LiPo. The on-board 5 V / 2.5 A regulator powers the FC, receiver and low-current peripherals. Servo rail is unregulated — feed it directly from a BEC or motor PDB.
 firmwareNotes: |
-  Use the released novaX AF-H7_nano ArduPilot image (board ID 6200). Do not substitute Matek firmware. Betaflight configuration exists in the FC repository, but an INAV or PX4 release for this board is not provided here. For USB DFU recovery hold BOOT during power-up and select the matching AF-H7_nano merged HEX. All firmware releases: https://github.com/novaX-ALUX/fc/releases
+  Use the released novaX AF-H7_nano ArduPilot image (board ID 6200). Do not substitute Matek firmware. Betaflight configuration exists in the FC repository, but an INAV or PX4 release for this board is not provided here. For USB DFU recovery hold BOOT during power-up and select the matching AF-H7_nano merged HEX. All published images are in the download list above
 ---

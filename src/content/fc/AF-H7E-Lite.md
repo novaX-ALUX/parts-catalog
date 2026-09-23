@@ -235,7 +235,7 @@ gallery:
   - { src: /images/products/fc_AF-H7E-Lite_bottom.png, caption: Bottom }
 firmware:
   - kind: "ArduPilot Copter (.apj package)"
-    file: https://github.com/novaX-ALUX/fc/releases/download/AF-H7E_Lite-v0.1.0/AF-H7E_Lite-v0.1.0-Copter.apj
+    file: /firmware/AF-H7E_Lite-v0.1.0-Copter.apj
     version: "0.1.0"
     date: "2026-09-17"
     size: "1.6 MB"
@@ -244,7 +244,7 @@ firmware:
     method: ardupilot
     webPath: /firmware/AF-H7E_Lite-v0.1.0-Copter.apj
   - kind: "ArduPilot Copter - Bootloader + App (merged HEX / DFU / SWD)"
-    file: https://github.com/novaX-ALUX/fc/releases/download/AF-H7E_Lite-v0.1.0/AF-H7E_Lite-v0.1.0-Copter_with_bl.hex
+    file: /firmware/AF-H7E_Lite-v0.1.0-Copter_with_bl.hex
     version: "0.1.0"
     date: "2026-09-17"
     size: "5.4 MB"
@@ -253,7 +253,7 @@ firmware:
     method: dfu
     webPath: /firmware/AF-H7E_Lite-v0.1.0-Copter_with_bl.hex
   - kind: "ArduPilot Plane (.apj package)"
-    file: https://github.com/novaX-ALUX/fc/releases/download/AF-H7E_Lite-v0.1.0/AF-H7E_Lite-v0.1.0-Plane.apj
+    file: /firmware/AF-H7E_Lite-v0.1.0-Plane.apj
     version: "0.1.0"
     date: "2026-09-17"
     size: "1.6 MB"
@@ -262,7 +262,7 @@ firmware:
     method: ardupilot
     webPath: /firmware/AF-H7E_Lite-v0.1.0-Plane.apj
   - kind: "ArduPilot Plane - Bootloader + App (merged HEX / DFU / SWD)"
-    file: https://github.com/novaX-ALUX/fc/releases/download/AF-H7E_Lite-v0.1.0/AF-H7E_Lite-v0.1.0-Plane_with_bl.hex
+    file: /firmware/AF-H7E_Lite-v0.1.0-Plane_with_bl.hex
     version: "0.1.0"
     date: "2026-09-17"
     size: "5.4 MB"
@@ -270,5 +270,5 @@ firmware:
     notes: "Plane bootloader + application combined image based at 0x08000000. Flash a running board via the catalog Web Updater -> DFU Recovery (Enter DFU, buttonless - same mechanism as AF-H7E); a blank or non-booting board is flashed via SWD/ST-Link on the DEBUG port. Copter and Plane share board_id 6207 - select by file name. Preliminary: not yet tested on AF-H7E Lite hardware."
     method: dfu
     webPath: /firmware/AF-H7E_Lite-v0.1.0-Plane_with_bl.hex
-firmwareNotes: 'Preliminary release for the AF-H7E Lite in development: build-verified on Windows, not yet bench- or flight-tested on Lite hardware. Update over USB-C like AF-H7E: open the catalog Web Updater, stay on Firmware Update, click Connect, pick the Copter or Plane .apj, then Update firmware. To reflash over USB DFU use DFU Recovery, click Enter DFU, then flash the matching _with_bl.hex; a blank board is recovered via SWD/ST-Link on the DEBUG port. Defaults: the SB header column is SBUS out (SERIAL8), RC IN auto-detects SBUS / PPM / DSM and supports DSM bind, and the battery monitor reads an I2C (INA2xx) power module on POWER 1 - set BATT_MONITOR 8 for a DroneCAN power module. All releases: https://github.com/novaX-ALUX/fc/releases'
+firmwareNotes: 'Preliminary release for the AF-H7E Lite in development: build-verified on Windows, not yet bench- or flight-tested on Lite hardware. Update over USB-C like AF-H7E: open the catalog Web Updater, stay on Firmware Update, click Connect, pick the Copter or Plane .apj, then Update firmware. To reflash over USB DFU use DFU Recovery, click Enter DFU, then flash the matching _with_bl.hex; a blank board is recovered via SWD/ST-Link on the DEBUG port. Defaults: the SB header column is SBUS out (SERIAL8), RC IN auto-detects SBUS / PPM / DSM and supports DSM bind, and the battery monitor reads an I2C (INA2xx) power module on POWER 1 - set BATT_MONITOR 8 for a DroneCAN power module. All published images are in the download list above'
 ---

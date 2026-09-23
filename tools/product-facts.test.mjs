@@ -143,12 +143,13 @@ test('AF-H7E Lite pin table follows the Pixhawk connector convention and ArduPil
   assert.ok(!names.some((n) => /M13/.test(n)), 'the 13th column is SB, not M13');
 });
 
-test('AF-H7E Lite firmware ships Copter and Plane for board ID 6207 from its own release tag', () => {
+test('AF-H7E Lite firmware ships Copter and Plane for board ID 6207, downloaded from this site', () => {
   const lite = product('fc', 'AF-H7E-Lite');
   assert.equal(lite.firmware.length, 4);
   for (const fw of lite.firmware) {
-    assert.match(fw.file, /\/releases\/download\/AF-H7E_Lite-v0\.1\.0\/AF-H7E_Lite-v0\.1\.0-(Copter|Plane)(\.apj|_with_bl\.hex)$/);
-    assert.equal(fw.webPath, '/firmware/' + fw.file.split('/').pop());
+    // The FC repository is private, so every download link must stay inside the catalog.
+    assert.match(fw.file, /^\/firmware\/AF-H7E_Lite-v0\.1\.0-(Copter|Plane)(\.apj|_with_bl\.hex)$/);
+    assert.equal(fw.webPath, fw.file);
     const bytes = readFileSync(new URL(`../public${fw.webPath}`, import.meta.url));
     assert.equal(createHash('sha256').update(bytes).digest('hex'), fw.sha256);
     if (fw.webPath.endsWith('.apj')) assert.equal(JSON.parse(bytes.toString()).board_id, 6207);
@@ -246,5 +247,18 @@ test('every FC product states its ArduPilot serial mapping (SERIAL_ORDER in the 
       .filter(([, per]) => per !== 'EMPTY' && !per.startsWith('OTG'))
       .map(([i, per]) => `SERIAL${i} = ${per}`).join(' · ') + ' (USB = SERIAL0)';
     assert.equal(want, fromHwdef, `${prod} expectation still matches hwdef.dat`);
+  }
+});
+
+test('no product links to a private repository for downloads (the FC repo is private)', () => {
+  for (const family of ['fc', 'esc', 'gnss', 'motor', 'camera', 'pmu']) {
+    for (const f of readdirSync(new URL(`../src/content/${family}/`, import.meta.url)).filter((x) => x.endsWith('.md'))) {
+      const p = product(family, f.replace(/\.md$/, ''));
+      for (const fw of p.firmware ?? []) {
+        assert.doesNotMatch(fw.file, /github\.com\/novaX-ALUX\/(fc|gnss|motor|camera|charger|rc|AE-)/,
+          `${family}/${f} ${fw.kind}: download must not point at a private repository`);
+      }
+      assert.doesNotMatch(p.firmwareNotes ?? '', /github\.com\/novaX-ALUX\/fc\/releases/, `${family}/${f} notes`);
+    }
   }
 });
