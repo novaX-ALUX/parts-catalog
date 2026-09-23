@@ -199,7 +199,9 @@ test('APMU-12S 140A: coming soon, FC port and button pins from the schematic, IN
   assert.deepEqual(param('BATT_SHUNT'), ['0.0001']);
   // INA228 ADCRANGE 0 (±163.84 mV) over 0.1 mΩ reads ±1638 A; BATT_MAX_AMPS sets ArduPilot's reporting full scale.
   assert.ok(Number(param('BATT_MAX_AMPS')[0]) >= 140, 'reporting full scale covers the 140 A one-minute rating');
-  assert.deepEqual(p.gallery.map((g) => g.caption), ['Isometric', 'Front', 'Back', 'Left', 'Right', 'Top', 'Bottom']);
+  assert.deepEqual(p.gallery.map((g) => g.caption), ['Isometric', 'Front', 'Back', 'Left', 'Right', 'Top', 'Bottom',
+    'Button board APMU-BTN1 — isometric', 'Button board APMU-BTN1 — top', 'Button board APMU-BTN1 — bottom']);
+  assert.equal(p.pinoutImages.length, 2, 'the board map and the button harness drawing');
 });
 
 test('every PMU product is registered completely (name, card, specs, pin table, 3D model)', () => {
