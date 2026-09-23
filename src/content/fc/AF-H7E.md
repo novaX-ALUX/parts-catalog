@@ -13,15 +13,15 @@ specs:
   - key: RAM / Flash
     value: 1 MB / 2 MB
   - key: IMU
-    value: BMI088 (Accel/Gyro)
+    value: BMI088 (Bosch, accel / gyro)
   - key: Secondary IMU
-    value: ICM-42688-P, ICM-20649
+    value: ICM-42688-P, ICM-20649 (TDK InvenSense)
   - key: IMU Heater
     value: Built-in heater on the IMU board, held at 45 °C (BRD_HEAT_TARG)
   - key: Magnetometer
-    value: RM3100
+    value: RM3100 (PNI)
   - key: Barometer
-    value: 2× ICP-20100
+    value: 2× ICP-20100 (TDK InvenSense)
   - key: Operating Voltage
     value: 4.75 – 5.7 V (Rated 5 V)
   - key: USB Input
