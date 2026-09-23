@@ -35,9 +35,11 @@ specs:
   - key: RSSI Input
     value: Analog
   - key: UART
-    value: 6 serial ports (2 with flow control) + debug console
+    value: 6 serial ports (2 with flow control, 2 as GPS ports) + debug console
+  - key: GPS
+    value: GPS 1 + GPS 2 (6-pin, UART + I2C, left / right)
   - key: I²C
-    value: 2 ports (I2C A, I2C B) + power-module bus on POWER 1 · 2
+    value: 2 dedicated ports (I2C A, I2C B) + GPS 1 · 2 + power-module bus on POWER 1 · 2
   - key: CAN
     value: 2 Port
   - key: Ethernet
@@ -48,10 +50,10 @@ specs:
     value: 16 × 30 mm / M3 (4 blind holes in the base, 3 mm thread)
   - key: Supported F/W
     value: novaX ArduPilot (Copter and Plane releases)
-description: AF-H7E Lite keeps the AF-H7E STM32H753 compute module and sensor module on a compact carrier without the IO co-processor. All 12 PWM outputs and an SBUS output come straight from the flight-controller MCU, with dual CAN, 100 Mbps Ethernet, redundant power inputs and a 5-pin RC input that takes AF-H7E cables. A heater on the IMU board holds the sensors at 45 °C (BRD_HEAT_TARG), keeping gyro and accelerometer bias steady from a cold start to a hot day; the RM3100 compass reading is corrected for the heater current. Four M3 blind holes in the base (16 × 30 mm) let it screw down onto a mounting plate instead of being taped. In development - the pin definition may change before release.
+description: AF-H7E Lite keeps the AF-H7E STM32H753 compute module and sensor module on a compact carrier without the IO co-processor. All 12 PWM outputs and an SBUS output come straight from the flight-controller MCU, with two 6-pin GPS ports on opposite edges for a redundant pair, two dedicated I2C ports, dual CAN, 100 Mbps Ethernet, redundant power inputs and a 5-pin RC input that takes AF-H7E cables. A heater on the IMU board holds the sensors at 45 °C (BRD_HEAT_TARG), keeping gyro and accelerometer bias steady from a cold start to a hot day; the RM3100 compass reading is corrected for the heater current. Four M3 blind holes in the base (16 × 30 mm) let it screw down onto a mounting plate instead of being taped. In development - the pin definition may change before release.
 pinoutImage: /images/products/fc_AF-H7E-Lite_pinout.png
 pinoutNotes: |
-  Preliminary pin definition — AF-H7E Lite is in development and connectors may change before release. On every JST connector pin 1 is the supply pin and the last pin is GND, following the Pixhawk connector standard. UART n maps to ArduPilot SERIALn: UART 1–2 default to MAVLink telemetry and UART 3–4 default to GPS. GPS modules connect to any UART or over DroneCAN; there is no dedicated GPS/safety port and no safety switch. RC IN is a 5-pin connector with the same pinout as AF-H7E and takes an SBUS, PPM or DSM receiver directly on pin 2 (protocol auto-detected, wired to the flight-controller MCU, no IO board needed); pin 1 supplies 5 V and pin 4 a switched 3.3 V for DSM / Spektrum satellite receivers, which the flight controller power-cycles to bind them. On-board without a connector: microSD card slot (logging), buzzer and RGB status LED.
+  Preliminary pin definition — AF-H7E Lite is in development and connectors may change before release. On every JST connector pin 1 is the supply pin and the last pin is GND, following the Pixhawk connector standard. UART n maps to ArduPilot SERIALn: UART 1–2 default to MAVLink telemetry, GPS 1 is SERIAL3 and GPS 2 is SERIAL5. GPS 1 and GPS 2 are 6-pin Pixhawk GPS ports (UART + I2C on one cable) placed on the left and right edges at the same height, so a redundant pair sits symmetrically on the airframe; each also works as a plain serial port, which is why the case is engraved GPS1/UART3 and GPS2/UART5. I2C A and I2C B are separate 4-pin ports for devices that only speak I2C (airspeed, rangefinder, external compass, LED); I2C A shares its bus with GPS 1 and I2C B with GPS 2, and further devices can be daisy-chained on a splitter cable as long as their addresses differ. There is no GPS/safety port and no safety switch. RC IN is a 5-pin connector with the same pinout as AF-H7E and takes an SBUS, PPM or DSM receiver directly on pin 2 (protocol auto-detected, wired to the flight-controller MCU, no IO board needed); pin 1 supplies 5 V and pin 4 a switched 3.3 V for DSM / Spektrum satellite receivers, which the flight controller power-cycles to bind them. On-board without a connector: microSD card slot (logging), buzzer and RGB status LED.
 
   The + rail of the PWM header is not powered by the flight controller. The 13th header column, SB, is an SBUS output, not a PWM channel: it carries servo channels 1–16 on one wire from USART6 (SERIAL8) with the signal inversion done inside the STM32H7, so SBUS servos, SBUS-to-PWM decoders and gimbals plug in with a standard servo lead and take power from the servo rail. Outputs share rate and protocol within the timer groups M1–M4, M5 · M6 · M9 · M10, M7–M8 and M11–M12; DShot works on every group except M7–M8, whose timer has no DMA (PWM and OneShot only).
 
@@ -97,14 +99,16 @@ pinTable:
       - { pin: 4, signal: CTS, function: "Clear to send — hardware flow control input" }
       - { pin: 5, signal: RTS, function: "Request to send — hardware flow control output" }
       - { pin: 6, signal: GND, function: "Ground" }
-  - name: UART 3
-    type: JST-GH 4P
-    mapping: SERIAL3 · USART1 · default GPS
+  - name: GPS 1
+    type: JST-GH 6P
+    mapping: SERIAL3 · USART1 + I2C2 · default GPS
     pins:
       - { pin: 1, signal: VCC, function: "5 V output" }
       - { pin: 2, signal: TX, function: "UART transmit (FC → device)" }
       - { pin: 3, signal: RX, function: "UART receive (device → FC)" }
-      - { pin: 4, signal: GND, function: "Ground" }
+      - { pin: 4, signal: SCL, function: "I2C clock — compass in the GPS module (bus shared with I2C A)" }
+      - { pin: 5, signal: SDA, function: "I2C data" }
+      - { pin: 6, signal: GND, function: "Ground" }
   - name: UART 4
     type: JST-GH 4P · rear edge
     mapping: SERIAL4 · UART8 · default GPS
@@ -113,14 +117,16 @@ pinTable:
       - { pin: 2, signal: TX, function: "UART transmit (FC → device)" }
       - { pin: 3, signal: RX, function: "UART receive (device → FC)" }
       - { pin: 4, signal: GND, function: "Ground" }
-  - name: UART 5
-    type: JST-GH 4P
-    mapping: SERIAL5 · USART2
+  - name: GPS 2
+    type: JST-GH 6P
+    mapping: SERIAL5 · USART2 + I2C3 · default GPS
     pins:
       - { pin: 1, signal: VCC, function: "5 V output" }
       - { pin: 2, signal: TX, function: "UART transmit (FC → device)" }
       - { pin: 3, signal: RX, function: "UART receive (device → FC)" }
-      - { pin: 4, signal: GND, function: "Ground" }
+      - { pin: 4, signal: SCL, function: "I2C clock — compass in the GPS module (bus shared with I2C B)" }
+      - { pin: 5, signal: SDA, function: "I2C data" }
+      - { pin: 6, signal: GND, function: "Ground" }
   - name: UART 6
     type: JST-GH 4P · rear edge
     mapping: SERIAL6 · UART4

@@ -89,13 +89,24 @@ test('AF-H7E Lite pin table follows the Pixhawk connector convention and ArduPil
   const table = product('fc', 'AF-H7E-Lite').pinTable;
   const names = table.map((c) => c.name);
   assert.equal(new Set(names).size, names.length, 'connector names are unique');
-  // UART n is ArduPilot SERIALn, so UART 1-2 come up as telemetry and UART 3-4 as GPS without setup.
-  for (let n = 1; n <= 6; n++) {
-    const uart = table.find((c) => c.name === `UART ${n}`);
-    assert.match(uart.mapping, new RegExp(`^SERIAL${n} `));
+  // UART n is ArduPilot SERIALn. SERIAL3 · SERIAL5 come out as the 6-pin GPS 1 · GPS 2 ports (UART + I2C).
+  const serialPort = { 1: 'UART 1', 2: 'UART 2', 3: 'GPS 1', 4: 'UART 4', 5: 'GPS 2', 6: 'UART 6' };
+  for (const [n, name] of Object.entries(serialPort)) {
+    assert.match(table.find((c) => c.name === name).mapping, new RegExp(`^SERIAL${n} `), `${name} = SERIAL${n}`);
   }
   for (const n of [1, 2]) assert.match(table.find((c) => c.name === `UART ${n}`).mapping, /MAVLink2/);
-  for (const n of [3, 4]) assert.match(table.find((c) => c.name === `UART ${n}`).mapping, /GPS/);
+  for (const n of ['GPS 1', 'GPS 2', 'UART 4']) assert.match(table.find((c) => c.name === n).mapping, /GPS/);
+  // GPS 1 · 2 are Pixhawk 6-pin GPS ports: UART plus the I2C bus shared with the matching I2C port.
+  for (const [gps, i2c] of [['GPS 1', 'I2C A'], ['GPS 2', 'I2C B']]) {
+    const c = table.find((x) => x.name === gps);
+    assert.deepEqual(c.pins.map((p) => p.signal), ['VCC', 'TX', 'RX', 'SCL', 'SDA', 'GND'], `${gps} pinout`);
+    const bus = table.find((x) => x.name === i2c).mapping;
+    assert.ok(c.mapping.includes(bus), `${gps} shares its I2C bus with ${i2c}`);
+  }
+  // I2C-only devices need their own ports — never fold these back into the GPS ports.
+  for (const n of ['I2C A', 'I2C B']) {
+    assert.deepEqual(table.find((c) => c.name === n).pins.map((p) => p.signal), ['VCC', 'SCL', 'SDA', 'GND'], `${n} pinout`);
+  }
   // Flow control is only claimed on the 6-pin ports.
   for (const c of table.filter((c) => /^UART/.test(c.name))) {
     const hasFlow = c.pins.some((p) => p.signal === 'RTS');
@@ -107,7 +118,7 @@ test('AF-H7E Lite pin table follows the Pixhawk connector convention and ArduPil
     assert.equal(c.pins.at(-1).signal, 'GND', `${c.name} last pin`);
   }
   // Removed on the Lite: IOMCU aux outputs, CAN power input, dedicated GPS/safety port.
-  for (const gone of ['AUX', 'POWER C1', 'POWER C2', 'GPS', 'SAFETY', 'IO DEBUG']) {
+  for (const gone of ['AUX', 'POWER C1', 'POWER C2', 'GPS & SAFETY', 'SAFETY', 'IO DEBUG']) {
     assert.ok(!names.some((n) => n.startsWith(gone)), `${gone} is not on the Lite`);
   }
   assert.ok(names.includes('POWER 1') && names.includes('POWER 2'), 'dual power inputs');
