@@ -20,7 +20,8 @@ specs:
   - { key: CAN Hub, value: "7× JST-GH 4P in parallel (5V · CAN_H · CAN_L · GND), passive — shares the flight controller's CAN bus · 5 V from the FC rail · 120 Ω termination by solder jumper JP301, open by default" }
   - { key: FC Power Port, value: "5 V · 4.5 A, always on with the battery (TI LM5146) · Molex Micro-Lock Plus 6P, AF-H7E POWER pin order" }
   - { key: Digital Monitor, value: "TI INA228 20-bit on the FC port I2C, address 0x40 · 0.1 mΩ Vishay WSLP5931 shunt — ArduPilot BATT_MONITOR 21" }
-  - { key: Button & LEDs, value: "JST-GH 7P button / 4-LED cable: tap, then press and hold ~2 s to switch on or off · AUTO-ON plug (pins 1–2 looped) switches on with the battery" }
+  - { key: Button & LEDs, value: "JST-GH 7P button / 4-LED cable: tap, then press and hold ~2 s to switch on or off · AUTO-ON plug (pins 6–7, BTN–GND, looped) switches on with the battery" }
+  - { key: Button Cable, value: "Straight 1:1 JST-GH 7P harness to the APMU-BTN1 button board — JST GHR-07V-S housing at both ends, SGHD-002T-P0.2 contacts, 28 AWG, 300 mm as standard. Pin 1 LED common (+), pins 2–5 the four LED cathodes, pin 6 the button contact, pin 7 GND; never a reversed harness. The AUTO-ON plug is the same housing with only pins 6 and 7 bridged, and replaces the cable" }
   - { key: PCB, value: "200 × 100 mm · 4 layers · 1.6 mm · 3 oz outer / 2 oz inner · parts on the top only (bottom = heat-sink face) · 4× M3, 4 mm from the edges" }
   - { key: Validation Status, value: "Design stage — schematic verified, PCB in routing; not yet built or tested" }
 description: |
@@ -28,7 +29,7 @@ description: |
 pinoutImages:
   - /images/products/pmu_APMU-12S-140A_pinout.png
 pinoutNotes: |
-  Top view: the battery connector (AS150U) and the 24 V, 16 V and 7.4 V outputs on the top edge, the 12 V output on the left edge, two ESC outputs on each side and one at the bottom, next to the NAV LEFT, BUTTON, NAV RIGHT and NAV PWM plugs; the seven CAN plugs are at the top right beside the FC power port. On every XT connector the flat side of the housing is positive, as marked on the board (+ / −). The AUTO-ON plug is a JST-GH 7P housing with pins 1 and 2 looped: with it in place the unit switches on when the battery is connected, and pulling it out later changes nothing. Holding the button while connecting the battery also switches the unit on. Under each of the four side XT90 housings (ESC1-ESC4) there is a pair of 5.3 mm holes marked + and -: if the XT90 is not fitted, the ESC wire is soldered straight into them.
+  Top view: the battery connector (AS150U) and the 24 V, 16 V and 7.4 V outputs on the top edge, the 12 V output on the left edge, two ESC outputs on each side and one at the bottom, next to the NAV LEFT, BUTTON, NAV RIGHT and NAV PWM plugs; the seven CAN plugs are at the top right beside the FC power port. On every XT connector the flat side of the housing is positive, as marked on the board (+ / −). The AUTO-ON plug is a JST-GH 7P housing with pins 6 and 7 (BTN and GND) looped: with it in place the unit switches on when the battery is connected, and pulling it out later changes nothing. Holding the button while connecting the battery also switches the unit on. Under each of the four side XT90 housings (ESC1-ESC4) there is a pair of 5.3 mm holes marked + and -: if the XT90 is not fitted, the ESC wire is soldered straight into them.
 pinTable:
   - name: BATTERY IN
     type: AS150U male, right angle (J101)
@@ -109,7 +110,7 @@ pinTable:
       - { pin: 6, signal: GND, function: "Ground" }
   - name: BUTTON
     type: JST-GH 7P (J901)
-    mapping: Power button and 4 LEDs — or the AUTO-ON plug (pins 1–2 looped)
+    mapping: Power button and 4 LEDs — or the AUTO-ON plug (pins 6–7 looped)
     pins:
       - { pin: 1, signal: BTN, function: "Button to GND (loop to pin 2 = AUTO-ON)" }
       - { pin: 2, signal: GND, function: "Ground" }
