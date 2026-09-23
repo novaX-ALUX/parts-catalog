@@ -13,13 +13,11 @@ specs:
   - key: RAM / Flash
     value: 1 MB / 2 MB
   - key: IMU
-    value: ICM-42688-P, BMI088
-  - key: Secondary IMU
-    value: ICM-20649 (optional)
+    value: 2× — ICM-42688-P, BMI088
   - key: IMU Heater
     value: Built-in heater on the IMU board, held at 45 °C (BRD_HEAT_TARG)
   - key: Magnetometer
-    value: RM3100 (optional; use an external compass when not fitted)
+    value: RM3100
   - key: Barometer
     value: 2× ICP-20100
   - key: Operating Voltage
@@ -52,7 +50,7 @@ specs:
     value: 16 × 30 mm / M3 (4 blind holes in the base, 3 mm thread)
   - key: Supported F/W
     value: novaX ArduPilot (Copter and Plane releases)
-description: AF-H7E Lite keeps the AF-H7E STM32H753 compute module and sensor module on a compact carrier without the IO co-processor. All 12 PWM outputs and an SBUS output come straight from the flight-controller MCU, with two 6-pin GPS ports on opposite edges for a redundant pair, two dedicated I2C ports, dual CAN, 100 Mbps Ethernet, redundant power inputs and a 5-pin RC input that takes AF-H7E cables. A heater on the IMU board holds the sensors at 45 °C (BRD_HEAT_TARG), keeping gyro and accelerometer bias steady from a cold start to a hot day; the RM3100 compass reading is corrected for the heater current. Four M3 blind holes in the base (16 × 30 mm) let it screw down onto a mounting plate instead of being taped. In development - the pin definition may change before release.
+description: AF-H7E Lite keeps the AF-H7E STM32H753 compute module and sensor module on a compact carrier without the IO co-processor. All 12 PWM outputs and an SBUS output come straight from the flight-controller MCU, with two 6-pin GPS ports on opposite edges for a redundant pair, two dedicated I2C ports, dual CAN, 100 Mbps Ethernet, redundant power inputs and a 5-pin RC input that takes AF-H7E cables. A heater on the IMU board holds the sensors at 45 °C (BRD_HEAT_TARG), keeping gyro and accelerometer bias steady from a cold start to a hot day; the RM3100 compass reading is corrected for the heater current. The board carries two IMUs, two barometers and the RM3100 compass. Four M3 blind holes in the base (16 × 30 mm) let it screw down onto a mounting plate instead of being taped. In development - the pin definition may change before release.
 pinoutImage: /images/products/fc_AF-H7E-Lite_pinout.png
 pinoutNotes: |
   Preliminary pin definition — AF-H7E Lite is in development and connectors may change before release. On every JST connector pin 1 is the supply pin and the last pin is GND, following the Pixhawk connector standard.
