@@ -17,6 +17,7 @@ specs:
   - { key: USB Input, value: "USB Type-C (Firmware & Power)" }
   - { key: PWM Output, value: "8 motor/servo channels + 1 LED channel" }
   - { key: Serial Ports, value: "6 hardware UARTs + USB configured; verify connector pinout" }
+  - { key: Serial Mapping, value: "SERIAL1 = USART1 · SERIAL2 = USART2 · SERIAL3 = USART3 · SERIAL4 = UART4 · SERIAL5 = UART5 · SERIAL6 = USART6 (USB = SERIAL0)" }
   - { key: Servo Output, value: "2 Port" }
   - { key: RC Input, value: "PWM / PPM / S.Bus" }
   - { key: Size, value: "39.4 × 39.4 mm" }

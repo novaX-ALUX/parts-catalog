@@ -90,12 +90,19 @@ test('AF-H7E Lite pin table follows the Pixhawk connector convention and ArduPil
   const names = table.map((c) => c.name);
   assert.equal(new Set(names).size, names.length, 'connector names are unique');
   // UART n is ArduPilot SERIALn. SERIAL3 · SERIAL5 come out as the 6-pin GPS 1 · GPS 2 ports (UART + I2C).
-  const serialPort = { 1: 'UART 1', 2: 'UART 2', 3: 'GPS 1', 4: 'UART 4', 5: 'GPS 2', 6: 'UART 6' };
+  // 커넥터 이름은 픽스호크 관례(TELEM n · GPS n). MCU 페리페럴 번호와 겹치지 않게 이름에 UART 를 쓰지 않는다.
+  const serialPort = { 1: 'TELEM 1', 2: 'TELEM 2', 3: 'GPS 1', 4: 'TELEM 3', 5: 'GPS 2', 6: 'TELEM 4' };
+  // 각 포트 mapping 은 "SERIALn · <MCU 페리페럴> …" 로 적어 hwdef 와 대조된다(2026-09-23 박재량 요청)
+  const peripheral = { 'TELEM 1': 'UART7', 'TELEM 2': 'UART5', 'GPS 1': 'USART1', 'TELEM 3': 'UART8',
+                       'GPS 2': 'USART2', 'TELEM 4': 'UART4', DEBUG: 'USART3' };
+  for (const [name, per] of Object.entries(peripheral)) {
+    assert.ok(table.find((c) => c.name === name).mapping.includes(per), `${name} names its MCU peripheral (${per})`);
+  }
   for (const [n, name] of Object.entries(serialPort)) {
     assert.match(table.find((c) => c.name === name).mapping, new RegExp(`^SERIAL${n} `), `${name} = SERIAL${n}`);
   }
-  for (const n of [1, 2]) assert.match(table.find((c) => c.name === `UART ${n}`).mapping, /MAVLink2/);
-  for (const n of ['GPS 1', 'GPS 2', 'UART 4']) assert.match(table.find((c) => c.name === n).mapping, /GPS/);
+  for (const n of [1, 2]) assert.match(table.find((c) => c.name === `TELEM ${n}`).mapping, /MAVLink2/);
+  for (const n of ['GPS 1', 'GPS 2', 'TELEM 3']) assert.match(table.find((c) => c.name === n).mapping, /GPS/);
   // GPS 1 · 2 are Pixhawk 6-pin GPS ports: UART plus the I2C bus shared with the matching I2C port.
   for (const [gps, i2c] of [['GPS 1', 'I2C A'], ['GPS 2', 'I2C B']]) {
     const c = table.find((x) => x.name === gps);
@@ -107,8 +114,8 @@ test('AF-H7E Lite pin table follows the Pixhawk connector convention and ArduPil
   for (const n of ['I2C A', 'I2C B']) {
     assert.deepEqual(table.find((c) => c.name === n).pins.map((p) => p.signal), ['VCC', 'SCL', 'SDA', 'GND'], `${n} pinout`);
   }
-  // Flow control is only claimed on the 6-pin ports.
-  for (const c of table.filter((c) => /^UART/.test(c.name))) {
+  // 흐름제어는 6핀 TELEM 에만 있다. GPS 포트는 6핀이지만 4·5번이 SCL/SDA 라 RTS/CTS 가 없다.
+  for (const c of table.filter((c) => /^TELEM /.test(c.name))) {
     const hasFlow = c.pins.some((p) => p.signal === 'RTS');
     assert.equal(hasFlow, c.pins.length === 6, `${c.name} flow-control pins match its pin count`);
   }
@@ -126,7 +133,7 @@ test('AF-H7E Lite pin table follows the Pixhawk connector convention and ArduPil
   const rc = table.find((c) => c.name === 'RC IN');
   // 2026-09-21: RC IN / UART 4 / UART 6 은 맨 뒤 아랫면에서 뒤로 꽂고, 그 윗면이 POWER 1 · 2(잠금이 뒷벽 쪽)다.
   assert.equal(rc.type, 'JST-GH 5P · rear edge');
-  for (const n of ['UART 4', 'UART 6']) assert.match(table.find((c) => c.name === n).type, /· rear edge$/, `${n} sits on the rear edge with RC IN`);
+  for (const n of ['TELEM 3', 'TELEM 4']) assert.match(table.find((c) => c.name === n).type, /· rear edge$/, `${n} sits on the rear edge with RC IN`);
   assert.deepEqual(rc.pins.map((p) => p.signal), ['VCC', 'RC_IN', 'RSSI', 'VCC_3V3', 'GND']);
   // 3-pin header = 13 columns: M1–M12 PWM + SB (SBUS out from USART6 / SERIAL8) — never labelled M13.
   const sb = table.find((c) => c.name.startsWith('SB'));
@@ -212,4 +219,19 @@ test('every PMU product is registered completely (name, card, specs, pin table, 
   }
   assert.ok(product('pmu', 'APMU-12S-100A').model3d, 'APMU-12S 100A has its 3D PCBA');
   assert.ok(product('pmu', 'APMU-12S-120A').model3d, 'APMU-12S 120A has its 3D PCBA');
+});
+
+// 2026-09-23 박재량: "uart 로만 써 있어 serial 몇 번인지 알 수가 없다" → FC 카탈로그마다 Serial Mapping 을 적고,
+// 그 값이 보드 정의(hwdef.dat)의 SERIAL_ORDER 와 같은지 여기서 검사한다. 손으로 고치면 바로 걸린다.
+test('every FC product states its ArduPilot serial mapping, matching SERIAL_ORDER in the board definition', () => {
+  const board = { 'AF-F4-nano': 'AF-F4_nano', 'AF-F4-nano-v2': 'AF-F4_nano_v2', 'AF-F4-T10-nano': 'AF-F4_T10_nano',
+                  'AF-F7-mini': 'AF-F7_mini', 'AF-H7E': 'AF-H7E', 'AF-H7E-Lite': 'AF-H7E_Lite', 'AF-H7-nano': 'AF-H7_nano' };
+  for (const [prod, dir] of Object.entries(board)) {
+    const hwdef = readFileSync(new URL(`../../../fc/boards/${dir}/ardupilot/hwdef.dat`, import.meta.url), 'utf8');
+    const order = hwdef.match(/^SERIAL_ORDER (.+)$/m)[1].trim().split(/\s+/);
+    const want = order.map((per, i) => [i, per])
+      .filter(([, per]) => per !== 'EMPTY' && !per.startsWith('OTG'))
+      .map(([i, per]) => `SERIAL${i} = ${per}`).join(' · ') + ' (USB = SERIAL0)';
+    assert.equal(spec(product('fc', prod), 'Serial Mapping'), want, `${prod} serial mapping`);
+  }
 });

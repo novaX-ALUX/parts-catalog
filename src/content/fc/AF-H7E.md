@@ -36,6 +36,8 @@ specs:
     value: Analog / PWM
   - key: UART
     value: 7 peripheral serial interfaces + dedicated IOMCU link
+  - key: Serial Mapping
+    value: SERIAL1 = UART7 · SERIAL2 = UART5 · SERIAL3 = USART1 · SERIAL4 = UART8 · SERIAL5 = USART2 · SERIAL6 = UART4 · SERIAL7 = USART3 (USB = SERIAL0)
   - key: I²C
     value: 4 configured buses including internal sensors; 3 exposed on multifunction ports
   - key: CAN

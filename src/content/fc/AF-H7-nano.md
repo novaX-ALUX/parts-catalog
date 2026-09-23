@@ -36,6 +36,7 @@ specs:
   - { key: USB Input, value: "USB-C (Firmware & Power)" }
   - { key: PWM Output, value: "10 motor/servo channels + 1 WS2812 LED channel" }
   - { key: UART, value: "7 Port" }
+  - { key: Serial Mapping, value: "SERIAL1 = USART1 · SERIAL2 = USART2 · SERIAL3 = USART3 · SERIAL4 = UART4 · SERIAL6 = USART6 · SERIAL7 = UART7 · SERIAL8 = UART8 (USB = SERIAL0)" }
   - { key: CAN, value: "1 Port" }
   - { key: RC Input, value: "S.Bus, PPM, CRSF, DSM" }
   - { key: Size, value: "36 × 36 × 5 mm" }

@@ -18,6 +18,7 @@ specs:
   - { key: Output Voltage, value: "3.3V/1A · 5V/3A · 10V/3A" }
   - { key: PWM Output, value: "5 channels in current novaX ArduPilot configuration" }
   - { key: Serial Ports, value: "3 hardware UARTs + USB in current novaX ArduPilot configuration" }
+  - { key: Serial Mapping, value: "SERIAL1 = USART3 · SERIAL2 = USART1 · SERIAL3 = USART2 (USB = SERIAL0)" }
   - { key: Blackbox, value: "microSD card" }
   - { key: RC Input, value: "PWM / PPM / S.Bus" }
   - { key: Size, value: "39.4 × 39.4 mm" }

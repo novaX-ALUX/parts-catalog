@@ -21,6 +21,7 @@ specs:
   - { key: RC Input, value: "S.Bus, PPM, DSM/DSM2/DSMX, CPPM" }
   - { key: RSSI Input, value: "Analog / PWM" }
   - { key: UART, value: "6 hardware serial interfaces configured; verify connector pinout" }
+  - { key: Serial Mapping, value: "SERIAL1 = USART2 · SERIAL2 = USART3 · SERIAL3 = USART1 · SERIAL4 = UART4 · SERIAL5 = USART6 · SERIAL6 = UART7 (USB = SERIAL0)" }
   - { key: I²C, value: "4 buses configured, including internal sensor buses" }
   - { key: CAN, value: "2 Port" }
   - { key: ADC, value: "VBat/Current + Aux Analog Input 2Ch" }
