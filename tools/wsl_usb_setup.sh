@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Retired 2026-09-07: all local novaX work runs on Windows. Preserve the old body as history.
+echo 'Disabled: WSL USB setup is retired. Use Windows COM/USB directly; do not attach the device to WSL.' >&2
+exit 2
 # WSL2 USB/IP + DFU 셋업 — novaX 보드 시리얼(/dev/ttyACM*)·STM32 ROM DFU 접근용.
 # 사전조건: Windows에 usbipd-win 설치 + 보드 attach (아래 README 주석 참고).
 # 실행:  sudo bash web/parts-catalog/tools/wsl_usb_setup.sh

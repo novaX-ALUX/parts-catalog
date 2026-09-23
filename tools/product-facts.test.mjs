@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import test from 'node:test';
 import yaml from 'js-yaml';
 
@@ -221,17 +221,29 @@ test('every PMU product is registered completely (name, card, specs, pin table, 
   assert.ok(product('pmu', 'APMU-12S-120A').model3d, 'APMU-12S 120A has its 3D PCBA');
 });
 
-// 2026-09-23 박재량: "uart 로만 써 있어 serial 몇 번인지 알 수가 없다" → FC 카탈로그마다 Serial Mapping 을 적고,
-// 그 값이 보드 정의(hwdef.dat)의 SERIAL_ORDER 와 같은지 여기서 검사한다. 손으로 고치면 바로 걸린다.
-test('every FC product states its ArduPilot serial mapping, matching SERIAL_ORDER in the board definition', () => {
+// 2026-09-23 박재량: "uart 로만 써 있어 serial 몇 번인지 알 수가 없다" → FC 카탈로그마다 Serial Mapping 을 적는다.
+// 기대값은 각 보드 정의(hwdef.dat)의 SERIAL_ORDER 에서 뽑은 것이고, 같은 작업트리에 보드 정의가 있으면 한 번 더 대조한다
+// (이 저장소만 체크아웃하는 CI 에는 fc/boards 가 없으므로 파일이 있을 때만).
+test('every FC product states its ArduPilot serial mapping (SERIAL_ORDER in the board definition)', () => {
+  const expected = {
+    'AF-F4-nano': 'SERIAL1 = USART1 · SERIAL2 = USART2 · SERIAL3 = USART3 · SERIAL4 = UART4 · SERIAL5 = UART5 · SERIAL6 = USART6 (USB = SERIAL0)',
+    'AF-F4-nano-v2': 'SERIAL1 = USART3 · SERIAL2 = USART1 · SERIAL3 = USART2 (USB = SERIAL0)',
+    'AF-F4-T10-nano': 'SERIAL1 = USART1 · SERIAL2 = USART2 · SERIAL3 = USART3 · SERIAL4 = UART4 · SERIAL5 = UART5 · SERIAL6 = USART6 (USB = SERIAL0)',
+    'AF-F7-mini': 'SERIAL1 = USART2 · SERIAL2 = USART3 · SERIAL3 = USART1 · SERIAL4 = UART4 · SERIAL5 = USART6 · SERIAL6 = UART7 (USB = SERIAL0)',
+    'AF-H7E': 'SERIAL1 = UART7 · SERIAL2 = UART5 · SERIAL3 = USART1 · SERIAL4 = UART8 · SERIAL5 = USART2 · SERIAL6 = UART4 · SERIAL7 = USART3 (USB = SERIAL0)',
+    'AF-H7E-Lite': 'SERIAL1 = UART7 · SERIAL2 = UART5 · SERIAL3 = USART1 · SERIAL4 = UART8 · SERIAL5 = USART2 · SERIAL6 = UART4 · SERIAL7 = USART3 · SERIAL8 = USART6 (USB = SERIAL0)',
+    'AF-H7-nano': 'SERIAL1 = USART1 · SERIAL2 = USART2 · SERIAL3 = USART3 · SERIAL4 = UART4 · SERIAL6 = USART6 · SERIAL7 = UART7 · SERIAL8 = UART8 (USB = SERIAL0)'
+  };
   const board = { 'AF-F4-nano': 'AF-F4_nano', 'AF-F4-nano-v2': 'AF-F4_nano_v2', 'AF-F4-T10-nano': 'AF-F4_T10_nano',
                   'AF-F7-mini': 'AF-F7_mini', 'AF-H7E': 'AF-H7E', 'AF-H7E-Lite': 'AF-H7E_Lite', 'AF-H7-nano': 'AF-H7_nano' };
-  for (const [prod, dir] of Object.entries(board)) {
-    const hwdef = readFileSync(new URL(`../../../fc/boards/${dir}/ardupilot/hwdef.dat`, import.meta.url), 'utf8');
-    const order = hwdef.match(/^SERIAL_ORDER (.+)$/m)[1].trim().split(/\s+/);
-    const want = order.map((per, i) => [i, per])
+  for (const [prod, want] of Object.entries(expected)) {
+    assert.equal(spec(product('fc', prod), 'Serial Mapping'), want, `${prod} serial mapping`);
+    const hwdefUrl = new URL(`../../../fc/boards/${board[prod]}/ardupilot/hwdef.dat`, import.meta.url);
+    if (!existsSync(hwdefUrl)) continue;                   // 카탈로그만 있는 환경(CI)에서는 건너뛴다
+    const order = readFileSync(hwdefUrl, 'utf8').match(/^SERIAL_ORDER (.+)$/m)[1].trim().split(/\s+/);
+    const fromHwdef = order.map((per, i) => [i, per])
       .filter(([, per]) => per !== 'EMPTY' && !per.startsWith('OTG'))
       .map(([i, per]) => `SERIAL${i} = ${per}`).join(' · ') + ' (USB = SERIAL0)';
-    assert.equal(spec(product('fc', prod), 'Serial Mapping'), want, `${prod} serial mapping`);
+    assert.equal(want, fromHwdef, `${prod} expectation still matches hwdef.dat`);
   }
 });
