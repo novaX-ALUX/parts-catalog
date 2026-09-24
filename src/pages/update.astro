@@ -7,22 +7,38 @@ import { readFirmwareMetadata } from '../lib/firmware-metadata.mjs';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 // Gather every firmware asset that opts into the web Update tool (has method + webPath).
-const all = [
-  ...await getCollection('fc'),
-  ...await getCollection('gnss'),
-  ...await getCollection('esc'),
-  ...await getCollection('motor'),
-  ...await getCollection('camera'),
-];
-type Row = { product: string; version: string; kind: string; method: string; path: string; file: string; size: string; family: string; mcu: string; signed: boolean };
+// The collection a product lives in IS its category, so a new product category needs no
+// change here: it appears in the navigation the moment one of its images opts in.
+const CATEGORIES = [
+  { key: 'fc', label: 'Flight controller' },
+  { key: 'gnss', label: 'GNSS' },
+  { key: 'esc', label: 'ESC' },
+  { key: 'motor', label: 'Motor' },
+  { key: 'camera', label: 'Camera' },
+] as const;
+const all = (await Promise.all(
+  CATEGORIES.map(async (c) => (await getCollection(c.key)).map((e) => ({ entry: e, cat: c.key as string })))
+)).flat();
+// Second level, flight controllers only: one board can ship both vehicles off one board ID,
+// and the vehicle is the thing an operator picks after the board. A VTOL (QuadPlane) runs the
+// Plane image, so it shares that group.
+const VEHICLES = [
+  { key: 'copter', label: 'Multicopter' },
+  { key: 'plane', label: 'VTOL / Plane' },
+] as const;
+type Row = { product: string; version: string; kind: string; method: string; path: string; file: string; size: string; family: string; mcu: string; signed: boolean; cat: string; vehicle: string; group: string };
 const rows: Row[] = [];
-for (const e of all) {
+for (const { entry: e, cat } of all) {
   // The DFU chip guard needs each board's MCU family (F4/F7/H7), read from its specs.
   const mcu = e.data.specs?.find((s) => s.key === 'MCU')?.value || '';
   const family = /H7/i.test(mcu) ? 'H7' : /F7/i.test(mcu) ? 'F7' : /F4/i.test(mcu) ? 'F4' : '';
   for (const fw of e.data.firmware ?? []) {
     if (fw.method && fw.webPath) {
-      rows.push({ product: e.data.name, version: fw.version, kind: fw.kind, method: fw.method, path: base + fw.webPath, file: fw.webPath.split('/').pop() || '', family, mcu, ...readFirmwareMetadata(publicDir, fw.webPath) });
+      const file = fw.webPath.split('/').pop() || '';
+      // Every novaX flight-controller image without a vehicle in its name is a Copter build
+      // (fc/scripts/build_ap.sh defaults to copter); only dual-vehicle boards carry the suffix.
+      const vehicle = cat !== 'fc' ? '' : (/Plane/i.test(fw.kind) || /-Plane/.test(file) ? 'plane' : 'copter');
+      rows.push({ product: e.data.name, version: fw.version, kind: fw.kind, method: fw.method, path: base + fw.webPath, file, family, mcu, cat, vehicle, group: vehicle ? `${cat}:${vehicle}` : cat, ...readFirmwareMetadata(publicDir, fw.webPath) });
     }
   }
 }
@@ -39,6 +55,29 @@ rows.sort((a, b) =>
 const WEB_UPDATE_FAMILIES = ['F4', 'F7', 'H7'];
 const fwRows = rows.filter((r) => r.method !== 'dfu' && WEB_UPDATE_FAMILIES.includes(r.family));
 const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.includes(r.family));
+
+// Group the rows for display. An empty category or vehicle is never drawn: the navigation
+// grows by itself as products ship, instead of listing placeholders that read as "0".
+const label = (key: string) => CATEGORIES.find((c) => c.key === key)?.label
+  ?? VEHICLES.find((v) => v.key === key)?.label ?? key;
+type Group = { key: string; label: string; rows: Row[]; subs: Group[] };
+function tree(list: Row[]): Group[] {
+  return CATEGORIES.map((c) => {
+    const inCat = list.filter((r) => r.cat === c.key);
+    const subs = VEHICLES
+      .map((v) => ({ key: `${c.key}:${v.key}`, label: v.label, rows: inCat.filter((r) => r.vehicle === v.key), subs: [] }))
+      .filter((g) => g.rows.length);
+    return { key: c.key, label: c.label, rows: inCat, subs: subs.length > 1 ? subs : [] };
+  }).filter((g) => g.rows.length);
+}
+const fwTree = tree(fwRows), dfuTree = tree(dfuRows);
+// One navigation serves both modes, so its markup is the union of the two. Each entry carries
+// a per-mode count and the script hides the ones that would read "0" in the active mode.
+const count = (t: Group[], key: string) =>
+  t.flatMap((g) => [g, ...g.subs]).find((g) => g.key === key)?.rows.length ?? 0;
+const navKeys = [...new Set([...fwTree, ...dfuTree].flatMap((g) => [g.key, ...g.subs.map((s) => s.key)]))];
+const nav = navKeys.map((key) => ({ key, label: label(key.split(':').pop()!), sub: key.includes(':'), fw: count(fwTree, key), dfu: count(dfuTree, key) }));
+const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label ?? '';
 ---
 <Layout title="Firmware Update — novaX Catalog" activeCategory="update">
   <section class="detail-body">
@@ -67,33 +106,47 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
         <div class="step warn"><b>Windows</b>WebUSB needs a one-time WinUSB driver (Zadig) on the DFU device.</div>
       </div>
 
-      <div class="card">
-        <div class="head">Select firmware <span id="listmode">(application image)</span></div>
-        <table class="cfg-table fwsel">
-          <thead><tr><th style="width:34px"></th><th>Product</th><th>Version</th><th>File</th></tr></thead>
-          <tbody data-list="fw">
-            {fwRows.length === 0 && <tr><td colspan="4" class="empty">No web-flashable app firmware yet.</td></tr>}
-            {fwRows.map((r, i) => (
-              <tr class="fwrow" data-method={r.method} data-path={r.path} data-name={`${r.product} ${r.version}`} data-family={r.family} data-mcu={r.mcu} data-signed={r.signed ? "1" : "0"}>
-                <td><span class="rad" data-radio></span></td>
-                <td class="pname">{r.product}</td><td>{r.version}</td>
-                <td><code>{r.file}</code> <span class="mtag">{r.method}</span>{r.size && <span class="fsize">{r.size}</span>}</td>
-              </tr>
-            ))}
-          </tbody>
-          <tbody data-list="dfu" hidden>
-            {dfuRows.length === 0 && <tr><td colspan="4" class="empty">No web-flashable recovery image yet.</td></tr>}
-            {dfuRows.map((r) => (
-              <tr class="fwrow" data-method={r.method} data-path={r.path} data-name={`${r.product} ${r.version}`} data-family={r.family} data-mcu={r.mcu} data-signed={r.signed ? "1" : "0"}>
-                <td><span class="rad" data-radio></span></td>
-                <td class="pname">{r.product}</td><td>{r.version}</td>
-                <td><code>{r.file}</code> <span class="mtag">{r.method}</span>{r.size && <span class="fsize">{r.size}</span>}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <label class="drop" id="drop">… or drag &amp; drop a firmware file here (<span data-droptypes>.apj / .bin</span>)
-          <input type="file" id="file" hidden /></label>
+      <div class="picker">
+        <nav class="catnav" aria-label="Firmware categories">
+          <button class="on" data-side="all" data-n-fw={fwRows.length} data-n-dfu={dfuRows.length}>All <span>{fwRows.length}</span></button>
+          {nav.map((n) => (
+            <button class={n.sub ? 'sub' : ''} data-side={n.key} data-n-fw={n.fw} data-n-dfu={n.dfu}>{n.label} <span>{n.fw}</span></button>
+          ))}
+        </nav>
+
+        <div class="pickmain">
+          <label class="find"><input id="find" type="search" placeholder="Find a board or file — e.g. h7e, x20d, plane" autocomplete="off" /></label>
+          <div class="card">
+            <div class="head">Select firmware <span id="listmode">(application image)</span></div>
+            <table class="cfg-table fwsel">
+              <thead><tr><th style="width:34px"></th><th>Product</th><th style="width:118px">Vehicle</th><th style="width:74px">Version</th><th>File</th></tr></thead>
+              {[{ mode: 'fw', groups: fwTree, empty: 'No web-flashable app firmware yet.' },
+                { mode: 'dfu', groups: dfuTree, empty: 'No web-flashable recovery image yet.' }].map(({ mode, groups, empty }) => (
+                <tbody data-list={mode} hidden={mode === 'dfu'}>
+                  {groups.length === 0 && <tr><td colspan="5" class="empty">{empty}</td></tr>}
+                  {groups.map((g) => [
+                    <tr class="grp" data-grp={g.key}><td colspan="5">{g.label} <span class="n">{g.rows.length}</span></td></tr>,
+                    ...(g.subs.length ? g.subs : [g]).flatMap((s) => [
+                      ...(g.subs.length ? [<tr class="grp lvl2" data-grp={s.key}><td colspan="5">{s.label} <span class="n">{s.rows.length}</span></td></tr>] : []),
+                      ...s.rows.map((r) => (
+                        <tr class="fwrow" data-method={r.method} data-path={r.path} data-name={`${r.product} ${r.version}`} data-family={r.family} data-mcu={r.mcu} data-signed={r.signed ? "1" : "0"} data-group={r.group}>
+                          <td><span class="rad" data-radio></span></td>
+                          <td class="pname">{r.product}</td>
+                          <td>{r.vehicle ? <span class={`veh ${r.vehicle}`}>{vehicleLabel(r.vehicle)}</span> : <span class="veh none">—</span>}</td>
+                          <td>{r.version}</td>
+                          <td><code>{r.file}</code> <span class="mtag">{r.method}</span>{r.size && <span class="fsize">{r.size}</span>}</td>
+                        </tr>
+                      )),
+                    ]),
+                  ])}
+                  <tr class="nohit" hidden><td colspan="5" class="empty">Nothing matches that search.</td></tr>
+                </tbody>
+              ))}
+            </table>
+            <label class="drop" id="drop">… or drag &amp; drop a firmware file here (<span data-droptypes>.apj / .bin</span>)
+              <input type="file" id="file" hidden /></label>
+          </div>
+        </div>
       </div>
 
       <div class="row-connect">
@@ -115,7 +168,7 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
 </Layout>
 
 <style>
-  .update-tool { max-width: 960px; }
+  .update-tool { max-width: 1172px; } /* 960 + the category rail (196) + its gap (16) */
   .update-tool [hidden] { display: none !important; } /* author .banner{display:flex} would otherwise override UA [hidden] */
   .update-tool .crumb { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-4); }
   .update-tool h1 { font-size: 30px; margin: 8px 0 18px; }
@@ -140,6 +193,29 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
   .chip { font-size: 12.5px; padding: 5px 11px; border-radius: 20px; border: 1px solid var(--line); color: var(--ink-3); }
   .chip.ok { color: #127a2e; border-color: #bfe3c8; background: #f1faf3; }
   .chip.err { color: #b22; border-color: #f0c4c4; background: #fcf2f2; }
+  .picker { display: grid; grid-template-columns: 196px 1fr; gap: 16px; align-items: start; }
+  @media (max-width: 760px) { .picker { grid-template-columns: 1fr; } .catnav { display: flex; flex-wrap: wrap; } }
+  .catnav { display: block; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .catnav button { display: flex; width: 100%; justify-content: space-between; gap: 10px; border: 0;
+    border-bottom: 1px solid #f1f1f1; background: #fff; padding: 10px 13px; font-size: 13.5px;
+    font-weight: 700; color: var(--ink); text-align: left; cursor: pointer; }
+  .catnav button:last-child { border-bottom: 0; }
+  .catnav button.sub { padding-left: 26px; font-size: 12.5px; font-weight: 600; color: var(--ink-3); background: #fcfcfd; }
+  .catnav button span { color: var(--ink-4); font-weight: 600; }
+  .catnav button.on { background: var(--blue, #1a73e8); color: #fff; }
+  .catnav button.on span { color: #dbe8ff; }
+  @media (max-width: 760px) { .catnav button { width: auto; border-bottom: 0; border-right: 1px solid #f1f1f1; } }
+  .find { display: block; margin-bottom: 10px; }
+  .find input { width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 9px;
+    padding: 10px 12px; font: inherit; font-size: 13.5px; }
+  .fwsel tr.grp td { background: #eef1f5; font-weight: 800; font-size: 12.5px; color: var(--ink); padding: 7px 10px; }
+  .fwsel tr.grp.lvl2 td { background: #f7f8fa; font-weight: 700; font-size: 12px; color: var(--ink-3); padding: 6px 10px 6px 24px; }
+  .fwsel tr.grp .n { color: var(--ink-4); font-weight: 600; margin-left: 6px; }
+  .veh { display: inline-block; white-space: nowrap; font-size: 11.5px; font-weight: 700; padding: 2px 7px; border-radius: 5px; }
+  .veh.copter { background: #e8f0fe; color: #1a4fa0; }
+  .veh.plane { background: #e9f6ec; color: #1f6b33; }
+  .veh.none { color: var(--ink-4); font-weight: 500; }
+  .fwsel .pname { white-space: nowrap; }
   .fwsel .fwrow { cursor: pointer; }
   .fwsel .fwrow.sel td { background: #f3f8ff; }
   .fwsel .empty { color: var(--ink-4); text-align: center; }
@@ -279,8 +355,48 @@ const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.inc
     selectedPath = null; droppedFile = null;
     document.querySelectorAll('.fwrow').forEach((r) => r.classList.remove('sel'));
     setStatus('Not connected'); refreshFlashEnabled();
+    applyFilter();
     autoDetect();
   }));
+
+  // ---- category navigation + search ----
+  // Both narrow the same list. A group heading stays only while one of its own rows shows, and a
+  // navigation entry that would read "0" in the active mode is dropped rather than greyed out.
+  let side = 'all';
+  const findBox = $('#find') as HTMLInputElement;
+  function applyFilter() {
+    const q = findBox.value.trim().toLowerCase();
+    document.querySelectorAll<HTMLElement>('.catnav button').forEach((b) => {
+      const n = Number(b.dataset[mode === 'dfu' ? 'nDfu' : 'nFw'] || 0);
+      b.hidden = n === 0;
+      const badge = b.querySelector('span');
+      if (badge) badge.textContent = String(n);
+      if (b.hidden && b.classList.contains('on')) { b.classList.remove('on'); side = 'all'; }
+    });
+    if (side === 'all') document.querySelector('.catnav button[data-side="all"]')?.classList.add('on');
+    const list = document.querySelector<HTMLElement>(`[data-list="${mode}"]`);
+    if (!list) return;
+    let hits = 0;
+    list.querySelectorAll<HTMLElement>('tr.fwrow').forEach((tr) => {
+      const g = tr.dataset.group || '';
+      const inSide = side === 'all' || g === side || g.startsWith(side + ':');
+      const inFind = !q || (tr.textContent || '').toLowerCase().includes(q);
+      tr.hidden = !(inSide && inFind);
+      if (!tr.hidden) hits++;
+    });
+    list.querySelectorAll<HTMLElement>('tr.grp').forEach((g) => {
+      const key = g.dataset.grp || '';
+      g.hidden = ![...list.querySelectorAll<HTMLElement>('tr.fwrow')]
+        .some((tr) => !tr.hidden && (tr.dataset.group === key || (tr.dataset.group || '').startsWith(key + ':')));
+    });
+    (list.querySelector('tr.nohit') as HTMLElement).hidden = hits > 0;
+  }
+  document.querySelectorAll<HTMLButtonElement>('.catnav button').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('.catnav button').forEach((x) => x.classList.remove('on'));
+    b.classList.add('on'); side = b.dataset.side || 'all'; applyFilter();
+  }));
+  findBox.addEventListener('input', applyFilter);
+  applyFilter();
 
   // ---- Software DFU (no BOOT0 button): from the running app (Web Serial), send the
   // ArduPilot boot-to-DFU magic; the board resets into the ST ROM DFU (0483:DF11). Then the
