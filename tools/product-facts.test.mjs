@@ -57,11 +57,19 @@ test('X20D is a separate R3 engineering product with its own heading contract', 
   assert.match(x20.firmwareNotes, /6205/);
   assert.match(x20.firmwareNotes, /upstream AP_Periph numeric version remains 1\.8/);
   assert.equal(x20.firmware.length, 4);
+  // Browser flashing is allowed only on the two paths verified on real hardware
+  // 2026-09-22: .apj over the USB-C ArduPilot bootloader (MAVLink reboot, program,
+  // CRC match) and the merged .hex over ROM DFU (buttonless Enter DFU, 0483:DF11).
+  // The DroneCAN .bin goes over the flight controller's SLCAN port, and the
+  // verification JSON is not an image -- neither may offer a browser flash.
+  const x20Method = { '.apj': 'ardupilot', '_with_bl.hex': 'dfu' };
   for (const fw of x20.firmware) {
     assert.equal(fw.version, '1.0.6');
     assert.match(fw.file, /^\/firmware\/gnss\/AP-RTK-X20D\/AP-RTK_X20D-v1\.0\.6/);
     assert.match(fw.sha256, /^[0-9a-f]{64}$/);
-    assert.equal(fw.method, undefined, 'Do not enable an unqualified browser-flash target');
+    const expected = Object.entries(x20Method).find(([suffix]) => fw.file.endsWith(suffix))?.[1];
+    assert.equal(fw.method, expected, `Only a hardware-verified flash path may be enabled: ${fw.file}`);
+    assert.equal(fw.webPath, expected ? fw.file : undefined, 'the Update tool loads the same-origin mirror');
   }
 });
 

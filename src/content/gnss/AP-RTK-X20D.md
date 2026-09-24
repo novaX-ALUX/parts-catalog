@@ -37,14 +37,18 @@ firmware:
     date: "2026-09-22"
     size: "202 KB"
     sha256: "cb5dd563e7402711ab647a65e19e84fa42de9965196d94ab82c38868ed6d35b8"
-    notes: "Board ID 6205 application package for ArduPilot-compatible uploaders over the X20D USB bootloader (bench: about 6 s). Not offered in this catalog's Web Updater."
+    notes: "Board ID 6205 application package for the catalog Web Updater → Firmware Update, or any ArduPilot-compatible uploader, over the X20D USB-C port (bench: about 6 s). The peripheral answers the MAVLink reboot-to-bootloader command, so no button is needed."
+    method: ardupilot
+    webPath: /firmware/gnss/AP-RTK-X20D/AP-RTK_X20D-v1.0.6.apj
   - kind: "Bootloader + App (merged HEX)"
     file: /firmware/gnss/AP-RTK-X20D/AP-RTK_X20D-v1.0.6_with_bl.hex
     version: "1.0.6"
     date: "2026-09-22"
     size: "731 KB"
     sha256: "2ead38ac0865ab67d1c5db27fcaf67ccad5aa4f86a657feb463f38429619d5de"
-    notes: "First-article SWD / STM32 ROM USB DFU image at 0x08000000 with the v1.0.5 bootloader. Raw DFU/SWD does not enforce board ID; verify X20D R3 hardware before programming."
+    notes: "First-article image at 0x08000000 with the v1.0.5 bootloader, for the catalog Web Updater → DFU Recovery (🛠 Enter DFU works buttonless on this board) or SWD/ST-Link on a blank board. Raw DFU/SWD does not enforce board ID; verify X20D R3 hardware before programming."
+    method: dfu
+    webPath: /firmware/gnss/AP-RTK-X20D/AP-RTK_X20D-v1.0.6_with_bl.hex
   - kind: "Release verification (JSON)"
     file: /firmware/gnss/AP-RTK-X20D/AP-RTK_X20D-v1.0.6-verification.json
     version: "1.0.6"
@@ -53,7 +57,7 @@ firmware:
     sha256: "11fac41410e6fc7a6ee122c8e07fc1bfe923e2c9c17c8a7c2980d34169fd2460"
     notes: "File sizes and SHA-256 hashes, source patches, bench results (heading through the flight controller moving-baseline path) and Windows build provenance. Not a flashable image."
 firmwareNotes: |
-  v1.0.6 is an engineering release, not hardware/flight approval. Heading works like AP-RTK dual: the X20D sends its ANT1 → ANT2 baseline (RelPosHeading) and the autopilot computes the heading from GPS1_MB_OFS — see Configuration (ANT1 front, the AP-RTK dual parameters). Earlier versions (v1.0.5 and before) reported heading with ANT1 at the rear. The receiver is moved to 230400 baud once and saved; boards with an older bootloader get the new one from Mission Planner's bootloader update over the X20D USB port. Native Windows GCC 10.2.1 build (Cygwin, no WSL). Product firmware string: novaX AP-RTK X20D v1.0.6; the upstream AP_Periph numeric version remains 1.8.0-dev, so DroneCAN GetNodeInfo can show 1.8. Board ID 6205; never substitute dual (1085) or G5H (6206) images. Raw DFU/SWD does not enforce board ID. Release history and source patches: https://github.com/novaX-ALUX/gnss/releases/tag/AP-RTK_X20D-v1.0.6. Outdoor RTK fixed, compass fallback and flight are not yet verified. The catalog Web Updater is not enabled for this target.
+  v1.0.6 is an engineering release, not hardware/flight approval. Heading works like AP-RTK dual: the X20D sends its ANT1 → ANT2 baseline (RelPosHeading) and the autopilot computes the heading from GPS1_MB_OFS — see Configuration (ANT1 front, the AP-RTK dual parameters). Earlier versions (v1.0.5 and before) reported heading with ANT1 at the rear. The receiver is moved to 230400 baud once and saved; boards with an older bootloader get the new one from Mission Planner's bootloader update over the X20D USB port. Native Windows GCC 10.2.1 build (Cygwin, no WSL). Product firmware string: novaX AP-RTK X20D v1.0.6; the upstream AP_Periph numeric version remains 1.8.0-dev, so DroneCAN GetNodeInfo can show 1.8. Board ID 6205; never substitute dual (1085) or G5H (6206) images. Raw DFU/SWD does not enforce board ID. Release history and source patches: https://github.com/novaX-ALUX/gnss/releases/tag/AP-RTK_X20D-v1.0.6. Outdoor RTK fixed, compass fallback and flight are not yet verified. The catalog Web Updater is enabled for this target over the USB-C port: Firmware Update takes the .apj (bench 2026-09-22: MAVLink reboot to bootloader, program, CRC match, 40 parameters preserved) and DFU Recovery takes the merged .hex (bench: buttonless 🛠 Enter DFU reached 0483:DF11 in 2.1 s, then erase, write and verify). A DroneCAN update with the .bin over the flight controller's SLCAN port stays the field path (about 46 s).
 configImages:
   - { src: /images/products/gnss_AP-RTK-X20D_antenna-setup.png, caption: "Antenna placement & wiring — Master (ANT1) front, Slave (ANT2) rear, ≥ 500 mm apart" }
   - { src: /images/products/gnss_AP-RTK-dual_offset-convention.png, caption: "Moving-baseline offset sign convention (X / Y / Z)" }
