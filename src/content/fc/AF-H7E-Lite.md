@@ -188,10 +188,10 @@ pinTable:
     type: JST-GH 4P
     mapping: 100BASE-T
     pins:
-      - { pin: 1, signal: TX+, function: "Ethernet transmit pair +" }
-      - { pin: 2, signal: TX−, function: "Ethernet transmit pair −" }
-      - { pin: 3, signal: RX+, function: "Ethernet receive pair +" }
-      - { pin: 4, signal: RX−, function: "Ethernet receive pair −" }
+      - { pin: 1, signal: RX−, function: "Ethernet receive pair − (same pin order as AF-H7E)" }
+      - { pin: 2, signal: RX+, function: "Ethernet receive pair +" }
+      - { pin: 3, signal: TX−, function: "Ethernet transmit pair −" }
+      - { pin: 4, signal: TX+, function: "Ethernet transmit pair +" }
   - name: DEBUG
     type: JST-SH 6P · Pixhawk Debug Mini
     mapping: SERIAL7 · USART3 · console + SWD
