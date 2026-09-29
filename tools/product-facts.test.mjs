@@ -185,18 +185,36 @@ test('APMU-12S 100A: coming soon, power-port pins from the V2 board, INA228 addr
 test('APMU-12S 140A: coming soon, FC port and button pins from the schematic, INA228 at 0x40 on a 0.1 mΩ shunt', () => {
   const p = product('pmu', 'APMU-12S-140A');
   assert.equal(p.comingSoon, true);
-  assert.match(spec(p, 'Peak Current (1 min)'), /140 A — the number in the name/, 'the name is the one-minute rating');
-  assert.match(spec(p, 'Continuous Current'), /70–75 A.*AS150U/, 'continuous is set by the battery connector');
+  // Current specification set by the user on 2026-09-24: continuous 30-40 A, a 130 A burst for a minute, and
+  // 200 A for five seconds the board has to survive. The name's 140 A stays: it is what the AS150U battery
+  // connector allows for a minute, so the specified burst sits inside it.
+  assert.match(spec(p, 'Peak Current (1 min)'), /130 A for one minute/, 'the specified burst');
+  assert.match(spec(p, 'Peak Current (1 min)'), /survives 200 A for five seconds/, 'the survival case');
+  assert.match(spec(p, 'Peak Current (1 min)'), /name's 140 A is what the AS150U/, 'the name is the connector');
+  assert.match(spec(p, 'Continuous Current'), /30-40 A/, 'continuous is the user specification');
   assert.match(spec(p, 'Continuous Current'), /to be confirmed by thermal test/i, 'still unmeasured');
+  assert.match(spec(p, 'Main Switch'), /^6 x Infineon/, 'six main FETs, sized by the unbounded 200 A case');
   assert.match(spec(p, 'ESC Direct-Solder Holes'), /Ø5\.3 mm plated holes under the XT90 housing/, 'wire can be soldered straight to the board');
+  assert.match(spec(p, 'ESC Direct-Solder Holes'), /All five outputs/, 'J107 has the holes too (2026-09-29)');
+  assert.match(spec(p, 'PCB'), /2\.0 mm/, 'the board is 2.0 mm since 2026-09-28');
   const signals = (name) => p.pinTable.find((c) => c.name === name).pins.map((x) => x.signal);
-  // J301 / J901 pin order of the SKiDL truth (pmu/APMU-12S_140A hardware/circuits).
-  assert.deepEqual(signals('POWER I2C'), ['5V', '5V', 'SCL', 'SDA', 'GND', 'GND']);
-  assert.deepEqual(signals('BUTTON'), ['BTN', 'GND', 'LED_A', 'LED1', 'LED2', 'LED3', 'LED4']);
+  // J301 / J309 / J901 pin order of the SKiDL truth (pmu/APMU-12S_140A hardware/kicad/apmu/apmu.net, 2026-09-29).
+  assert.deepEqual(signals('POWER 1'), ['5V', '5V', 'SCL', 'SDA', 'GND', 'GND']);
+  assert.deepEqual(signals('POWER 2'), ['5V', '5V', 'NC', 'NC', 'GND', 'GND']);
+  assert.deepEqual(signals('BUTTON'), ['LED+', 'LED1', 'LED2', 'LED3', 'LED4', 'BTN', 'GND']);
   assert.deepEqual(signals('ESC OUT ×5'), ['OUT', 'GND']);
+  // The three auxiliary outputs are the reference board's own connector (2026-09-25/26): a black JST XH 4-circuit
+  // top-entry header (B4B-XH-A, 3.0 A per circuit). Two circuits carry the rail and two the return.
+  assert.deepEqual(signals('SERVO 7.4V'), ['7V4', '7V4', 'GND', 'GND']);
+  assert.deepEqual(signals('16V'), ['16V', '16V', 'GND', 'GND']);
+  assert.deepEqual(signals('24V'), ['24V', '24V', 'GND', 'GND']);
+  for (const name of ['SERVO 7.4V', '16V', '24V']) {
+    assert.match(p.pinTable.find((c) => c.name === name).type, /JST B4B-XH-A XH 4P/,
+      `${name} is the reference board XH 4-circuit header, not an XT plug`);
+  }
   // J1201 / J1202 / J1203 and J302-J308 of the SKiDL truth (circuits/apmu_nav.py, apmu_sense.build_can).
-  assert.deepEqual(signals('NAV LEFT'), ['5V_LED', '5V_LED', 'WHITE', 'RED']);
-  assert.deepEqual(signals('NAV RIGHT'), ['5V_LED', '5V_LED', 'WHITE', 'BLUE']);
+  assert.deepEqual(signals('NAV LEFT'), ['5V_LED', 'WHITE', 'RED', 'GND']);
+  assert.deepEqual(signals('NAV RIGHT'), ['5V_LED', 'WHITE', 'BLUE', 'GND']);
   assert.deepEqual(signals('NAV PWM IN'), ['PWM', 'GND']);
   assert.deepEqual(signals('CAN ×7'), ['5V', 'CAN_H', 'CAN_L', 'GND']);
   assert.match(spec(p, 'Navigation Lights'), /59 times a minute.*40–100 per minute/, 'blink rate inside 14 CFR 25.1401');
