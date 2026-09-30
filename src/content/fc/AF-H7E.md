@@ -60,10 +60,6 @@ description: AF-H7E is a modular STM32H753 flight controller based on the Pixhaw
 pinoutImage: /images/products/fc_AF-H7E_pinout.png
 pinoutImages:
   - /images/products/fc_AF-H7E_pinout.png
-  - /images/products/fc_AF-H7E_pinout_top_front.png
-  - /images/products/fc_AF-H7E_pinout_left.png
-  - /images/products/fc_AF-H7E_pinout_right.png
-  - /images/products/fc_AF-H7E_pinout_front.png
   - /images/products/fc_AF-H7E_dimensions.png
 pinoutNotes: 'I2C bus numbering on the multi-function ports: the GPS & Safety port carries I2C1, the GPS2 port carries I2C2, and the UART4 port carries I2C3.'
 pinTable:

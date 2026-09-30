@@ -266,7 +266,7 @@ class Sheet:
 
     def badge(self, ax, x, y, s, color, r=22):
         ax.add_patch(Circle((x, y), r, fc=color, ec="white", lw=3, zorder=20))
-        self.text(ax, x, y + 1, s, PX["badge"], ha="center", va="center", color="white", fontweight="bold", zorder=21)
+        self.text(ax, x, y + 1, s, PX["badge"] if r >= 20 else 26, ha="center", va="center", color="white", fontweight="bold", zorder=21)
 
     def _add(self, h, fn):
         self.ops.append((self.y, fn))
@@ -358,10 +358,13 @@ class Sheet:
         self._add(h, fn)
 
     def caption(self, s):
-        """면 제목 한 줄(한 장에 면이 여럿일 때 각 지도 위)."""
+        """면 제목(한 장에 면이 여럿일 때 각 그림 위) — 길면 줄을 나눈다."""
+        ls = wrap(s, PX["name"], W - 2 * MARGIN, True)
+
         def fn(ax, y0):
-            self.text(ax, MARGIN, y0 + 30, s, PX["name"], ha="left", va="center", fontweight="bold")
-        self._add(52, fn)
+            for i, t in enumerate(ls):
+                self.text(ax, MARGIN, y0 + 30 + 46 * i, t, PX["name"], ha="left", va="center", fontweight="bold")
+        self._add(52 + 46 * (len(ls) - 1), fn)
 
     def map(self, img, items, max_h=900):
         """img = 제품 그림 배열, items = [{"box": (x0, x1, y0, y1) 그림 px, "letter", "p1": "L"|"R"|"T"|"B"|None,
@@ -480,6 +483,89 @@ class Sheet:
                 self.text(ax, MARGIN, y0 + 26 + i * 40, s, PX["small"], ha="left", va="center", color="#333333")
         self._add(20 + 40 * len(ls), fn)
 
+    def board(self, img, items, img_w=None, gap=34, lead=60, rowgap=26, badge_r=18):
+        """원래 배치 한 덩어리: 제품 그림(가운데) + 둘레 표(위 T · 아래 B · 왼쪽 L · 오른쪽 R) + 파란 점선 연결선 + 빨간 ①.
+        items = [{"box": (x0, x1, y0, y1) 그림 px, "name", "sub", "table", "p1", "side": "T"|"B"|"L"|"R",
+                  "row": 그림에 가까운 줄부터 1, 2, …(T · B), "tx": 표 가운데 x(캔버스 px, 없으면 커넥터 위), "pos": ① 자리(marks),
+                  "lx": 연결선을 곧게 내릴 x(그림 px — 아래 줄 커넥터 사이 틈, B 만)}]
+        img_w 가 없으면 = 캔버스 폭에서 왼쪽 · 오른쪽 표 열을 뺀 폭. 표 칸 순서 = 그림에서 보이는 핀 순서(부르는 쪽이 정한다)."""
+        ih0, iw0 = img.shape[:2]
+        size = [ctable_size(it["name"], it.get("sub"), it.get("table")) for it in items]
+        wl = max([sz[0] for sz, it in zip(size, items) if it["side"] == "L"], default=0)
+        wr = max([sz[0] for sz, it in zip(size, items) if it["side"] == "R"], default=0)
+        avail = W - 2 * MARGIN - (wl + gap if wl else 0) - (wr + gap if wr else 0)
+        img_w = min(img_w or avail, avail)
+        k = img_w / iw0
+        ih = ih0 * k
+        ix0 = MARGIN + (wl + gap if wl else 0) + (avail - img_w) / 2
+        cx = [ix0 + (it["box"][0] + it["box"][1]) / 2 * k for it in items]
+
+        def rows(side):
+            rs = sorted({it.get("row", 1) for it in items if it["side"] == side})
+            out = []
+            for r in rs:
+                idx = sorted([i for i, it in enumerate(items) if it["side"] == side and it.get("row", 1) == r],
+                             key=lambda i: items[i].get("tx", cx[i]))
+                st = spread1d([items[i].get("tx", cx[i]) for i in idx], [size[i][0] for i in idx], MARGIN, W - MARGIN, 24)
+                out.append((idx, st, max(size[i][1] for i in idx)))
+            return out
+        top, bot = rows("T"), rows("B")
+        iy0 = (sum(rh for _, _, rh in top) + rowgap * (len(top) - 1) + lead) if top else 16
+        pos = {}
+        yb = iy0 - lead
+        for idx, st, rh in top:                                              # 위 줄: 안쪽 줄부터 위로, 표 아래 끝을 맞춘다
+            for i, x in zip(idx, st):
+                pos[i] = (x, yb - size[i][1])
+            yb -= rh + rowgap
+        cy = [iy0 + (it["box"][2] + it["box"][3]) / 2 * k for it in items]
+        bottom, cols = iy0 + ih, []
+        for side in ("L", "R"):                                              # 옆 열: 표 몸통 가운데를 커넥터 높이에
+            idx = sorted([i for i, it in enumerate(items) if it["side"] == side], key=lambda i: cy[i])
+            if not idx:
+                continue
+            st = spread1d([cy[i] - C_HEAD - size[i][3] / 2 + size[i][1] / 2 for i in idx], [size[i][1] for i in idx],
+                          iy0 if top else 0, 1e9, 22)
+            for i, y in zip(idx, st):
+                pos[i] = (ix0 - gap - size[i][0] if side == "L" else ix0 + img_w + gap, y)
+                cols.append((pos[i][0], pos[i][0] + size[i][0], y + size[i][1]))
+                bottom = max(bottom, y + size[i][1])
+        yt = iy0 + ih + lead
+        for idx, st, rh in bot:                                              # 아래 줄: 안쪽 줄부터 아래로, 표 위 끝을 맞춘다
+            for x0_, x1_, cb in cols:                                        # 옆 열 표와 겹치면 그 아래로
+                if cb > yt and any(x < x1_ and x + size[i][0] > x0_ for i, x in zip(idx, st)):
+                    yt = cb + rowgap
+            for i, x in zip(idx, st):
+                pos[i] = (x, yt)
+            bottom = max(bottom, yt + rh)
+            yt += rh + rowgap
+        H = bottom + 34
+
+        def fn(ax, y0):
+            ax.imshow(img, extent=[ix0, ix0 + img_w, y0 + iy0 + ih, y0 + iy0], zorder=1, interpolation="lanczos")
+            for i, it in enumerate(items):
+                b = it["box"]
+                bx = (ix0 + b[0] * k, ix0 + b[1] * k, y0 + iy0 + b[2] * k, y0 + iy0 + b[3] * k)
+                self.marks(ax, bx, None, it.get("p1"), r=badge_r, pos=it.get("pos", "inside"))
+                x, y = pos[i][0], y0 + pos[i][1]
+                w, h, bw, bh = size[i]
+                bcx, bcy = (bx[0] + bx[1]) / 2, (bx[2] + bx[3]) / 2
+                if it["side"] == "B" and "lx" in it:                             # 커넥터 사이 틈으로 곧게 내린 뒤 표로(원래 그림의 GPS & SAFETY)
+                    gx = ix0 + it["lx"] * k
+                    pts = [(gx, bx[3] + 2), (gx, y - 22), (x + w / 2, y - 22), (x + w / 2, y)]
+                elif it["side"] == "T":
+                    pts = [(bcx, bx[2] - 9), (x + w / 2, y + h)]
+                elif it["side"] == "B":
+                    pts = [(bcx, bx[3] + 9), (x + w / 2, y)]
+                else:
+                    ay = y + C_HEAD + bh / 2 if bh else y + C_HEAD / 2
+                    ex = x + w if it["side"] == "L" else x
+                    d = 16 if it["side"] == "L" else -16
+                    pts = [(ex, ay), (ex + d, ay), (bx[0] - 9 if it["side"] == "L" else bx[1] + 9, bcy)]
+                ax.plot([q[0] for q in pts], [q[1] for q in pts], color=BLUE, lw=2.4, ls=(0, (6, 4)), zorder=11)
+                draw_ctable(self, ax, x, y, it["name"], it.get("sub"), it.get("table"))
+            ax.plot([MARGIN, W - MARGIN], [y0 + H - 8, y0 + H - 8], color=LINE, lw=2)
+        self._add(H, fn)
+
     def save(self, out):
         H = int(self.y + MARGIN)
         fig = plt.figure(figsize=(W / DPI, H / DPI), dpi=DPI)
@@ -496,3 +582,132 @@ class Sheet:
                "texts": len(self.texts), "min_font_canvas_px": smallest[1], "min_font_screen_px": round(smallest[1] * SCALE, 1),
                "smallest_text": smallest[0], "rule_screen_px": MIN_SCREEN_PX}
         return rep
+
+
+# ────────────── 원래 배치(제품 그림 가운데 + 둘레 표 + 점선 연결선)의 표 ──────────────
+# 사용자 2026-09-30 "제품으로 해서 한페이지로 하고 원래 레이아웃에 포트설명 글자만 키우면되지 왜 전부 다 쪼개났냐"
+#   → 제품마다 한 장, 원래 배치 그대로 표 글자만 키운다(화면 13 px 이상 — Sheet.text 가 막는다). 지도 + 카드(map · card)는 쓰지 않는다.
+CX = dict(name=30, sub=26, sig=28, pin=26)            # 둘레 표 글자(캔버스 px, 화면 = ½)
+C_MIN, C_PAD, C_PIN_H, C_SIG_H, C_ROW_H, C_PIN_W, C_LAB_W, C_HEAD = 60, 20, 36, 50, 46, 54, 64, 76
+
+
+def csig_px(lab):
+    """신호 칸 글자 — + · − 한 글자는 획이 가늘어 키운다."""
+    return CX["sig"] + 8 if lab in ("+", "−") else CX["sig"]
+
+
+def _cw(lab):
+    return max(C_MIN, text_w(lab, csig_px(lab), True) + C_PAD)
+
+
+def _crows_w(rows):
+    return [max(_cw(r[j][1]) for r in rows if j < len(r)) for j in range(max(len(r) for r in rows))]
+
+
+def _cgrid_w(table):
+    return max([52] + [text_w(v, csig_px(v) if len(v) < 3 else CX["pin"], True) + 14 for _, _, vals in table[2] for v in vals])
+
+
+def ctable_size(name, sub, table):
+    """둘레 표 크기 → (폭, 높이, 몸통 폭, 몸통 높이). 머리 상자(이름 · 부제)가 몸통보다 넓으면 칸을 늘려 맞춘다.
+    table = ("h", cells) 가로 | ("v", cells) 세로 | ("rows", [cells, …]) 패드 묶음 | ("grid", 열 이름, [(줄 이름, 색, 칸 …)]) | ("one", 글자, 색) | None(머리만)"""
+    hw = max(text_w(name, CX["name"], True), text_w(sub, CX["sub"]) if sub else 0) + 32
+    kind = table[0] if table else None
+    if kind == "h":
+        bw, bh = sum(_cw(c[1]) for c in table[1]), (C_PIN_H if _numbered(table[1]) else 0) + C_SIG_H
+    elif kind == "v":
+        bw, bh = (C_PIN_W if _numbered(table[1]) else 0) + max([110] + [_cw(c[1]) for c in table[1]]), C_ROW_H * len(table[1])
+    elif kind == "rows":
+        bw, bh = sum(_crows_w(table[1])), C_SIG_H * len(table[1])
+    elif kind == "grid":
+        bw, bh = C_LAB_W + _cgrid_w(table) * len(table[1]), C_SIG_H * len(table[2])
+    elif kind == "one":
+        bw, bh = max(150, text_w(table[1], CX["sig"], True) + 40), C_SIG_H
+    else:
+        bw, bh = 0, 0
+    return max(hw, bw), C_HEAD + bh, bw, bh
+
+
+def draw_ctable(sh, ax, x, y, name, sub, table):
+    """원래 모양 표: 둥근 머리 상자(이름 굵게 · 부제) 아래 칸 — 번호 줄(1 번 = 빨간 굵은 숫자 + 빨간 밑줄) · 신호 줄."""
+    w, h, bw, bh = ctable_size(name, sub, table)
+    ax.add_patch(FancyBboxPatch((x, y), w, C_HEAD, boxstyle="round,pad=0,rounding_size=10", fc="white", ec=INK, lw=2, zorder=12))
+    sh.text(ax, x + w / 2, y + (25 if sub else C_HEAD / 2), name, CX["name"], ha="center", va="center", fontweight="bold", zorder=13)
+    if sub:
+        sh.text(ax, x + w / 2, y + 57, sub, CX["sub"], ha="center", va="center", color=GREY, zorder=13)
+    kind = table[0] if table else None
+    y0, f = y + C_HEAD, (w / bw if bw else 1.0)
+
+    def cell(cx, cy, cw, ch, fc="white"):
+        ax.add_patch(Rectangle((cx, cy), cw, ch, fc=fc, ec=INK, lw=1.6, zorder=12))
+
+    def pin_txt(cx, cy, pin):
+        one = pin == "1"
+        sh.text(ax, cx, cy, pin, CX["pin"] + (4 if one else 0), ha="center", va="center", color=RED if one else GREY,
+                fontweight="bold" if one else "normal", zorder=13)
+
+    def sig_txt(cx, cy, lab, col, px=None):
+        sh.text(ax, cx, cy, lab, px or csig_px(lab), ha="center", va="center", color=col, fontweight="bold", zorder=13)
+    if kind == "h":
+        ph = C_PIN_H if _numbered(table[1]) else 0
+        cx = x
+        for pin, lab, col in table[1]:
+            cw = _cw(lab) * f
+            if ph:
+                cell(cx, y0, cw, ph, "#eef1f5")
+                if pin:
+                    pin_txt(cx + cw / 2, y0 + ph / 2 + 1, pin)
+            cell(cx, y0 + ph, cw, C_SIG_H)
+            if pin == "1":
+                ax.add_patch(Rectangle((cx + 1.5, y0 + ph + C_SIG_H - 7), cw - 3, 7, fc=RED, ec="none", zorder=13))
+            sig_txt(cx + cw / 2, y0 + ph + C_SIG_H / 2 - 1, lab, col)
+            cx += cw
+    elif kind == "v":
+        pw = C_PIN_W if _numbered(table[1]) else 0
+        for i, (pin, lab, col) in enumerate(table[1]):
+            yy = y0 + i * C_ROW_H
+            if pw:
+                cell(x, yy, pw, C_ROW_H, "#eef1f5")
+                if pin:
+                    pin_txt(x + pw / 2, yy + C_ROW_H / 2 + 1, pin)
+            cell(x + pw, yy, w - pw, C_ROW_H)
+            if pin == "1":
+                ax.add_patch(Rectangle((x + pw + 1.5, yy + 1.5), 7, C_ROW_H - 3, fc=RED, ec="none", zorder=13))
+            sig_txt(x + pw + (w - pw) / 2, yy + C_ROW_H / 2, lab, col)
+    elif kind == "rows":
+        ws = [v * f for v in _crows_w(table[1])]
+        for i, row in enumerate(table[1]):
+            cx = x
+            for (pin, lab, col), cw in zip(row, ws):
+                cell(cx, y0 + i * C_SIG_H, cw, C_SIG_H)
+                sig_txt(cx + cw / 2, y0 + i * C_SIG_H + C_SIG_H / 2 - 1, lab, col)
+                cx += cw
+    elif kind == "grid":
+        cols, rws = table[1], table[2]
+        gw = (w - C_LAB_W) / len(cols)
+        for i, (rl, col, vals) in enumerate(rws):
+            yy = y0 + i * C_SIG_H
+            cell(x, yy, C_LAB_W, C_SIG_H, "#eef1f5")
+            sig_txt(x + C_LAB_W / 2, yy + C_SIG_H / 2 - 1, rl, col)
+            for j, v in enumerate(vals):
+                cell(x + C_LAB_W + j * gw, yy, gw, C_SIG_H)
+                sig_txt(x + C_LAB_W + j * gw + gw / 2, yy + C_SIG_H / 2 - 1, v, col, csig_px(v) if len(v) < 3 else CX["pin"])
+    elif kind == "one":
+        cell(x, y0, w, C_SIG_H)
+        sig_txt(x + w / 2, y0 + C_SIG_H / 2 - 1, table[1], table[2], CX["sig"])
+    return w, h
+
+
+def spread1d(targets, sizes, lo, hi, gap):
+    """가운데 목표 → 겹치지 않는 시작 위치(순서 유지). 범위를 넘치면 끝에서부터 당긴다, 그래도 안 들어가면 오류(배치를 고쳐야 한다)."""
+    st = []
+    for i, (t, z) in enumerate(zip(targets, sizes)):
+        st.append(max(t - z / 2, lo if i == 0 else st[-1] + sizes[i - 1] + gap))
+    if st and st[-1] + sizes[-1] > hi:
+        st[-1] = hi - sizes[-1]
+        for i in range(len(st) - 2, -1, -1):
+            st[i] = min(st[i], st[i + 1] - gap - sizes[i])
+    if st and st[0] < lo - 0.5:
+        raise ValueError("표가 한 줄에 안 들어간다: 폭 합 %.0f > %.0f" % (sum(sizes) + gap * (len(sizes) - 1), hi - lo))
+    return st
+

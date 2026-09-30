@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""GNSS 핀아웃 그림 — AP-RTK X20D · dual · G5H · AP-M10 — 면마다 '지도 + 카드'(글자 = 화면 13 px 이상, pinout_style.Sheet).
+"""GNSS 핀아웃 그림 — AP-RTK X20D · dual · G5H · AP-M10 — 제품당 한 장, 원래 배치(제품 그림 + 아래 표 + 파란 점선) · 표 글자 = 화면 13 px 이상.
 
-규칙(사용자 2026-09-29 "커넥터 모양대로 핀아웃을 설명해야 헷갈리지 않을거 아냐" · 2026-09-30 "이 글자가 보이니???"):
-  표 칸 = 그림 속 커넥터의 실제 핀 순서·방향(가로 커넥터 = 가로 표, 세로 = 세로 표), 1 번 끝 = 그림 위 빨간 ① + 표의 빨간 1 번 칸.
+규칙(사용자 2026-09-29 "커넥터 모양대로 핀아웃을 설명해야 헷갈리지 않을거 아냐" · 2026-09-30 "제품으로 해서 한페이지로 하고 원래 레이아웃에
+포트설명 글자만 키우면되지"): 표 칸 = 그림 속 커넥터의 실제 핀 순서·방향(가로 커넥터 = 가로 표, 세로 = 세로 표), 1 번 끝 = 그림 위 빨간 ① + 표의 빨간 1 번 칸.
 1 번 위치 근거 = PCB 패드 좌표(kicad-cli pcb export ipcd356) + 그림 속 포트 배치(2026-09-29, 반증 워커와 대조 — web/parts-catalog/tools/pinout/cross_verify/):
   X20D R3 · G5H: U17 PPS · U14 UART · U15 DEBUG 가 한 옆면에 y 순서로, 각 커넥터 1 번이 y 가 가장 작은 끝.
                  그 면을 마주 보면 왼 → 오 = PPS · UART · DEBUG → **1 번 = 왼쪽**. U16 CAN 1 번 x 112.5 > 4 번 108.8,
@@ -30,7 +30,7 @@ from PIL import Image
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from pinout_style import BLUE, RED, Sheet, crop_px, load_rgb, region, word_cells  # noqa: E402
+from pinout_style import BLUE, RED, Sheet, hstack, load_rgb, region, word_cells  # noqa: E402
 
 CAT = os.path.normpath(os.path.join(HERE, "..", ".."))
 IMG = os.path.join(CAT, "public", "images", "products")
@@ -38,16 +38,14 @@ SRC = os.path.join(HERE, "src")
 ARGS = sys.argv[1:]
 X20D_RENDER = ARGS[ARGS.index("--x20d") + 1] if "--x20d" in ARGS else "D:/1_Work/remote-results/x20d-pin-views/pin"
 COLORS = "red = power    black = GND    blue = signal"
-LEG_P1 = [("A", BLUE), "= connector, its table below", ("1", RED), "= pin 1, the red 1 in its table", COLORS]
-LEG_NO_P1 = [("A", BLUE), "= connector, its table below", COLORS]
+LEG_P1 = [("1", RED), "= pin 1, the red 1 in its table", COLORS]
 GH4 = "4-Pin · JST-GH"
-READS = "Each table reads left → right exactly as the picture next to it"
+READS = "Each table lists the pins left → right exactly as you see them in the picture it points to"
 
 
-# ────────────── 바탕 그림 ──────────────
+# ────────────── 바탕 그림: (배열, 원본 좌표 상자 → 배열 좌표 함수) ──────────────
 def lineart_side():
-    """제조사 dual 그림(578 × 766)의 **왼쪽 옆면도**만(UART 가 보이는 면 — 이 면의 제품 렌더는 없다). 회색 표시(RGB 147·149·152)는 지운다.
-    → (배열, 원본 좌표 → 배열 좌표 함수)"""
+    """제조사 dual 그림(578 × 766)의 **왼쪽 옆면도**만(UART 가 보이는 면 — 이 면의 제품 렌더는 없다). 회색 표시(RGB 147·149·152)는 지운다."""
     a = load_rgb(os.path.join(SRC, "dual_lineart_vendor.png")).astype(int)
     grey = (np.abs(a - np.array([147, 149, 152])).sum(axis=2) < 40)
     a[grey] = 255
@@ -74,8 +72,8 @@ def photo_m10():
     return a, lambda b: (b[0] - 188, b[1] - 188, b[2] - 70, b[3] - 70)
 
 
-def x20d_view(view):
-    """X20D 평행 투영 렌더 한 면 → (배열, 케이스 좌표 mm 상자 (x0, x1, y0, y1, z0, z1) → 렌더 px 함수)."""
+def x20d_view(view, reg):
+    """X20D 평행 투영 렌더 한 면(구역 reg 로 자름) → (배열, 케이스 좌표 mm 상자 (x0, x1, y0, y1, z0, z1) → 배열 px 함수)."""
     log = open(os.path.join(X20D_RENDER, "..", "blender.log"), encoding="utf-8", errors="replace").read()
     c = json.loads(log[log.rindex("RESULT ") + 7:].splitlines()[0])["out"][view]["cam"]
     w, h = c["size"]
@@ -83,84 +81,82 @@ def x20d_view(view):
 
     def to_px(p):
         d = [p[i] - c["center_mm"][i] for i in range(3)]
-        return w / 2 + s * sum(d[i] * c["right"][i] for i in range(3)), h / 2 - s * sum(d[i] * c["up"][i] for i in range(3))
+        return w / 2 + s * sum(d[i] * c["right"][i] for i in range(3)) - reg[0], h / 2 - s * sum(d[i] * c["up"][i] for i in range(3)) - reg[2]
 
     def box(b3):
         pts = [to_px((x, y, z)) for x in b3[:2] for y in b3[2:4] for z in b3[4:6]]
         return min(p[0] for p in pts), max(p[0] for p in pts), min(p[1] for p in pts), max(p[1] for p in pts)
-    return load_rgb(os.path.join(X20D_RENDER, "x20d_%s_rgba.png" % view)), box
+    return region(load_rgb(os.path.join(X20D_RENDER, "x20d_%s_rgba.png" % view)), *reg), box
 
 
-# ────────────── 제품별 면 ──────────────
-# 면 = (제목, 바탕 함수, 지도 구역 px 또는 None(전체), 지도 최대 높이, 배지 자리, [커넥터 …])
-# 커넥터 = (이름, 상자(바탕 함수가 받는 좌표), 부제, 표, 1 번 끝)
-# 표 = ("h" 가로 왼 → 오 | "v" 세로 위 → 아래, 칸) | ("one", 글자, 색) · 1 번 끝 = "L" 왼 · "T" 위 · None(번호 없음)
-# 배지 자리 = "inside" 상자 안 | "below" / "above" 상자 바로 아래 / 위(그 반대쪽에 포트 각인이 있을 때) | "left" 세로 커넥터 왼쪽 바깥
-XS = -17.7                                                    # X20D PPS · UART · DEBUG 면(x) — 렌더 각인 RESULT at_mm
-X20D = [
-    ("PPS · UART · DEBUG side", lambda: x20d_view("gh"), (20, 2380, 40, 860), 900, "below", [
-        ("PPS", (XS, XS, 8.0, 15.8, 0.5, 5.2), GH4, ("h", word_cells(["GND", "EVENT", "GND", "PPS"], [1, 2, 3, 4])), "L"),
-        ("UART", (XS, XS, -1.9, 6.0, 0.5, 5.2), GH4, ("h", word_cells(["GND", "TX", "RX", "5V"], [1, 2, 3, 4])), "L"),
-        ("DEBUG", (XS, XS, -14.35, -3.7, 0.5, 5.2), "6-Pin · JST-GH",
-         ("h", word_cells(["5V", "SWDIO", "SWCLK", "RX", "TX", "GND"], [1, 2, 3, 4, 5, 6])), "L")]),
-    ("USB · CAN end", lambda: x20d_view("front"), (0, 1800, 40, 860), 560, "below", [
-        ("USB", (-9.4, 0.4, -24, -24, 0.3, 3.9), "Type-C", ("one", "USB 2.0", BLUE), None),
-        ("CAN", (1.9, 9.8, -24, -24, 0.5, 5.2), GH4, ("h", word_cells(["GND", "CAN_L", "CAN_H", "5V"], [1, 2, 3, 4])), "L")]),
-    ("Antenna end", lambda: x20d_view("ant"), (0, 1800, 40, 900), 560, "below", [
-        ("ANT2", (6.5, 11.5, 25, 25, -5.75, -0.8), "MMCX · slave antenna", ("one", "RF", BLUE), None),
-        ("ANT1", (-11.5, -6.5, 25, 25, -5.75, -0.8), "MMCX · master antenna", ("one", "RF", BLUE), None)]),
-]
+def joined(parts, height):
+    """그림 여러 장을 같은 높이로 가로로 이어 한 그림으로 → (배열, [각 그림 상자 변환 함수])."""
+    arr, offs = hstack([p[0] for p in parts], height)
+    return arr, [(lambda b, f=p[1], o=o: tuple(v * o[1] + (o[0] if i < 2 else 0) for i, v in enumerate(f(b)))) for p, o in zip(parts, offs)]
 
 
-def dual_faces(dev, uart_sub, usb_sub):
-    return [
-        ("USB · CAN end — product render", lambda: device(dev), None, 700, "above", [
-            ("USB", (478, 606, 790, 842), usb_sub, ("one", "USB 2.0", BLUE), None),
-            ("CAN", (612, 742, 800, 846), GH4, ("h", word_cells(["GND", "CAN_L", "CAN_H", "5V"], [1, 2, 3, 4])), "L")]),
-        ("UART side — maker's drawing (no render of this side)", lineart_side, None, 460, "left", [
-            ("UART", (151, 184, 139, 200), uart_sub, ("v", word_cells(["GND", "TX", "RX", "5V"], [1, 2, 3, 4])), "T")]),
-    ]
+def it(box, name, sub, table, p1=None, side="B", **kw):
+    return dict(box=box, name=name, sub=sub, table=table, p1=p1, side=side, **kw)
+
+
+# ────────────── 제품별 한 장 ──────────────
+def x20d(sh):
+    XS = -17.7                                                    # PPS · UART · DEBUG 면(x) — 렌더 각인 RESULT at_mm
+    img, box = x20d_view("gh", (20, 2380, 40, 860))
+    sh.caption("PPS · UART · DEBUG side")
+    sh.board(img, [
+        it(box((XS, XS, 8.0, 15.8, 0.5, 5.2)), "PPS", GH4, ("h", word_cells(["GND", "EVENT", "GND", "PPS"], [1, 2, 3, 4])), "L"),
+        it(box((XS, XS, -1.9, 6.0, 0.5, 5.2)), "UART", GH4, ("h", word_cells(["GND", "TX", "RX", "5V"], [1, 2, 3, 4])), "L"),
+        it(box((XS, XS, -14.35, -3.7, 0.5, 5.2)), "DEBUG", "6-Pin · JST-GH",
+           ("h", word_cells(["5V", "SWDIO", "SWCLK", "RX", "TX", "GND"], [1, 2, 3, 4, 5, 6])), "L")], img_w=1400)
+    img, (fb, ab) = joined([x20d_view("front", (0, 1800, 40, 860)), x20d_view("ant", (0, 1800, 40, 860))], 820)
+    sh.caption("USB · CAN end (left) and antenna end (right)")
+    sh.board(img, [
+        it(fb((-9.4, 0.4, -24, -24, 0.3, 3.9)), "USB", "Type-C", ("one", "USB 2.0", BLUE)),
+        it(fb((1.9, 9.8, -24, -24, 0.5, 5.2)), "CAN", GH4, ("h", word_cells(["GND", "CAN_L", "CAN_H", "5V"], [1, 2, 3, 4])), "L"),
+        it(ab((6.5, 11.5, 25, 25, -5.75, -0.8)), "ANT2", "MMCX · slave antenna", ("one", "RF", BLUE)),
+        it(ab((-11.5, -6.5, 25, 25, -5.75, -0.8)), "ANT1", "MMCX · master antenna", ("one", "RF", BLUE))])
+
+
+def dual_like(dev, uart_sub, usb_sub):
+    def draw(sh):
+        img, (db, lb) = joined([device(dev), lineart_side()], 900)
+        sh.caption("Product render (left: USB and CAN on the front) · maker's drawing of the UART side (right — no render of that side)")
+        sh.board(img, [
+            it(db((478, 606, 790, 842)), "USB", usb_sub, ("one", "USB 2.0", BLUE)),
+            it(db((612, 742, 800, 846)), "CAN", GH4, ("h", word_cells(["GND", "CAN_L", "CAN_H", "5V"], [1, 2, 3, 4])), "L"),
+            it(lb((151, 184, 139, 200)), "UART", uart_sub, ("v", word_cells(["GND", "TX", "RX", "5V"], [1, 2, 3, 4])), "T")],
+            img_w=1100)
+    return draw
+
+
+def m10(sh):
+    img, b = photo_m10()
+    sh.board(img, [
+        it(b((268, 302, 344, 380)), "BMM350", "Compass on the module's I2C bus", ("one", "I2C", BLUE)),
+        it(b((328, 452, 342, 455)), "GPS", "6-Pin · JST-GH · UART + I2C", ("h", word_cells(["SDA", "SCL", "TXD", "RXD", "5V", "GND"])))],
+        img_w=760)
 
 
 PRODUCTS = {
-    "x20d": {"out": "gnss_AP-RTK-X20D_pinout.png", "title": "AP-RTK X20D Pinout", "legend": LEG_P1,
-             "lead": "Each face seen straight on. %s; number = pin on the R3 board." % READS, "faces": X20D},
-    "dual": {"out": "gnss_AP-RTK-dual_pinout.png", "title": "AP-RTK dual Pinout", "legend": LEG_P1,
-             "lead": "%s (UART: top → bottom); number = pin on the X-RTK2HP V6.0 board." % READS,
-             "faces": dual_faces("gnss_AP-RTK-dual_device.png", GH4, "Type-C")},
-    "g5h": {"out": "gnss_AP-RTK-G5H_pinout.png", "title": "AP-RTK G5H Pinout", "legend": LEG_P1,
-            "lead": "%s (UART: top → bottom); number = pin on the G5H board." % READS,
-            "faces": dual_faces("gnss_AP-RTK-G5H_device.png", "4-Pin · JST-GH · receiver COM2", "Type-C · MCU bootloader / DFU")},
-    "m10": {"out": "gnss_X_G10C_pinout.png", "title": "AP-M10 Pinout", "legend": LEG_NO_P1,
-            "lead": "Cells left → right as printed on the maker's photo. The photo names the signals but gives no pin numbers.",
-            "faces": [("Module — maker's photo", photo_m10, None, 600, "inside", [
-                ("GPS", (328, 452, 342, 455), "6-Pin · JST-GH · UART + I2C", ("h", word_cells(["SDA", "SCL", "TXD", "RXD", "5V", "GND"])), None),
-                ("BMM350", (268, 302, 344, 380), "Compass on the module's I2C bus", ("one", "I2C", BLUE), None)])]},
+    "x20d": ("gnss_AP-RTK-X20D_pinout.png", "AP-RTK X20D Pinout", READS + "; number = pin on the R3 board.", LEG_P1, x20d),
+    "dual": ("gnss_AP-RTK-dual_pinout.png", "AP-RTK dual Pinout", READS + " (UART: top → bottom); number = pin on the X-RTK2HP V6.0 board.",
+             LEG_P1, dual_like("gnss_AP-RTK-dual_device.png", GH4, "Type-C")),
+    "g5h": ("gnss_AP-RTK-G5H_pinout.png", "AP-RTK G5H Pinout", READS + " (UART: top → bottom); number = pin on the G5H board.",
+            LEG_P1, dual_like("gnss_AP-RTK-G5H_device.png", "4-Pin · JST-GH · receiver COM2", "Type-C · MCU bootloader / DFU")),
+    "m10": ("gnss_X_G10C_pinout.png", "AP-M10 Pinout",
+            "Cells left → right as printed on the maker's photo. The photo names the signals but gives no pin numbers.", [COLORS], m10),
 }
 
 
 def render(key, out_dir):
-    cfg = PRODUCTS[key]
+    out, title, lead, legend, draw = PRODUCTS[key]
     sh = Sheet()
-    sh.header(cfg["title"], cfg["lead"], cfg["legend"])
-    n = 0
-    for title, source, reg, max_h, pos, conns in cfg["faces"]:
-        img, conv = source()
-        reg = reg or (0, img.shape[1], 0, img.shape[0])
-        boxes = [conv(c[1]) for c in conns]
-        if len(cfg["faces"]) > 1:
-            sh.caption(title)
-        sh.map(region(img, *reg), [{"box": (b[0] - reg[0], b[1] - reg[0], b[2] - reg[2], b[3] - reg[2]), "letter": chr(65 + n + i),
-                                     "p1": c[4], "pos": pos} for i, (c, b) in enumerate(zip(conns, boxes))], max_h=max_h)
-        for (name, _, sub, table, p1), b in zip(conns, boxes):
-            pad = min(120, max(40, 0.5 * max(b[1] - b[0], b[3] - b[2])))
-            crop, cb = crop_px(img, b, pad * (1.8 if pos == "left" else 1.0), pad * (1.8 if pos == "above" else 1.3),
-                               pad * (1.8 if pos == "below" else 1.0))
-            sh.card(crop, cb, chr(65 + n), p1, name, sub, table, pos=pos)
-            n += 1
-    out = os.path.join(out_dir, cfg["out"])
-    rep = sh.save(out)
-    print(out, rep["shown_px"], "min font on screen %.1f px (%r)" % (rep["min_font_screen_px"], rep["smallest_text"]))
+    sh.header(title, lead, legend)
+    draw(sh)
+    path = os.path.join(out_dir, out)
+    rep = sh.save(path)
+    print(path, rep["shown_px"], "min font on screen %.1f px (%r)" % (rep["min_font_screen_px"], rep["smallest_text"]))
 
 
 if __name__ == "__main__":
