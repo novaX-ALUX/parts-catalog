@@ -23,9 +23,16 @@
 `pinout_style.Sheet.board`). **핀 데이터(칸 순서 · 1 번 끝 · 신호)는 4–6 회차 합의본 그대로**이고 배치만 바뀌었다. 연결선이 다른 커넥터를
 가로지르지 않게 AF-H7E GPS & SAFETY 선은 원래 그림처럼 CAN 2 와 TELEM 1 사이 틈으로 내린다.
 
+## 4 차: AF-F4 nano v2 윗면 BEC 8핀 표 위아래 반대 — 제보(2026-09-30)로 확인 · 수정
+근거 = FC 보드 PCB `fc/_vendor/F405/Nova_F405-8S_V1.5/AP_F405_FC_V1.5.PcbDoc`(Components6 · Pads6 · Nets6). J1(8핀, 오른쪽 가장자리)
+1 번 패드 y 68.76 mm(가장 아래) … 8 번 75.76 mm(가장 위) · 1→8 = PA3 UART2 RX · PA2 UART2 TX · PC11 UART3 RX · PC10 UART3 TX ·
+PA15(M5 → LED) · PB7 SDA · PB6 SCL · GND. 사진 방향 = PCB 윗면(Y 위) — 같은 PCB 의 ESC 9핀(P11) 왼→오 9…1 번이 사진 실크
+"C 4 3 2 1 + + − −" 와 같고, GPS 6핀(P3) 위→아래 − + TX RX SCL SDA 도 그림과 같다. 그래서 BEC 표만 뒤집혀 있었다(위→아래 RX TX RX TX LED SDA SCL −
+→ − SCL SDA LED TX RX TX RX). 그림(fc_F4_nano_v2_pinout_top.png)의 표 8 칸만 옮겼다. 아랫면 그림(BEC 보드)은 그 보드 PCB 가 저장소에 없어 확인하지 못했다.
+
 ## 합의에서 뺀 미결(자료 없음)
 - AF-H7 nano 그림 = 펌웨어 포트 대응표(커넥터 그림 아님, product-facts 테스트가 고정).
-- AE-6S 60A BC · AF-F4 nano / T10 nano · AF-F4 nano v2 · AP-M10 — 보드 PCB·제조사 핀 번호 자료가 저장소에 없다. 제조사 그림·실크 순서 그대로 두고 번호·① 를 새로 쓰지 않았다.
+- AE-6S 60A BC · AF-F4 nano / T10 nano · AP-M10 — 보드 PCB·제조사 핀 번호 자료가 저장소에 없다. AF-F4 nano v2 는 FC 보드 PCB(V1.5)가 fc/_vendor 에 있다(4 차) — BEC 보드만 없다. 제조사 그림·실크 순서 그대로 두고 번호·① 를 새로 쓰지 않았다.
 - AF-H7E PWM 헤더 양산 부품의 공칭 피치(BOM = DIP-60 만). 핀 표는 받침 PCB 좌표(줄 ≈ 2.54 · 채널 2.6 mm)만 적는다.
 - 제품 사진과 새 렌더 중 어느 쪽이 양산 표면·색인지(실물 없음).
 
