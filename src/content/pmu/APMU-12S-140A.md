@@ -20,7 +20,7 @@ specs:
   - { key: CAN Hub, value: "7× JST-GH 4P in parallel (5V · CAN_H · CAN_L · GND), passive — shares the flight controller's CAN bus · 5 V from the FC rail · 120 Ω termination by solder jumper JP301, open by default" }
   - { key: FC Power Port, value: "5 V, always on with the battery (TI LM5146, 4.5 A) · two Molex Micro-Lock Plus 6P ports in the AF-H7E POWER pin order: FC PWR1 (J301) with the INA228 on its I2C, FC PWR2 (J309) 5 V only, for the flight controller's second power input (pins 3–4 open) · 2.2 A per plug - Molex rates 2.2 A per circuit with AWG 26 and does not allow circuits to be added, and the flight controller takes one input at a time" }
   - { key: Digital Monitor, value: "TI INA228 20-bit on the FC port I2C, address 0x40 · 0.1 mΩ Vishay WSLP5931 shunt — ArduPilot BATT_MONITOR 21" }
-  - { key: Button & LEDs, value: "JST-GH 7P button / 4-LED cable: tap, then press and hold ~2 s to switch on or off · AUTO-ON plug (pins 6–7, BTN–GND, looped) switches on with the battery · the four state LEDs are Würth 150060GS75000 (0603, 525 nm, 3.2 V typical forward voltage - chosen high because the GreenPAK turns one off by driving its cathode to 3.3 V, and a low-forward-voltage LED kept glowing there; the datasheet gives no minimum, so staying dark is checked on the prototype); the whole sequencer, the LED bar, the precharge check and the navigation-light timing sit in ONE configured Renesas GreenPAK (SLG46826G) — settings in its NVM, still no microcontroller and no firmware" }
+  - { key: Button & LEDs, value: "JST-GH 7P button / 4-LED cable: tap, then press and hold ~2 s to switch on or off · with no button cable plugged in it switches on with the battery (no jumper) · the four state LEDs are Würth 150060GS75000 (0603, 525 nm, 3.2 V typical forward voltage - chosen high because the GreenPAK turns one off by driving its cathode to 3.3 V, and a low-forward-voltage LED kept glowing there; the datasheet gives no minimum, so staying dark is checked on the prototype); the whole sequencer, the LED bar, the precharge check and the navigation-light timing sit in ONE configured Renesas GreenPAK (SLG46826G) — settings in its NVM, still no microcontroller and no firmware" }
   - { key: Button Cable, value: "Straight 1:1 JST-GH 7P harness to the APMU-BTN1 button board — JST GHR-07V-S housing at both ends, SSHL-002T-P0.2 contacts, 28 AWG, 300 mm as standard. Pin 1 LED common (+), pins 2–5 the four LED cathodes, pin 6 the button contact, pin 7 GND; never a reversed harness. The board carries its own resistors (150 Ω common + 1 kΩ per LED) and a 6.8 kΩ that lets the main board tell 'no cable' from 'cable, not pressed' on the single button wire. The AUTO-ON plug is the same housing with only pins 6 and 7 bridged, and replaces the cable" }
   - { key: PCB, value: "200 × 100 mm · 4 layers · 2.0 mm · 3 oz outer / 2 oz inner · parts on the top only (bottom = heat-sink face) · 4× M3, 4 mm from the edges" }
   - { key: Validation Status, value: "Design stage - 278 parts (283 footprints with the two copper plates and three open-neck pads of the + path), placement only: routing is outsourced. Schematic verified in 3 consecutive identical passes (hash 5e1be37b66383ab5): 120 of 120 nets match the truth netlist pin for pin, every one of the 23 connectors has its pin order checked against the plug it mates with, ERC clean, no overlapping text, every part inside the 12S voltage rules with no waiver (312/312), and the Altium SchDoc re-imports to the same netlist. Board verified in 3 consecutive identical passes (hash 1a8d5a32f553ccb0) with 11 of 11 deliberate defects caught: KiCad DRC 0 errors, 0 schematic-parity differences, all 701 ratlines present, every part with its 3D model; the Altium PcbDoc carries the same pad nets pin for pin. Still to do: the GreenPAK configuration, the routing itself, and the thermal test" }
@@ -32,7 +32,7 @@ pinoutImages:
 pinoutNotes: |
   Figure 1 is the main board, figure 2 the button harness. Figure 2 is drawn from the two netlists, so the cable in
   it is the cable the boards expect: a straight 1:1 JST-GH 7P harness, GHR-07V-S housings and SSHL-002T-P0.2
-  contacts on 28 AWG, 300 mm as standard, and the AUTO-ON plug is the same housing with only pins 6 and 7 bridged.
+  contacts on 28 AWG, 300 mm as standard, and with no button cable at all the PMU switches on with the battery.
   Top view: the battery connector (AS150U) and the 24 V, 16 V and 7.4 V outputs on the top edge, the 12 V output on the left edge, two ESC outputs on each side and one at the bottom, next to the NAV LEFT, BUTTON, NAV RIGHT and NAV PWM plugs; the seven CAN plugs are at the top right beside the two FC power ports (FC PWR2, FC PWR1). On every XT connector the flat side of the housing is positive, as marked on the board (+ / −). The AUTO-ON plug is a JST-GH 7P housing with pins 6 and 7 (BTN and GND) looped: with it in place the unit switches on when the battery is connected, and pulling it out later changes nothing. Holding the button while connecting the battery also switches the unit on. Under each of the five XT90 housings (ESC1-ESC5) there is a pair of 5.3 mm holes marked + and -, 10.9 mm apart like the XT90 pins: if the XT90 is not fitted, the ESC wire is soldered straight into them. The battery input has the same pair under the AS150U, 18 mm apart.
 pinTable:
   - name: BATTERY IN
@@ -131,14 +131,14 @@ pinTable:
       - { pin: 6, signal: GND, function: "Ground" }
   - name: BUTTON
     type: JST-GH 7P (J901)
-    mapping: Power button and 4 LEDs — or the AUTO-ON plug (pins 6–7 looped)
+    mapping: Power button and 4 LEDs — left empty, the PMU switches on with the battery
     pins:
       - { pin: 1, signal: LED+, function: "LED common (+5 V) - the button board limits it with 150 Ω" }
       - { pin: 2, signal: LED1, function: "LED 1 cathode" }
       - { pin: 3, signal: LED2, function: "LED 2 cathode" }
       - { pin: 4, signal: LED3, function: "LED 3 cathode" }
       - { pin: 5, signal: LED4, function: "LED 4 cathode" }
-      - { pin: 6, signal: BTN, function: "Button to GND (loop to pin 7 = AUTO-ON)" }
+      - { pin: 6, signal: BTN, function: "Button to GND" }
       - { pin: 7, signal: GND, function: "Ground" }
 configParams:
   - { section: "POWER 1 port (INA228)", name: BATT_MONITOR, value: "21", note: "INA2xx I2C battery monitor" }
