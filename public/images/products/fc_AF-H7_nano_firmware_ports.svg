@@ -19,6 +19,6 @@
     </g>
     <text x="60" y="615" font-size="24" fill="#62dcc7">PWM1–10: motor / servo · PWM11: WS2812 LED</text>
     <text x="60" y="658" font-size="20">Source: novaX-ALUX/fc · boards/AF-H7_nano/ardupilot/hwdef.dat</text>
-    <text x="60" y="692" font-size="18" fill="#a5b7cc">Verify PCB revision and connector orientation before wiring. Flash only matching AF-H7_nano firmware.</text>
+    <text x="60" y="692" font-size="19.5" fill="#a5b7cc">Verify PCB revision and connector orientation before wiring. Flash only matching AF-H7_nano firmware.</text>
   </g>
 </svg>

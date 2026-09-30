@@ -22,7 +22,7 @@ specs:
 description: |
   AP-RTK X20D uses one u-blox ZED-X20D all-band receiver and two antennas for RTK positioning and heading. The STM32 forwards the receiver's position and heading plus separate RM3100 compass measurements over DroneCAN to the flight controller; yaw fusion belongs to the flight controller, not the peripheral MCU. Product images are renders of the enclosure design fitted with the R3 PCB, with engraved port and LED names; the gallery also shows the R3 PCB CAD renders. Firmware 1.0.6 is supplied for engineering evaluation, not as production or flight-qualified firmware.
 pinoutImage: /images/products/gnss_AP-RTK-X20D_pinout.png
-pinoutNotes: '① UART (5V · RX · TX · GND) · ② CAN (5V · CAN_H · CAN_L · GND) · ③ DEBUG (GND · TX · RX · SWCLK · SWDIO · 5V) · ④ PPS (PPS · GND · EVENT · GND) · ANT1 · ANT2 (MMCX).'
+pinoutNotes: 'Listed from the last pin to pin 1 (the Pinout image shows each connector as seen and marks pin 1): ① UART (5V · RX · TX · GND) · ② CAN (5V · CAN_H · CAN_L · GND) · ③ DEBUG (GND · TX · RX · SWCLK · SWDIO · 5V) · ④ PPS (PPS · GND · EVENT · GND) · ANT1 · ANT2 (MMCX).'
 firmware:
   - kind: "AP_Periph (DroneCAN update)"
     file: /firmware/gnss/AP-RTK-X20D/AP-RTK_X20D-v1.0.6.bin

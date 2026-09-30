@@ -57,11 +57,254 @@ specs:
   - key: Ethernet
     value: 100 Mbps x 1 Port
 description: AF-H7E is a modular STM32H753 flight controller based on the Pixhawk FMUv6x architecture. The CUAV variant configures BMI088, ICM-42688-P and ICM-20649 IMUs, an RM3100 compass and two ICP-20100 barometers. A heater on the IMU board holds the sensors at 45 °C (BRD_HEAT_TARG), keeping gyro and accelerometer bias steady from a cold start to a hot day; the RM3100 compass reading is corrected for the heater current. Eight FMU outputs and eight IOMCU outputs provide 16 channels. Seven peripheral serial interfaces, a dedicated IOMCU link, four I2C buses including internal sensors, and two CAN buses are configured. Published firmware here is novaX ArduPilot Copter and Plane; PX4 compatibility is not verified by this catalog.
-pinoutImage: /images/products/cuav-pixhawk6x-connectors.png
+pinoutImage: /images/products/fc_AF-H7E_pinout.png
 pinoutImages:
+  - /images/products/fc_AF-H7E_pinout.png
+  - /images/products/fc_AF-H7E_pinout_top_front.png
+  - /images/products/fc_AF-H7E_pinout_left.png
+  - /images/products/fc_AF-H7E_pinout_right.png
+  - /images/products/fc_AF-H7E_pinout_front.png
   - /images/products/fc_AF-H7E_dimensions.png
-  - /images/products/cuav-pixhawk6x-connectors.png
 pinoutNotes: 'I2C bus numbering on the multi-function ports: the GPS & Safety port carries I2C1, the GPS2 port carries I2C2, and the UART4 port carries I2C3.'
+pinTable:
+  - name: POWER 1
+    type: Molex Micro-Lock Plus 6P (1.25 mm) · top, left of the FMU
+    mapping: Primary power input · I2C1 power monitor
+    pins:
+      - { pin: 1, signal: VCC_IN, function: "5 V supply input from the power module" }
+      - { pin: 2, signal: VCC_IN, function: "5 V supply input from the power module" }
+      - { pin: 3, signal: SCL, function: "Power-module I2C clock (voltage / current monitor)" }
+      - { pin: 4, signal: SDA, function: "Power-module I2C data (voltage / current monitor)" }
+      - { pin: 5, signal: GND, function: "Ground" }
+      - { pin: 6, signal: GND, function: "Ground" }
+  - name: POWER 2
+    type: Molex Micro-Lock Plus 6P (1.25 mm) · top, right of the FMU
+    mapping: Redundant power input · I2C2 power monitor
+    pins:
+      - { pin: 1, signal: VCC_IN, function: "5 V supply input from the second power module" }
+      - { pin: 2, signal: VCC_IN, function: "5 V supply input from the second power module" }
+      - { pin: 3, signal: SCL, function: "Power-module I2C clock (voltage / current monitor)" }
+      - { pin: 4, signal: SDA, function: "Power-module I2C data (voltage / current monitor)" }
+      - { pin: 5, signal: GND, function: "Ground" }
+      - { pin: 6, signal: GND, function: "Ground" }
+  - name: POWER C1
+    type: 6P · top, rear left (on the PWM header block)
+    mapping: CAN power module input · CAN1
+    pins:
+      - { pin: 1, signal: GND, function: "Ground" }
+      - { pin: 2, signal: GND, function: "Ground" }
+      - { pin: 3, signal: CAN_L, function: "CAN1 bus low (same bus as the CAN 1 port)" }
+      - { pin: 4, signal: CAN_H, function: "CAN1 bus high" }
+      - { pin: 5, signal: VCC_IN, function: "5 V supply input from the CAN power module" }
+      - { pin: 6, signal: VCC_IN, function: "5 V supply input from the CAN power module" }
+  - name: POWER C2
+    type: 6P · top, rear right (on the PWM header block)
+    mapping: CAN power module input · CAN2
+    pins:
+      - { pin: 1, signal: GND, function: "Ground" }
+      - { pin: 2, signal: GND, function: "Ground" }
+      - { pin: 3, signal: CAN_L, function: "CAN2 bus low (same bus as the CAN 2 port)" }
+      - { pin: 4, signal: CAN_H, function: "CAN2 bus high" }
+      - { pin: 5, signal: VCC_IN, function: "5 V supply input from the second CAN power module" }
+      - { pin: 6, signal: VCC_IN, function: "5 V supply input from the second CAN power module" }
+  - name: TELEM 1
+    type: JST-GH 6P · front, lower row
+    mapping: SERIAL1 · UART7 · default MAVLink2
+    pins:
+      - { pin: 1, signal: VCC, function: "5 V output" }
+      - { pin: 2, signal: TX, function: "UART transmit (FC → device)" }
+      - { pin: 3, signal: RX, function: "UART receive (device → FC)" }
+      - { pin: 4, signal: CTS, function: "Clear to send — hardware flow control input" }
+      - { pin: 5, signal: RTS, function: "Request to send — hardware flow control output" }
+      - { pin: 6, signal: GND, function: "Ground" }
+  - name: TELEM 2
+    type: JST-GH 6P · front, lower row
+    mapping: SERIAL2 · UART5 · default MAVLink2
+    pins:
+      - { pin: 1, signal: VCC, function: "5 V output" }
+      - { pin: 2, signal: TX, function: "UART transmit (FC → device)" }
+      - { pin: 3, signal: RX, function: "UART receive (device → FC)" }
+      - { pin: 4, signal: CTS, function: "Clear to send — hardware flow control input" }
+      - { pin: 5, signal: RTS, function: "Request to send — hardware flow control output" }
+      - { pin: 6, signal: GND, function: "Ground" }
+  - name: TELEM 3
+    type: JST-GH 6P · front, upper row
+    mapping: SERIAL5 · USART2
+    pins:
+      - { pin: 1, signal: VCC, function: "5 V output" }
+      - { pin: 2, signal: TX, function: "UART transmit (FC → device)" }
+      - { pin: 3, signal: RX, function: "UART receive (device → FC)" }
+      - { pin: 4, signal: CTS, function: "Clear to send — hardware flow control input" }
+      - { pin: 5, signal: RTS, function: "Request to send — hardware flow control output" }
+      - { pin: 6, signal: GND, function: "Ground" }
+  - name: GPS & SAFETY
+    type: JST-GH 10P · front, upper row
+    mapping: SERIAL3 · USART1 + I2C1 · default GPS
+    pins:
+      - { pin: 1, signal: VCC, function: "5 V output" }
+      - { pin: 2, signal: TX, function: "UART transmit (FC → GPS)" }
+      - { pin: 3, signal: RX, function: "UART receive (GPS → FC)" }
+      - { pin: 4, signal: SCL, function: "I2C1 clock — compass in the GPS module" }
+      - { pin: 5, signal: SDA, function: "I2C1 data" }
+      - { pin: 6, signal: SAFETY_SW, function: "Safety switch input" }
+      - { pin: 7, signal: SAFETY_LED, function: "Safety switch LED output" }
+      - { pin: 8, signal: VCC_3V3, function: "3.3 V supply for the safety switch" }
+      - { pin: 9, signal: BUZZER, function: "Buzzer output" }
+      - { pin: 10, signal: GND, function: "Ground" }
+  - name: GPS 2
+    type: JST-GH 6P · front, upper row
+    mapping: SERIAL4 · UART8 + I2C2 · default GPS
+    pins:
+      - { pin: 1, signal: VCC, function: "5 V output" }
+      - { pin: 2, signal: TX, function: "UART transmit (FC → GPS)" }
+      - { pin: 3, signal: RX, function: "UART receive (GPS → FC)" }
+      - { pin: 4, signal: SCL, function: "I2C2 clock — compass in the GPS module" }
+      - { pin: 5, signal: SDA, function: "I2C2 data" }
+      - { pin: 6, signal: GND, function: "Ground" }
+  - name: UART 4
+    type: JST-GH 7P · right side, front
+    mapping: SERIAL6 · UART4 + I2C3
+    pins:
+      - { pin: 1, signal: VCC, function: "5 V output" }
+      - { pin: 2, signal: TX, function: "UART transmit (FC → device)" }
+      - { pin: 3, signal: RX, function: "UART receive (device → FC)" }
+      - { pin: 4, signal: SCL, function: "I2C3 clock" }
+      - { pin: 5, signal: SDA, function: "I2C3 data" }
+      - { pin: 6, signal: NFC_GPIO, function: "General-purpose I/O" }
+      - { pin: 7, signal: GND, function: "Ground" }
+  - name: CAN 1
+    type: JST-GH 4P · front, lower row
+    mapping: CAN1 · DroneCAN
+    pins:
+      - { pin: 1, signal: VCC, function: "5 V output to CAN peripherals (not a power input)" }
+      - { pin: 2, signal: CAN_H, function: "CAN bus high" }
+      - { pin: 3, signal: CAN_L, function: "CAN bus low" }
+      - { pin: 4, signal: GND, function: "Ground" }
+  - name: CAN 2
+    type: JST-GH 4P · front, lower row
+    mapping: CAN2 · DroneCAN
+    pins:
+      - { pin: 1, signal: VCC, function: "5 V output to CAN peripherals (not a power input)" }
+      - { pin: 2, signal: CAN_H, function: "CAN bus high" }
+      - { pin: 3, signal: CAN_L, function: "CAN bus low" }
+      - { pin: 4, signal: GND, function: "Ground" }
+  - name: DSM / SBUS RC
+    type: JST-GH 5P · right side
+    mapping: RC input through the IOMCU · SBUS / DSM
+    pins:
+      - { pin: 1, signal: VCC, function: "5 V receiver supply" }
+      - { pin: 2, signal: RC_IN, function: "SBUS / DSM receiver input" }
+      - { pin: 3, signal: RSSI, function: "Analog RSSI input" }
+      - { pin: 4, signal: VCC_3V3, function: "3.3 V supply for DSM / Spektrum satellite receivers" }
+      - { pin: 5, signal: GND, function: "Ground" }
+  - name: PPM IN
+    type: JST-GH 3P · right side
+    mapping: PPM receiver input
+    pins:
+      - { pin: 1, signal: VCC, function: "5 V receiver supply" }
+      - { pin: 2, signal: PPM, function: "PPM receiver input" }
+      - { pin: 3, signal: GND, function: "Ground" }
+  - name: SBUS OUT
+    type: JST-GH 3P · right side, rear
+    mapping: SBUS output from the IOMCU
+    pins:
+      - { pin: 1, signal: NC, function: "Not connected" }
+      - { pin: 2, signal: SBUS_OUT, function: "SBUS servo output" }
+      - { pin: 3, signal: GND, function: "Ground" }
+  - name: PWM OUT M1–M8
+    type: 3 × 16 pin header · rows about 2.54 mm (servo plug S · + · −), channels 2.6 mm apart on the base PCB · columns 1–8 (left)
+    mapping: MAIN outputs from the IOMCU · SERVO1–8
+    pins:
+      - { pin: S, signal: M1 … M8, function: "Motor / servo output signal, one per channel (rear row)" }
+      - { pin: +, signal: V_SERVO, function: "Servo rail 0 – 9.9 V, bussed across all channels — supplied externally (e.g. BEC)" }
+      - { pin: −, signal: GND, function: "Ground (front row)" }
+  - name: PWM OUT A1–A8
+    type: 3 × 16 pin header · rows about 2.54 mm (servo plug S · + · −), channels 2.6 mm apart on the base PCB · columns 9–16 (right)
+    mapping: AUX outputs from the FMU · SERVO9–16
+    pins:
+      - { pin: S, signal: A1 … A8, function: "Motor / servo output signal, one per channel (rear row)" }
+      - { pin: +, signal: V_SERVO, function: "Servo rail 0 – 9.9 V, bussed across all channels — supplied externally (e.g. BEC)" }
+      - { pin: −, signal: GND, function: "Ground (front row)" }
+  - name: ETHERNET
+    type: JST-GH 4P · left side
+    mapping: 100BASE-T
+    pins:
+      - { pin: 1, signal: RX−, function: "Ethernet receive pair −" }
+      - { pin: 2, signal: RX+, function: "Ethernet receive pair +" }
+      - { pin: 3, signal: TX−, function: "Ethernet transmit pair −" }
+      - { pin: 4, signal: TX+, function: "Ethernet transmit pair +" }
+  - name: USB-C
+    type: USB Type-C · left side, rear
+    mapping: SERIAL0 · USB 2.0 Full Speed
+    pins:
+      - { pin: "A4 B4 A9 B9", signal: VBUS, function: "5 V from USB — configuration and firmware update on the bench" }
+      - { pin: "A6 B6", signal: D+, function: "USB data +" }
+      - { pin: "A7 B7", signal: D−, function: "USB data −" }
+      - { pin: "A5 B5", signal: CC1 / CC2, function: "Configuration channel (device role)" }
+      - { pin: "A1 B1 A12 B12", signal: GND, function: "Ground" }
+  - name: USB
+    type: JST-GH 4P · front end, middle
+    mapping: USB 2.0 — same data lines as the USB-C port (use one at a time)
+    pins:
+      - { pin: 1, signal: VBUS, function: "5 V USB supply" }
+      - { pin: 2, signal: D−, function: "USB data −" }
+      - { pin: 3, signal: D+, function: "USB data +" }
+      - { pin: 4, signal: GND, function: "Ground" }
+  - name: AD & IO
+    type: JST-GH 8P · left side, front
+    mapping: FMU auxiliary inputs and outputs
+    pins:
+      - { pin: 1, signal: VCC, function: "5 V output" }
+      - { pin: 2, signal: CAP1, function: "FMU timer capture input" }
+      - { pin: 3, signal: BOOTLOADER, function: "FMU bootloader request input" }
+      - { pin: 4, signal: RST_REQ, function: "FMU reset request input" }
+      - { pin: 5, signal: nARMED, function: "Armed status output (low = armed)" }
+      - { pin: 6, signal: ADC_3V3, function: "Analog input, 0 – 3.3 V" }
+      - { pin: 7, signal: ADC_6V6, function: "Analog input, 0 – 6.6 V (divided)" }
+      - { pin: 8, signal: GND, function: "Ground" }
+  - name: SPI 6
+    type: JST-GH 11P · right side
+    mapping: External SPI6 — not enabled in novaX firmware
+    pins:
+      - { pin: 1, signal: VCC, function: "5 V output" }
+      - { pin: 2, signal: SCK, function: "SPI clock" }
+      - { pin: 3, signal: MISO, function: "SPI data in" }
+      - { pin: 4, signal: MOSI, function: "SPI data out" }
+      - { pin: 5, signal: CS1, function: "Chip select 1" }
+      - { pin: 6, signal: CS2, function: "Chip select 2" }
+      - { pin: 7, signal: SYNC, function: "Sync output" }
+      - { pin: 8, signal: DRDY1, function: "Data-ready input 1" }
+      - { pin: 9, signal: DRDY2, function: "Data-ready input 2" }
+      - { pin: 10, signal: nRESET, function: "Reset output" }
+      - { pin: 11, signal: GND, function: "Ground" }
+  - name: FMU DEBUG
+    type: JST-SH 10P · front end, left · Pixhawk Debug Full
+    mapping: SERIAL7 · USART3 · console + SWD
+    pins:
+      - { pin: 1, signal: VCC_3V3, function: "3.3 V reference for the debug probe" }
+      - { pin: 2, signal: CONSOLE_TX, function: "Debug console transmit (FC → probe)" }
+      - { pin: 3, signal: CONSOLE_RX, function: "Debug console receive (probe → FC)" }
+      - { pin: 4, signal: SWDIO, function: "SWD data — bootloader programming and firmware recovery" }
+      - { pin: 5, signal: SWCLK, function: "SWD clock" }
+      - { pin: 6, signal: SWO, function: "Trace output (shared with SPI6 SCK)" }
+      - { pin: 7, signal: NFC_GPIO, function: "General-purpose I/O" }
+      - { pin: 8, signal: PH11, function: "General-purpose I/O" }
+      - { pin: 9, signal: nRST, function: "FMU reset" }
+      - { pin: 10, signal: GND, function: "Ground" }
+  - name: IO DEBUG
+    type: JST-SH 10P · front end, right
+    mapping: IOMCU console + SWD
+    pins:
+      - { pin: 1, signal: VCC_3V3, function: "3.3 V reference for the debug probe" }
+      - { pin: 2, signal: IO_TX, function: "IOMCU console transmit" }
+      - { pin: 3, signal: NC, function: "Not connected" }
+      - { pin: 4, signal: SWDIO, function: "IOMCU SWD data" }
+      - { pin: 5, signal: SWCLK, function: "IOMCU SWD clock" }
+      - { pin: 6, signal: SWO, function: "IOMCU trace output" }
+      - { pin: 7, signal: GPIO1, function: "IOMCU spare I/O" }
+      - { pin: 8, signal: GPIO2, function: "IOMCU spare I/O" }
+      - { pin: 9, signal: nRST, function: "IOMCU reset" }
+      - { pin: 10, signal: GND, function: "Ground" }
 firmware:
   - kind: "ArduPilot Copter (.apj package)"
     file: /firmware/AF-H7E-v1.3.0-Copter.apj

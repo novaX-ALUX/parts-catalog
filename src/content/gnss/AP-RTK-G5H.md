@@ -4,7 +4,7 @@ tagline: Dual-Antenna RTK GNSS with Septentrio mosaic-G5 P3H
 image: /images/products/gnss_AP-RTK-G5H_device.png
 pictureKey: gnss_X_RTK2
 pinoutImage: /images/products/gnss_AP-RTK-G5H_pinout.png
-pinoutNotes: '① UART (5V · RX · TX · GND — receiver COM2 for RxTools / firmware upgrade) · ② CAN (5V · CAN_H · CAN_L · GND). USB-C connects to the MCU (bootloader / DFU).'
+pinoutNotes: 'Listed from the last pin to pin 1 (the Pinout image shows each connector as seen and marks pin 1): ① UART (5V · RX · TX · GND — receiver COM2 for RxTools / firmware upgrade) · ② CAN (5V · CAN_H · CAN_L · GND). USB-C connects to the MCU (bootloader / DFU).'
 order: 21
 hidden: true   # 2026-09-12 공개 카탈로그(카드 + /gnss/ap-rtk-g5h/ 제품페이지)에서 제외. update 탭 펌웨어 목록은 유지.
 specs:
