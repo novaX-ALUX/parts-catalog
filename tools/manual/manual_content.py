@@ -99,6 +99,38 @@ def image_size(path):
         return im.size
 
 
+def page_chunks(path, work, tag, max_ratio):
+    """세로로 긴 핀아웃 시트(카탈로그 화면용 지도 + 카드, web/parts-catalog/tools/pinout) → 쪽 크기 조각.
+    한 쪽에 통째로 넣으면 글자가 1.7 pt 까지 줄어든다 → 쪽 너비 그대로 두고 빈 줄(흰색 · 카드 사이 구분선)에서 잘라 여러 쪽으로.
+    → [(조각 png, 폭 px, 높이 px)]"""
+    import numpy as np
+    from PIL import Image
+    im = Image.open(path).convert("RGB")
+    a = np.asarray(im).astype(int)
+    w, hgt = im.size
+    blank = (a.min(axis=2) >= 240).all(axis=1)                               # 흰 줄
+    seg = a[:, 40:w - 40]                                                    # 블록 끝 구분선 = 좌우 여백(40 px) 사이 한 가지 옅은 색, 여백은 흰색
+    line = ((seg.std(axis=1).max(axis=1) < 4) & (seg.mean(axis=(1, 2)) < 248) & (seg.min(axis=(1, 2)) >= 170)
+            & (a[:, :30].min(axis=(1, 2)) >= 245) & (a[:, w - 30:].min(axis=(1, 2)) >= 245))   # → 면 제목이 지도와 떨어지지 않게 여기서 먼저
+    max_h = int(w * max_ratio)
+    out, y0 = [], 0
+    while y0 < hgt:
+        if hgt - y0 <= max_h:
+            y1 = hgt
+        else:
+            lo = y0 + max_h // 3                                              # 조각이 너무 짧지 않게 1/3 이후에서
+            cand = np.nonzero(line[lo:y0 + max_h])[0]
+            if not len(cand):
+                cand = np.nonzero(blank[lo:y0 + max_h])[0]
+            y1 = lo + int(cand[-1]) + 1 if len(cand) else y0 + max_h
+        q = Path(work) / ("%s_%d.png" % (tag, len(out) + 1))
+        q.parent.mkdir(parents=True, exist_ok=True)
+        im.crop((0, y0, w, y1)).save(q)
+        out.append((q, w, y1 - y0))
+        y0 = y1
+    return out
+
+
 def ko_val(slug, v):
     return MP.KO_VALUE.get(slug, {}).get(v) or MP.KO_COMMON.get(v) or spec_value(v, "ko")
 
@@ -120,9 +152,18 @@ def product(d, lang, work, h):
         pages.append((title(L["specs"]), '<div><div class="sub">%s</div><table class="t">%s</table></div>' % (L["basic"], trs)))
     photos = {g if isinstance(g, str) else g["src"] for g in (d.get("gallery") or [])}   # 갤러리에도 있는 그림 = 제품 사진·렌더 → 돌리지 않음
                                                                            # (갤러리 항목 = 경로 또는 {src, caption})
-    for src in (d.get("pinoutImages") or ([d["pinoutImage"]] if d.get("pinoutImage") else [])):
+    for k, src in enumerate(d.get("pinoutImages") or ([d["pinoutImage"]] if d.get("pinoutImage") else [])):
         sub = L["dim_sub"] if "dimension" in src else L["pin_sub"]
-        path = h["fit"](h["root"] / "public" / src.lstrip("/"), 1800)
+        orig = h["root"] / "public" / src.lstrip("/")
+        ow, oh = image_size(orig)
+        if ow and oh and orig.suffix.lower() != ".svg" and src not in photos and oh / ow > 1.25 * 205.0 / 171.4:
+            # 세로로 긴 시트 → 원본 PNG 를 쪽 너비 그대로 잘라 여러 쪽(통째로 긴 변 1800 px 에 맞추면 폭이 ~480 px 로 줄어 글자가 뭉개진다)
+            parts = page_chunks(orig, work, "pinout%d" % k, 205.0 / 171.4)
+            for j, (q, qw, qh) in enumerate(parts):
+                fig = '<div class="fig" style="height:%.1fpt"><img src="%s"></div>' % (min(205.0, 171.4 * qh / qw), h["fit"](q, 1800).as_uri())
+                pages.append((title(L["pinout"]), '<div><div class="sub">%s (%d/%d)</div>%s</div>' % (sub, j + 1, len(parts), fig)))
+            continue
+        path = h["fit"](orig, 1800)
         w, hh = image_size(path)
         if w and hh and w / hh > 1.12 and src not in photos:                # 가로로 긴 도면은 90° 돌려 쪽 높이를 씀(읽을 때 책을 돌림)
             s = min(205.0 / w, 171.4 / hh)
