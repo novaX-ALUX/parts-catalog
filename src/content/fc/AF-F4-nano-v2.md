@@ -28,8 +28,7 @@ specs:
 description: |
   AF-F4 nano v2 is a compact F4-class flight controller built around the STM32F405, with an ICM-42688-P IMU and a DPS368 barometer onboard. GNSS and compass are external: the 6-pin GPS port carries USART1 and I2C1 for a module with MAX-M10S and QMC5883P. Without an external positioning or heading source those measurements are unavailable. The current novaX ArduPilot definition enables five PWM outputs, three hardware UARTs plus USB, and microSD logging. Board ID 6204 allows compatible APJ uploaders to check the target; raw DFU and SWD flashing do not provide that protection. Use only the matching AF-F4_nano_v2 image.
 pinoutImages:
-  - /images/products/fc_F4_nano_v2_pinout_top.png
-  - /images/products/fc_F4_nano_v2_pinout_bottom.png
+  - /images/products/fc_F4_nano_v2_pinout.png
 firmware:
   - kind: "ArduPilot (.apj package)"
     file: /firmware/AF-F4_nano_v2-v1.0.12.apj

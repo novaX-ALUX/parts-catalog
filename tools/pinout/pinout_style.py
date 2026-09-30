@@ -9,6 +9,7 @@
   ② 카드 = 커넥터마다 한 줄 [확대 그림(① 표시) | 글자 · 이름 · 부제 · 핀 표] — 표 칸 왼 → 오 = 확대 그림에서 보이는 핀 왼 → 오.
 핀 신호 정본은 카탈로그 md 의 pinTable 이고 여기서는 읽기만 한다. + = 5 V(빨강) · − = GND(검정) · 신호 = 파랑.
 """
+import json
 import os
 import re
 
@@ -254,7 +255,7 @@ class Sheet:
     """위에서 아래로 블록을 쌓는 px 캔버스(y 아래로). 모든 글자는 text() 로 — 화면 13 px 미만이면 오류."""
 
     def __init__(self):
-        self.ops, self.y, self.texts = [], MARGIN, []
+        self.ops, self.y, self.texts, self.tables = [], MARGIN, [], []
 
     # ── 그리기 도구 ──
     def text(self, ax, x, y, s, px, **kw):
@@ -539,6 +540,8 @@ class Sheet:
             bottom = max(bottom, yt + rh)
             yt += rh + rowgap
         H = bottom + 34
+        for it in items:                                                     # 핀 잠금 대조용 기록(PINOUT_PINS_JSON)
+            self.tables.append({"name": it["name"], "table": _plain(it.get("table"))})
 
         def fn(ax, y0):
             ax.imshow(img, extent=[ix0, ix0 + img_w, y0 + iy0 + ih, y0 + iy0], zorder=1, interpolation="lanczos")
@@ -577,6 +580,9 @@ class Sheet:
             fn(ax, y0)
         fig.savefig(out, dpi=DPI, facecolor="white")
         plt.close(fig)
+        if os.environ.get("PINOUT_PINS_JSON"):                               # 핀 잠금 대조: 이 그림이 그린 표 전부
+            with open(os.environ["PINOUT_PINS_JSON"], "w", encoding="utf-8") as fp:
+                json.dump({"file": os.path.basename(out), "tables": self.tables}, fp, ensure_ascii=False, indent=1)
         smallest = min(self.texts, key=lambda t: t[1])
         rep = {"file": os.path.basename(out), "canvas_px": [W, H], "shown_px": [PAGE_PX, round(H * SCALE)],
                "texts": len(self.texts), "min_font_canvas_px": smallest[1], "min_font_screen_px": round(smallest[1] * SCALE, 1),
@@ -696,6 +702,20 @@ def draw_ctable(sh, ax, x, y, name, sub, table):
         cell(x, y0, w, C_SIG_H)
         sig_txt(x + w / 2, y0 + C_SIG_H / 2 - 1, table[1], table[2], CX["sig"])
     return w, h
+
+
+def _plain(table):
+    """표 → 기록용(글자만): h/v = [(번호, 글자)], rows = [[글자 …]], grid = {열 이름, 줄}, one = 글자."""
+    if not table:
+        return None
+    k = table[0]
+    if k in ("h", "v"):
+        return {"kind": k, "cells": [[c[0], c[1]] for c in table[1]]}
+    if k == "rows":
+        return {"kind": k, "rows": [[c[1] for c in r] for r in table[1]]}
+    if k == "grid":
+        return {"kind": k, "cols": list(table[1]), "rows": [[r[0], list(r[2])] for r in table[2]]}
+    return {"kind": k, "text": table[1]}
 
 
 def spread1d(targets, sizes, lo, hi, gap):
