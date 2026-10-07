@@ -232,6 +232,21 @@ export class Px4Updater {
     try { await this.io.write(new Uint8Array([P.REBOOT, P.EOC])); } catch { /**/ }
   }
 
+  /** Leave the bootloader after a flash and report a signature rejection. A secure bootloader
+   *  (AF-H7E CR) checks the image it just received and answers FAILED when it is not signed with
+   *  the board's key; other bootloaders answer OK or nothing, which keeps the old behaviour. */
+  private async bootFlashed(log: Log) {
+    log('Boot new app …');
+    this.io.drain();
+    try { await this.io.write(new Uint8Array([P.REBOOT, P.EOC])); } catch { return; }
+    let r: Uint8Array;
+    // The secure bootloader hashes the whole image before it answers (seconds for a bad one).
+    try { r = await this.io.read(2, 6000); } catch { return; } // no answer: older bootloader, app booting
+    if (r[0] === P.INSYNC && r[1] === P.FAILED) {
+      throw new Error('Firmware rejected by the secure bootloader — the image is not signed with this board\'s key (missing or invalid signature), so the board does not run it and stays in the bootloader. Upload the genuine signed firmware for this board.');
+    }
+  }
+
   async close() {
     await this.io.release();
     try { await this.port.close(); } catch { /**/ }
@@ -350,6 +365,6 @@ export class Px4Updater {
     await this.erase(log, progress);
     const programmed = await this.program(image, log, progress);
     if (!(await this.verify(programmed, log))) throw new Error('CRC verify failed — flash mismatch');
-    await this.reboot(log);
+    await this.bootFlashed(log);
   }
 }
