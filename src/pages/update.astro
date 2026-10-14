@@ -53,6 +53,9 @@ rows.sort((a, b) =>
 // app+bootloader flashed to board_id 6201 over serial, then a full DFU erase+write+leave→boot).
 // Windows needs the one-time WinUSB (Zadig) step on the df11 device, same as F4/H7.
 const WEB_UPDATE_FAMILIES = ['F4', 'F7', 'H7'];
+// AF-H7E CR only (temporary, director 2026-10-14): from v1.0.3 its flight firmware has no USB, so
+// it is updated in the bootloader's 10 s after plug-in — its rows get the ⏳ Update on plug-in button.
+const PLUG_IN_UPDATE = /^AF-H7E CR$/;
 const fwRows = rows.filter((r) => r.method !== 'dfu' && WEB_UPDATE_FAMILIES.includes(r.family));
 const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.includes(r.family));
 
@@ -129,7 +132,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
                     ...(g.subs.length ? g.subs : [g]).flatMap((s) => [
                       ...(g.subs.length ? [<tr class="grp lvl2" data-grp={s.key}><td colspan="5">{s.label} <span class="n">{s.rows.length}</span></td></tr>] : []),
                       ...s.rows.map((r) => (
-                        <tr class="fwrow" data-method={r.method} data-path={r.path} data-name={`${r.product} ${r.version}`} data-family={r.family} data-mcu={r.mcu} data-signed={r.signed ? "1" : "0"} data-group={r.group}>
+                        <tr class="fwrow" data-method={r.method} data-path={r.path} data-name={`${r.product} ${r.version}`} data-family={r.family} data-mcu={r.mcu} data-signed={r.signed ? "1" : "0"} data-group={r.group} data-plugin={PLUG_IN_UPDATE.test(r.product) ? "1" : "0"}>
                           <td><span class="rad" data-radio></span></td>
                           <td class="pname">{r.product}</td>
                           <td>{r.vehicle ? <span class={`veh ${r.vehicle}`}>{vehicleLabel(r.vehicle)}</span> : <span class="veh none">—</span>}</td>
@@ -151,6 +154,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
 
       <div class="row-connect">
         <button id="connect" class="btn btn-line">🔌 Connect</button>
+        <button id="waitplug" class="btn btn-line" hidden title="AF-H7E CR: its flight firmware has no USB, so the update runs in the bootloader's 10 s after plug-in">⏳ Update on plug-in</button>
         <button id="softdfu" class="btn btn-line" hidden title="실행 중인 보드를 소프트웨어로 ROM DFU에 진입시킴 (AF-F4 ≥ v0.2.2 / T10 ≥ v0.3.2 / nano v2 ≥ v1.0.1 / AF-F7 ≥ v0.2.4 / AF-H7E ≥ v0.2.2)">🛠 Enter DFU</button>
         <button id="dfuconnect" class="btn btn-line" hidden title="보드가 DFU(0483:DF11)에 있을 때 WebUSB 장치 선택 팝업을 새 클릭으로 열어 연결 (브라우저 제스처 요구 우회)">🔌 Connect DFU device</button>
         <span id="status" class="chip">Not connected</span>
@@ -239,10 +243,11 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
 
-  const BUILD = '2026-07-21c * REVERTED the H7E leave-jump auto-boot (it did NOT boot from the browser and left the board stuck in DFU). H7E DFU again RESTORES BOOT_CM7_ADD0=0x08000000 so a power-cycle boots the app. DFU device picker stays consistent with serial (Flash (DFU) always shows the picker).';
+  const BUILD = '2026-10-14 * AF-H7E CR: ⏳ Update on plug-in (its flight firmware has no USB from v1.0.3). 2026-07-21c * REVERTED the H7E leave-jump auto-boot (it did NOT boot from the browser and left the board stuck in DFU). H7E DFU again RESTORES BOOT_CM7_ADD0=0x08000000 so a power-cycle boots the app. DFU device picker stays consistent with serial (Flash (DFU) always shows the picker).';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
+  const waitBtn = $('#waitplug') as HTMLButtonElement;
   let mode: 'fw' | 'dfu' = 'fw';
   let conn: any = null;
   // Serial tab: true once 🔌 Connect has rebooted the running app into its bootloader. The board is
@@ -254,6 +259,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
   let selectedFamily: string | null = null; // F4/F7/H7 of the picked catalog firmware (DFU guard)
   let selectedName: string | null = null;
   let selectedSigned = false;   // this catalog artifact ships an Ed25519 manifest
+  let selectedPlugIn = false;   // AF-H7E CR (temporary): no USB while it runs → ⏳ Update on plug-in
 
   const log = (m: string, cls = '') => { const d = document.createElement('div'); if (cls) d.className = cls; d.textContent = m; logEl.appendChild(d); logEl.scrollTop = 1e9; };
   const progress = (done: number, total: number) => { barEl.style.width = total ? `${Math.round((done / total) * 100)}%` : '0'; };
@@ -270,6 +276,9 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
     [soft, dconn, flashBtn, connectBtn].forEach((b) => b.classList.remove('pulse'));
     dconn.hidden = true; connectBtn.hidden = true;                       // Connect buttons merged into the action
     const picked = !!(selectedPath || droppedFile);
+    waitBtn.classList.remove('pulse');
+    waitBtn.hidden = !(mode === 'fw' && picked && selectedPlugIn && !conn); // AF-H7E CR only (temporary)
+    if (!waitBtn.hidden) waitBtn.classList.add('pulse');
     if (mode === 'dfu') {
       soft.disabled = false;
       if (conn || !picked) { soft.hidden = true; }                       // connected, or pick firmware first
@@ -289,7 +298,8 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
         // but requestPort()'s picker lists every port for the user to select. flash() then detects
         // an already-in-bootloader port (trySync) and programs it directly with no reboot.
         connectBtn.hidden = false;
-        if (conn || serialRebooted) flashBtn.classList.add('pulse'); // connected, or app already rebooted → ⚡ Update (opens the picker for the bootloader port, then flashes)
+        if (selectedPlugIn && !conn) { /* AF-H7E CR: ⏳ Update on plug-in pulses instead */ }
+        else if (conn || serialRebooted) flashBtn.classList.add('pulse'); // connected, or app already rebooted → ⚡ Update (opens the picker for the bootloader port, then flashes)
         else connectBtn.classList.add('pulse');                      // fresh → 🔌 Connect (pick the port; if it's the running app, Connect reboots it into the bootloader)
       }
     }
@@ -513,6 +523,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
     selectedPath = row.dataset.path || null; droppedFile = null;
     selectedFamily = row.dataset.family || null; selectedName = row.dataset.name || null;
     selectedSigned = row.dataset.signed === '1';
+    selectedPlugIn = row.dataset.plugin === '1';
     serialRebooted = false; // re-selecting firmware restarts the Connect→Update sequence
     // If we were auto-reconnected to a DFU device of a DIFFERENT chip (e.g. an F4 sitting in DFU
     // while the user now picks F7 firmware), release it so we neither flash nor stay "connected"
@@ -541,7 +552,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
   ['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('over'); }));
   drop.addEventListener('drop', (e) => { const f = (e as DragEvent).dataTransfer?.files?.[0]; if (f) pickFile(f); });
   function pickFile(f: File) {
-    droppedFile = f; selectedPath = null;
+    droppedFile = f; selectedPath = null; selectedPlugIn = false;
     selectedFamily = null; selectedName = null; // dropped file → no catalog family to match against
     ($('#softdfu') as HTMLElement).hidden = true; // unknown family for a dropped file → no software DFU button
     document.querySelectorAll('.fwrow').forEach((r) => r.classList.remove('sel'));
@@ -583,6 +594,27 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
         log('→ No serial port. A NEW / blank board — or a board already in DFU — has no COM port. Click the 🛠 DFU Recovery tab above, pick the *_with_bl.hex, then 🔌 Connect DFU device.', 'pend');
     }
     refreshFlashEnabled();
+  });
+
+  // ---- AF-H7E CR only (temporary): its flight firmware has no USB from v1.0.3, so it is reachable
+  // only in its bootloader's 10 s after plug-in. Catch that port (the bootloader then keeps waiting)
+  // and run the normal ⚡ Update on it. ----
+  waitBtn.addEventListener('click', async () => {
+    waitBtn.disabled = true; connectBtn.disabled = true;
+    setStatus('⏳ waiting for the board …', '');
+    let caught = false;
+    try {
+      conn = await Px4Updater.waitForPlugIn(log);
+      serialRebooted = false; caught = true;
+      setStatus('● bootloader connected', 'ok');
+      log('Caught the bootloader — updating.', 'ok');
+    } catch (e: any) {
+      conn = null; setStatus('Not connected', '');
+      log(String(e?.message || e), 'err');
+    }
+    waitBtn.disabled = false; connectBtn.disabled = false;
+    refreshFlashEnabled();
+    if (caught) flashBtn.click();
   });
 
   // ---- AF-F4 T10 release-signature gate -------------------------------------
