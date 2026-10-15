@@ -20,8 +20,6 @@ const P = {
   PROG_MULTI_MAX: 252,
 };
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-// USB IDs of the ArduPilot bootloader port (the running app is PID 0x5740).
-const BL_USB = { usbVendorId: 0x1209, usbProductId: 0x5741 };
 
 // MAVLink1 COMMAND_LONG: MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN(246) param1=3 (reboot to
 // bootloader), target_system=1. Exact frame captured from pymavlink — proven on hardware.
@@ -130,38 +128,6 @@ export class Px4Updater {
     const port = await (navigator as any).serial.requestPort(filters.length ? { filters } : undefined);
     await port.open({ baudRate });
     return new Px4Updater(port);
-  }
-
-  /** Catch a board's bootloader right after it is plugged in. A board whose flight firmware has no
-   *  USB (AF-H7E CR ≥ v1.0.3) shows a port only while its bootloader waits after power-up (10 s);
-   *  any valid command makes the bootloader keep waiting. Browsers list a granted port only while it
-   *  is plugged in, so: a bootloader port that is already there (e.g. still waiting after a refused
-   *  image) is taken at once; otherwise the port picker opens, filtered to bootloaders, and shows the
-   *  board the moment it is re-plugged. Call it from a click (the picker needs one). */
-  static async waitForPlugIn(log: Log, baudRate = 115200): Promise<Px4Updater> {
-    if (!Px4Updater.available()) throw new Error('This browser does not support Web Serial (desktop Chrome/Edge required).');
-    const serial = (navigator as any).serial;
-    const isBl = (p: SerialPort) => {
-      const i = (p as any).getInfo?.() || {};
-      return i.usbVendorId === BL_USB.usbVendorId && i.usbProductId === BL_USB.usbProductId;
-    };
-    const tryPort = async (p: SerialPort): Promise<Px4Updater | null> => {
-      try { await p.open({ baudRate }); } catch { return null; } // still enumerating / held elsewhere
-      const u = new Px4Updater(p);
-      if (await u.trySync()) return u;
-      await u.close();
-      return null;
-    };
-    let present: SerialPort[] = [];
-    try { present = (await serial.getPorts()).filter(isBl); } catch { /* getPorts unavailable */ }
-    for (const p of present) {
-      const u = await tryPort(p);
-      if (u) return u;
-    }
-    log('Unplug the board\'s USB and plug it back in — then pick "ArduPilot (COMxx)" in the popup within 10 s.');
-    const u = await tryPort(await serial.requestPort({ filters: [BL_USB] }));
-    if (u) return u;
-    throw new Error('The picked port did not answer as a bootloader — its 10 s window may have passed. Click ⏳ Update on plug-in again, then re-plug USB.');
   }
 
   /** Is there a port the user has previously authorized? (Does NOT open it — opening
