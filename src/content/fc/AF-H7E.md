@@ -7,6 +7,7 @@ order: 40
 manuals:
   - { label: "한국어", file: /manuals/fc_AF-H7E_manual_ko.pdf }
   - { label: English, file: /manuals/fc_AF-H7E_manual_en.pdf }
+  - { label: "User Guide (booklet)", file: /manuals/fc_AF-H7E_user_guide.pdf }
 specs:
   - key: MCU
     value: STM32H753, ARM Cortex-M7, 480 MHz
