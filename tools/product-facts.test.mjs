@@ -265,10 +265,13 @@ test('every FC product states its ArduPilot serial mapping (SERIAL_ORDER in the 
     'AF-F7-mini': 'SERIAL1 = USART2 · SERIAL2 = USART3 · SERIAL3 = USART1 · SERIAL4 = UART4 · SERIAL5 = USART6 · SERIAL6 = UART7 (USB = SERIAL0)',
     'AF-H7E': 'SERIAL1 = UART7 · SERIAL2 = UART5 · SERIAL3 = USART1 · SERIAL4 = UART8 · SERIAL5 = USART2 · SERIAL6 = UART4 · SERIAL7 = USART3 (USB = SERIAL0)',
     'AF-H7E-Lite': 'SERIAL1 = UART7 · SERIAL2 = UART5 · SERIAL3 = USART1 · SERIAL4 = UART8 · SERIAL5 = USART2 · SERIAL6 = UART4 · SERIAL7 = USART3 · SERIAL8 = USART6 (USB = SERIAL0)',
-    'AF-H7-nano': 'SERIAL1 = USART1 · SERIAL2 = USART2 · SERIAL3 = USART3 · SERIAL4 = UART4 · SERIAL6 = USART6 · SERIAL7 = UART7 · SERIAL8 = UART8 (USB = SERIAL0)'
+    'AF-H7-nano': 'SERIAL1 = USART1 · SERIAL2 = USART2 · SERIAL3 = USART3 · SERIAL4 = UART4 · SERIAL6 = USART6 · SERIAL7 = UART7 · SERIAL8 = UART8 (USB = SERIAL0)',
+    'AF-H7-nano-V2': 'SERIAL1 = USART1 · SERIAL2 = USART2 · SERIAL3 = USART3 · SERIAL4 = UART4 · SERIAL6 = USART6 · SERIAL7 = UART7 · SERIAL8 = UART8 (USB = SERIAL0)'
   };
+  // V2 has no board definition of its own yet — it keeps the AF-H7 nano MCU pin map (fc/AF-H7-nano-V2 docs/pinmap_V2.md)
   const board = { 'AF-F4-nano': 'AF-F4_nano', 'AF-F4-nano-v2': 'AF-F4_nano_v2', 'AF-F4-T10-nano': 'AF-F4_T10_nano',
-                  'AF-F7-mini': 'AF-F7_mini', 'AF-H7E': 'AF-H7E', 'AF-H7E-Lite': 'AF-H7E_Lite', 'AF-H7-nano': 'AF-H7_nano' };
+                  'AF-F7-mini': 'AF-F7_mini', 'AF-H7E': 'AF-H7E', 'AF-H7E-Lite': 'AF-H7E_Lite', 'AF-H7-nano': 'AF-H7_nano',
+                  'AF-H7-nano-V2': 'AF-H7_nano' };
   for (const [prod, want] of Object.entries(expected)) {
     assert.equal(spec(product('fc', prod), 'Serial Mapping'), want, `${prod} serial mapping`);
     const hwdefUrl = new URL(`../../../fc/boards/${board[prod]}/ardupilot/hwdef.dat`, import.meta.url);
@@ -278,6 +281,24 @@ test('every FC product states its ArduPilot serial mapping (SERIAL_ORDER in the 
       .filter(([, per]) => per !== 'EMPTY' && !per.startsWith('OTG'))
       .map(([i, per]) => `SERIAL${i} = ${per}`).join(' · ') + ' (USB = SERIAL0)';
     assert.equal(want, fromHwdef, `${prod} expectation still matches hwdef.dat`);
+  }
+});
+
+// 2026-10-24 이사님 #oa01b41c3 "깃에 v2 넣어서 커밍순으로 하고 핀아웃까지 제대로" — V2 회로(fc/AF-H7-nano-V2 v0.0.12) 그대로.
+test('AF-H7 nano V2: coming soon after AF-H7 nano, ESC port = AE-8S-60A 4-in-1 V2 pin numbers, ports in the common order', () => {
+  const v2 = product('fc', 'AF-H7-nano-V2');
+  assert.equal(v2.comingSoon, true);
+  assert.equal(v2.order, product('fc', 'AF-H7-nano').order + 1, 'V2 card sits right after AF-H7 nano');
+  assert.equal(v2.firmware, undefined, 'no firmware before the board is released');
+  const pins = (name) => v2.pinTable.find((c) => c.name === name).pins.map((p) => `${p.pin}:${p.signal}`).join(' ');
+  assert.equal(pins('ESC'), '1:GND 2:GND 3:VBAT 4:VBAT 5:M1 6:M2 7:M3 8:M4 9:CUR 10:TEL');
+  assert.equal(pins('GPS'), '1:SDA 2:SCL 3:RX 4:TX 5:5V 6:GND', 'novaX AP-M10 order');
+  assert.equal(pins('RC'), '1:5V 2:GND 3:RX 4:TX', 'Betaflight serial');
+  assert.equal(pins('DJI O3'), '1:12V 2:GND 3:TX 4:RX 5:GND 6:SBUS', 'Betaflight digital VTX');
+  assert.equal(pins('CAN'), '1:5V 2:CAN_H 3:CAN_L 4:GND', 'Pixhawk CAN');
+  assert.equal(pins('SWD'), '1:3V3 2:GND 3:SWDIO 4:SWCLK', 'Betaflight SWD');
+  for (const f of [v2.image, ...v2.pinoutImages, ...v2.gallery.map((g) => g.src)]) {
+    assert.ok(existsSync(new URL(`../public${f}`, import.meta.url)), `${f} exists`);
   }
 });
 

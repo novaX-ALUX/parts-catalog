@@ -1,0 +1,100 @@
+# -*- coding: utf-8 -*-
+"""AF-H7 nano V2 핀아웃 한 장 — 윗면 3D 렌더 + 커넥터 표, 아랫면 3D 렌더 + 땜 패드 표 (AF-F4 nano v2 와 같은 배치).
+
+이사님 2026-10-24 #oa01b41c3 "깃에 v2 넣어서 커밍순으로 하고 이런 핀아웃까지 제대로 만들어" (보기 = AF-F4 nano v2 핀아웃).
+근거(V2 회로 정본 = fc/AF-H7-nano-V2 저장소, v0.0.12):
+  커넥터 = hardware/kicad/AFH7NANO/AFH7NANO_V2.kicad_pcb 의 부품 자리(mm) · 핀 신호 = 이 저장소 src/content/fc/AF-H7-nano-V2.md 의
+  pinTable(정본 — 여기서는 읽기만) · 핀 1 끝 = 같은 판의 1 번 패드 자리.
+  땜 패드(아랫면, 1.5 × 2.0 mm) = 같은 판의 번호 없는 협력사 패드와 그 넷 · 인쇄 글자는 협력사 실크 그대로(사진에 보임).
+바탕 = public/images/products/fc_AF-H7-nano-V2_{top,bottom}.png (V2 판 KiCad 3D 렌더, 1768 px, 정면 직교).
+  mm → px: 빈 판 렌더(투명)의 판 테두리 = 74…1693 · 70…1689 px ↔ 판 129.226…167.776 · 85.729…124.279 mm (42.02 px/mm).
+  아랫면은 좌우가 거울(x px = 1693 − …).
+실행: python h7_nano_v2_pinout.py [출력 폴더]   → fc_AF-H7-nano-V2_pinout.png
+"""
+import os
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+from pinout_style import RED, Sheet, load_rgb, pin_table, region, subtitle, word_color  # noqa: E402
+
+CAT = os.path.normpath(os.path.join(HERE, "..", ".."))
+IMG = os.path.join(CAT, "public", "images", "products")
+MD = os.path.join(CAT, "src", "content", "fc", "AF-H7-nano-V2.md")
+OUT = sys.argv[1] if len(sys.argv) > 1 else IMG
+S, X0, Y0, PX0, PY0, PX1 = 42.02, 129.226, 85.729, 74, 70, 1693
+
+
+def box(x0, y0, x1, y1, bottom=False):
+    """판 mm 상자 → 렌더 px (x0, x1, y0, y1)."""
+    a, b = (PX1 - (x1 - X0) * S, PX1 - (x0 - X0) * S) if bottom else (PX0 + (x0 - X0) * S, PX0 + (x1 - X0) * S)
+    return (round(a), round(b), round(PY0 + (y0 - Y0) * S), round(PY0 + (y1 - Y0) * S))
+
+
+def word(sig):
+    return "−" if sig == "GND" else sig
+
+
+def table(entry, order, kind):
+    """md pinTable 한 커넥터 → 표(kind 'h' 왼 → 오 · 'v' 위 → 아래, order = 사진에서 보이는 핀 번호 순서)."""
+    sig = dict(entry["pins"])
+    return (kind, [(str(p), word(sig[str(p)]), word_color(word(sig[str(p)]))) for p in order])
+
+
+def words(s, kind):
+    return (kind, [("", w, word_color(w)) for w in s.split()])
+
+
+# 윗면 커넥터: (pinTable 이름, 판 mm 상자, 표 방향, 사진에서 보이는 핀 순서, 1 번 끝, 표 자리)
+TOP = [
+    ("ESC", (161.04, 92.18, 167.65, 106.03), "v", range(10, 0, -1), "B", "R"),
+    ("OpenIPC", (161.81, 106.14, 167.64, 117.15), "v", range(6, 0, -1), "B", "R"),
+    ("SWD", (133.86, 94.84, 138.09, 96.04), "h", range(1, 5), "L", "L"),
+    ("RC", (129.54, 97.08, 135.04, 103.68), "v", range(1, 5), "T", "L"),
+    ("GPS", (129.33, 107.39, 135.94, 117.24), "v", range(1, 7), "T", "L"),
+    ("VTX", (147.35, 86.51, 153.95, 92.01), "h", range(4, 0, -1), "R", "T"),
+    ("CAMERA", (154.33, 86.51, 159.93, 92.01), "h", range(3, 0, -1), "R", "T"),
+    ("CAN", (137.36, 118.38, 146.17, 123.77), "h", range(1, 5), "L", "B"),
+    ("DJI O3", (150.65, 118.36, 159.26, 123.86), "h", range(1, 7), "L", "B"),
+]
+# 아랫면 땜 패드(사진 = 아래에서 본 모습, 좌우 거울): (이름, 부제, 판 mm 상자, 표, 표 자리)
+PADS = [
+    ("PWM pads", "outer column · silk S5–S10", (165.39, 94.63, 166.89, 115.98), words("S5 S6 S7 S8 S9 S10 5V −", "v"), "L"),
+    ("ESC pads", "inner column · silk S4 S3 S2 S1 = M1–M4", (161.33, 94.63, 162.83, 115.86),
+     words("M1 M2 M3 M4 − VBAT RX4 TX4", "v"), "L"),
+    ("Edge pads", "SPI3 · UART3 · buzzer", (129.83, 94.63, 131.33, 115.86), words("BZ− SCK MISO MOSI CS2 CS1 RX3 TX3", "v"), "R"),
+    ("Top pads", "UART1 · WS2812 LED · I2C2", (138.6, 86.42, 160.54, 88.42), words("5V SCL2 SDA2 − LED 5V − RX1 TX1", "h"), "T"),
+    ("Bottom pads", "UART2 · UART8 · CAN1 · 12 V", (137.45, 121.63, 159.12, 123.63), words("RX2 TX2 12V RX8 TX8 5V CANL CANH −", "h"),
+     "B"),
+]
+
+
+def main():
+    pins = pin_table(MD)
+    top = load_rgb(os.path.join(IMG, "fc_AF-H7-nano-V2_top.png"))
+    bot = load_rgb(os.path.join(IMG, "fc_AF-H7-nano-V2_bottom.png"))
+    sh = Sheet()
+    sh.header("AF-H7 nano V2 Pinout",
+              "Each table lists the pins as you see them in the picture: left → right, side connectors top → bottom.",
+              [("1", RED), "= pin 1, the red 1 in its table", "red = power    − = GND    blue = signal"])
+    sh.caption("Top — connectors (all JST, pin 1 marked)")
+    items = [{"box": box(*b), "name": n, "sub": subtitle(pins[n]), "table": table(pins[n], o, k), "p1": p1, "side": sd}
+             for n, b, k, o, p1, sd in TOP]
+    items.append({"box": box(136.81, 85.82, 146.45, 94.0), "name": "USB-C", "sub": "firmware · power", "table": None, "p1": None,
+                  "side": "T"})
+    sh.board(region(top, 0, top.shape[1], 0, top.shape[0]), items, img_w=760)
+    sh.caption("Bottom — solder pads (seen from below, so left and right are swapped)")
+    sh.board(region(bot, 0, bot.shape[1], 0, bot.shape[0]),
+             [{"box": box(*b, bottom=True), "name": n, "sub": s, "table": t, "p1": None, "side": sd} for n, s, b, t, sd in PADS],
+             img_w=700)
+    sh.note(["5V on GPS, RC, CAN, the top pads and the PWM-column pad is the USB-or-battery rail: it is on with USB alone.",
+             "The camera 5V and the bottom-pad 5V are the battery 5 V regulator. 12 V (silk 10V) and VBAT come only from the battery.",
+             "UART4 goes to both DJI O3 and OpenIPC (and the RX4/TX4 pads) — use one of them.",
+             "Pad silk S1–S4 counts the other way: the pad printed S4 is M1 (PWM1), S1 is M4 — same order as the ESC port."])
+    out = os.path.join(OUT, "fc_AF-H7-nano-V2_pinout.png")
+    rep = sh.save(out)
+    print(out, rep["shown_px"], "min font on screen %.1f px (%r)" % (rep["min_font_screen_px"], rep["smallest_text"]))
+
+
+if __name__ == "__main__":
+    main()
