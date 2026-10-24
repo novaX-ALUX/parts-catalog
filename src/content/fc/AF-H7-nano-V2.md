@@ -15,6 +15,10 @@ specs:
   - { key: ESC Port, value: "10-pin JST-SH: GND · GND · VBAT · VBAT · M1–M4 · CUR · TEL — straight 1:1 cable to the novaX AE-8S-60A 4-in-1 V2 ESC" }
   - { key: Current & Telemetry, value: "ESC current on the ESC port (PC1, 40 A per volt, same scale as the ESC) · ESC telemetry on SERIAL7 (UART7 RX)" }
   - { key: PWM Output, value: "10 motor/servo channels (M1–M4 on the ESC port and pads, S5–S10 on pads) + 1 WS2812 LED pad" }
+  - { key: Motor Order, value: "Betaflight order out of the box — 1 rear right · 2 front right · 3 rear left · 4 front left; ArduPilot default FRAME_TYPE 12 (BetaFlightX), so the 1:1 ESC cable needs no remapping" }
+  - { key: Power Select Pads, value: "Camera 5 V or VBAT · VTX 12 V or VBAT — 3-pad solder jumpers on the bottom (cut and bridge); VBAT only for devices rated for the pack" }
+  - { key: Buzzer / Switch, value: "BZ+ pad (5 V or 12 V by solder jumper) and BZ− on a 30 V 5.8 A MOSFET — a buzzer, or on/off for another device (ArduPilot relay · Betaflight PINIO)" }
+  - { key: Production Pads, value: "VBUS · D+ · D− · GND · BOOT0 · 3V3 test pads on a 2.54 mm row — flashing jigs program several boards over one USB hub, no button" }
   - { key: Serial Mapping, value: "SERIAL1 = USART1 · SERIAL2 = USART2 · SERIAL3 = USART3 · SERIAL4 = UART4 · SERIAL6 = USART6 · SERIAL7 = UART7 · SERIAL8 = UART8 (USB = SERIAL0)" }
   - { key: Ports, value: "GPS + compass · ELRS/RC · analog VTX · analog camera · DJI O3 · OpenIPC · CAN (JST-GH, Pixhawk order) · SWD pads" }
   - { key: CAN, value: "1 port · TI TCAN3413 3.3 V CAN FD transceiver — works on USB power" }
@@ -30,7 +34,7 @@ pinoutImages:
   - /images/products/fc_AF-H7-nano-V2_pinout.png
 pinoutNotes: |
   Figure: top connectors, then the bottom solder pads seen from below (left and right swapped). Pin numbers are the connector's own pin 1, marked with a red 1.
-  The 5 V on GPS, RC and CAN is the USB-or-battery rail; the camera 5 V is the battery 5 V regulator; 12 V and VBAT come only from the battery. UART4 goes to both the DJI O3 and OpenIPC connectors — use one of them. On the bottom pads the printed S1–S4 count the other way: the pad printed S4 is M1 (PWM1).
+  The 5 V on GPS, RC and CAN is the USB-or-battery rail; the camera 5 V is the battery 5 V regulator; 12 V and VBAT come only from the battery. The camera and VTX supplies can be moved to VBAT with their bottom solder jumpers. UART4 goes to both the DJI O3 and OpenIPC connectors — use one of them. Motor pads M1–M4 are the ESC port's M1–M4 (Betaflight order).
 pinTable:
   - name: ESC
     type: JST-SH 1.0 mm 10P (JST SM10B-SRSS-TB)
@@ -68,7 +72,7 @@ pinTable:
     type: JST-SH 1.0 mm 4P
     mapping: SERIAL1 TX (USART1) — 12 V analog VTX, OSD video out and VTX control
     pins:
-      - { pin: 1, signal: 12V, function: "12 V (battery only)" }
+      - { pin: 1, signal: 12V, function: "12 V by default, or VBAT with solder jumper JP2" }
       - { pin: 2, signal: GND, function: "Ground" }
       - { pin: 3, signal: VIDEO, function: "Video out (with OSD)" }
       - { pin: 4, signal: TX, function: "USART1 TX — SmartAudio / Tramp" }
@@ -76,7 +80,7 @@ pinTable:
     type: JST-SH 1.0 mm 3P
     mapping: Analog camera in — the OSD overlays it
     pins:
-      - { pin: 1, signal: 5V, function: "5 V (battery 5 V regulator)" }
+      - { pin: 1, signal: 5V, function: "5 V by default (battery 5 V regulator), or VBAT with solder jumper JP1" }
       - { pin: 2, signal: GND, function: "Ground" }
       - { pin: 3, signal: VIDEO, function: "Camera video in" }
   - name: DJI O3
@@ -116,7 +120,7 @@ pinTable:
       - { pin: 3, signal: SWDIO, function: "SWD data" }
       - { pin: 4, signal: SWCLK, function: "SWD clock" }
 firmwareNotes: |
-  No firmware release yet — V2 images will be listed here with the board. V2 keeps the AF-H7 nano serial mapping above and adds the ESC current (PC1) and telemetry (SERIAL7) inputs.
+  No firmware release yet — V2 images will be listed here with the board. V2 keeps the AF-H7 nano serial mapping above, adds the ESC current (PC1) and telemetry (SERIAL7) inputs, and defaults to the Betaflight motor order (FRAME_TYPE 12).
 gallery:
   - { src: /images/products/fc_AF-H7-nano-V2_iso.png, caption: "Isometric — 3D render, design stage" }
   - { src: /images/products/fc_AF-H7-nano-V2_top.png, caption: Top }
