@@ -118,9 +118,10 @@ img { display: block; max-width: 100%; height: auto; }
 .card .imgwrap.placeholder {
   color: var(--ink-4); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
 }
-/* "Coming Soon" badge — same pill as the active filter chip, overlaid on the card image. */
+/* "Coming Soon" / "NDAA Available" badges — same pill as the filter chips, overlaid on the card image
+   (Coming Soon = filled · NDAA = outlined; when both show, NDAA sits under Coming Soon). */
 .card .imgwrap { position: relative; }
-.soon {
+.soon, .ndaa {
   display: inline-block; padding: 4px 11px; border-radius: 999px;
   font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600;
   white-space: nowrap; line-height: 1.4;
@@ -129,6 +130,11 @@ img { display: block; max-width: 100%; height: auto; }
   position: absolute; top: 12px; left: 12px;
   background: var(--ink); color: #fff; border: 1px solid var(--ink);
 }
+.card .ndaa {
+  position: absolute; top: 12px; left: 12px;
+  background: var(--bg); color: var(--ink); border: 1px solid var(--ink);
+}
+.card .soon + .ndaa { top: 42px; }
 .card .body { padding: 16px 18px 20px; }
 .card .cat { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-4); }
 .card .name { font-size: 16px; font-weight: 600; margin: 6px 0 4px; color: var(--ink); }
@@ -144,6 +150,10 @@ img { display: block; max-width: 100%; height: auto; }
 .detail-hero .soon {
   margin-left: 14px; vertical-align: middle;
   color: #fff; border: 1px solid rgba(255, 255, 255, 0.55);
+}
+.detail-hero .ndaa {
+  margin-left: 14px; vertical-align: middle;
+  background: #fff; color: var(--ink); border: 1px solid #fff;
 }
 
 .detail-body { padding: 48px 0 96px; }

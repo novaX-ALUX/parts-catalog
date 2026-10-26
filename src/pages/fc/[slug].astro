@@ -27,7 +27,7 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
     <div class="container">
       <div class="crumbs"><a href={`${base}/#fc`}>{CATEGORY_LABEL.fc}</a></div>
       <div class="meta">Product · Catalog 2026</div>
-      <h1>{d.name}{d.comingSoon && <span class="soon">Coming Soon</span>}</h1>
+      <h1>{d.name}{d.comingSoon && <span class="soon">Coming Soon</span>}{d.ndaa && <span class="ndaa">NDAA Available</span>}</h1>
       {d.tagline && <div class="tag">{d.tagline}</div>}
     </div>
   </section>

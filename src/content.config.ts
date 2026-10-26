@@ -16,6 +16,7 @@ const baseSchema = z.object({
   order: z.number().default(999),
   hidden: z.boolean().optional().default(false), // exclude from public catalog card + product page (update tool still lists firmware)
   comingSoon: z.boolean().optional().default(false), // announced but not released — "Coming Soon" badge on card + product page
+  ndaa: z.boolean().optional().default(false), // NDAA-compliant build offered — "NDAA Available" badge on card + product page
   specs: z.array(specPair)
 });
 

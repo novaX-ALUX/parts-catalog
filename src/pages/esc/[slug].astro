@@ -25,7 +25,7 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
     <div class="container">
       <div class="crumbs"><a href={`${base}/#esc`}>{CATEGORY_LABEL.esc}</a></div>
       <div class="meta">Product · Catalog 2026</div>
-      <h1>{d.name}</h1>
+      <h1>{d.name}{d.ndaa && <span class="ndaa">NDAA Available</span>}</h1>
       {d.tagline && <div class="tag">{d.tagline}</div>}
     </div>
   </section>
