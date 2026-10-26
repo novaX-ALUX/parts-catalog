@@ -7,6 +7,7 @@ import Tabs from '../../components/Tabs.astro';
 import Gallery from '../../components/Gallery.astro';
 import { CATEGORY_LABEL } from '../../content.config';
 import { maxThrust } from '../../lib/scale';
+import { displayName } from '../../lib/display-name';
 
 export async function getStaticPaths() {
   const items = await getCollection('motor');
@@ -27,7 +28,7 @@ const hasCol = (rows: any[], key: string) => rows.some((r) => r[key] && r[key] !
     <div class="container">
       <div class="crumbs"><a href={`${base}/#motor`}>{CATEGORY_LABEL.motor}</a></div>
       <div class="meta">Motor · Catalog 2026</div>
-      <h1>{d.name}{d.ndaa && <span class="ndaa">NDAA Available</span>}</h1>
+      <h1>{displayName('motor', d)}{d.ndaa && <span class="ndaa">NDAA Available</span>}</h1>
       {d.tagline && <div class="tag">{d.tagline}</div>}
     </div>
   </section>
