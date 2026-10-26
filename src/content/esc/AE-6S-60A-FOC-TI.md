@@ -1,5 +1,6 @@
 ---
 name: AE-6S 60A FOC TI
+ndaa: true
 tagline: TI C2000 Sensorless-FOC ESC · 6S LiPo
 order: 27
 manuals:

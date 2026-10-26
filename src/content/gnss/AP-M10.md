@@ -1,5 +1,6 @@
 ---
 name: AP-M10
+ndaa: true
 tagline: Compact GNSS Module with Integrated Compass
 image: /images/products/gnss_X_G10C.png
 pictureKey: gnss_X_G10C

@@ -1,5 +1,6 @@
 ---
 name: AP-RTK X20D
+ndaa: true
 tagline: Dual-Antenna RTK GNSS with u-blox ZED-X20D
 image: /images/products/gnss_AP-RTK-X20D.png
 order: 22

@@ -1,5 +1,6 @@
 ---
 name: AE-4S 55A
+ndaa: true
 tagline: Compact 4S ESC for Blade8 Platforms
 image: /images/products/esc_8-4S-55A.png
 pictureKey: esc_8-4S-55A

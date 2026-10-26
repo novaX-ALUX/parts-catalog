@@ -1,5 +1,6 @@
 ---
 name: AF-F4 nano
+ndaa: true
 tagline: Compact F4 Flight Controller · Compatible Model X Blade
 image: /images/products/fc_AF-F4-nano.png
 gallery:

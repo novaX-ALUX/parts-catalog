@@ -1,5 +1,6 @@
 ---
 name: APMU-12S 140A
+ndaa: true
 tagline: 12S Power Management Unit — 140 A (1 min) Switched ESC Bus with Precharge, 5 V · 7.4 V · 12 V · 16 V · 24 V Rails
 image: /images/products/pmu_APMU-12S-140A.png
 model3d: /models/pmu/APMU-12S-140A.glb

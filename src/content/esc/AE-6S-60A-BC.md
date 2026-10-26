@@ -1,5 +1,6 @@
 ---
 name: AE-6S 60A BC
+ndaa: true
 tagline: 32-bit ESC for X-Blade 10/15 · 6S LiPo
 image: /images/products/esc_32-6S-60A-BC.png
 pictureKey: esc_32-6S-60A-BC

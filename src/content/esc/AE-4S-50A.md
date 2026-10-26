@@ -1,5 +1,6 @@
 ---
 name: AE-4S 50A
+ndaa: true
 tagline: Compact 4S ESC for Blade8 Platforms
 order: 5
 manuals:

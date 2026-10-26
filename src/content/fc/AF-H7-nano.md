@@ -1,5 +1,6 @@
 ---
 name: AF-H7 nano
+ndaa: true
 tagline: High-Performance H7 Flight Controller · 2–8S LiPo
 image: /images/products/fc_AF-H7-nano.png
 gallery:

@@ -1,5 +1,6 @@
 ---
 name: AF-F4 nano v2
+ndaa: true
 tagline: Compact F4 Flight Controller · External GPS/Compass Port · ArduPilot
 image: /images/products/fc_AF-F4-nano-v2.png
 gallery:
