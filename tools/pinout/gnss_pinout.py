@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """GNSS 핀아웃 그림 — AP-RTK X20D · dual · G5H · AP-M10 — 제품당 한 장, 원래 배치(제품 그림 + 아래 표 + 파란 점선) · 표 글자 = 화면 13 px 이상.
 
 규칙(사용자 2026-09-29 "커넥터 모양대로 핀아웃을 설명해야 헷갈리지 않을거 아냐" · 2026-09-30 "제품으로 해서 한페이지로 하고 원래 레이아웃에
@@ -15,7 +15,8 @@
 바탕:
   X20D = 블렌더 평행 투영 3 면(커넥터 정면) — gnss/AP-RTK_X20D/hardware/render/x20d_render_cfg.py <glb> out/pin cfg.json pinout
          → blender-3d 스킬 product_photo.py(HP). <렌더 폴더>/x20d_{gh,front,ant}_rgba.png + ../blender.log 의 RESULT(카메라 → mm 를 픽셀로)
-  dual · G5H = 제품 렌더(앞면 USB·CAN) + 제조사 옆면도(UART — 이 면의 렌더가 없다, src/dual_lineart_vendor.png)
+  dual = 카탈로그 렌더 앞면(USB · CAN) + 왼쪽 옆면(UART, 2026-10-27 케이스 STEP 에 구멍을 뚫어 다시 렌더) — DUAL_RENDER, 카메라 = RESULT
+  G5H = 제품 렌더(앞면 USB·CAN) + 제조사 옆면도(UART — 이 면의 렌더가 없다, src/dual_lineart_vendor.png)
   M10 = 제조사 사진(src/m10_photo_vendor.png, 파란 주석 지움). src 는 git 의 원래 카탈로그 그림 — 출력 파일을 다시 읽지 않는다.
 포트 이름 = 케이스 각인 그대로(PPS · UART · DEBUG · USB · CAN · ANT1 · ANT2). 앞에 원 숫자를 붙이지 않는다 — 빨간 ① = 1 번 핀 표시와 헷갈린다.
 실행: python gnss_pinout.py [x20d dual g5h m10] [--out 폴더] [--x20d 렌더 폴더]   (기본 = public/images/products 의 원래 파일 이름)
@@ -37,6 +38,9 @@ IMG = os.path.join(CAT, "public", "images", "products")
 SRC = os.path.join(HERE, "src")
 ARGS = sys.argv[1:]
 X20D_RENDER = ARGS[ARGS.index("--x20d") + 1] if "--x20d" in ARGS else "D:/1_Work/remote-results/x20d-pin-views/pin"
+# AP-RTK dual = 카탈로그 렌더(2026-10-27): 업체 케이스 STEP(RTK-V4)에 없던 UART 구멍을 SolidCraft 로 뚫은 판
+# (미리보기/catalog-render/rtkdual_uart/RTK-V4_uart.step — 이사님 #o847a414d "구멍 솔리드크래프트로 너가 만들면 되는거고").
+DUAL_RENDER = ARGS[ARGS.index("--dual") + 1] if "--dual" in ARGS else "D:/1_Work/remote-results/catalog-rtk3-1027/rtkdual"
 COLORS = "red = power    black = GND    blue = signal"
 LEG_P1 = [("1", RED), "= pin 1, the red 1 in its table", COLORS]
 GH4 = "4-Pin · JST-GH"
@@ -130,6 +134,43 @@ def dual_like(dev, uart_sub, usb_sub):
     return draw
 
 
+def dual_view(view):
+    """AP-RTK dual 카탈로그 렌더 한 면(평행 투영, 투명 배경 → 제품 둘레만 자름) → (배열, 케이스 mm 상자 → 배열 px 함수, 카메라).
+    케이스 mm = 업체 STEP 좌표(블렌더 축과 같음): 앞(USB · CAN) = −y · 뒤(안테나) = +y · 왼쪽 옆면(UART) = −x."""
+    log = open(os.path.join(DUAL_RENDER, "..", "rtkdual_blender.log"), encoding="utf-8", errors="replace").read()
+    c = json.loads(log[log.rindex("RESULT ") + 7:].splitlines()[0])["out"][view]["cam"]
+    a = np.asarray(Image.open(os.path.join(DUAL_RENDER, "rtkdual_%s_rgba.png" % view)))
+    ys, xs = np.nonzero(a[:, :, 3] > 8)
+    m = 30
+    reg = (max(xs.min() - m, 0), xs.max() + m, max(ys.min() - m, 0), ys.max() + m)
+    w, h = c["size"]
+    s = max(w, h) / c["ortho_scale_mm"]
+
+    def to_px(p):
+        d = [p[i] - c["center_mm"][i] for i in range(3)]
+        return w / 2 + s * sum(d[i] * c["right"][i] for i in range(3)) - reg[0], h / 2 - s * sum(d[i] * c["up"][i] for i in range(3)) - reg[2]
+
+    def box(b3):
+        pts = [to_px((x, y, z)) for x in b3[:2] for y in b3[2:4] for z in b3[4:6]]
+        return min(p[0] for p in pts), max(p[0] for p in pts), min(p[1] for p in pts), max(p[1] for p in pts)
+    return region(load_rgb(os.path.join(DUAL_RENDER, "rtkdual_%s_rgba.png" % view)), *reg), box, c
+
+
+def dual(sh):
+    """앞면(USB · CAN) + 왼쪽 옆면(UART) 렌더. 1 번 핀(X-RTK2HP V6.0 rtk2hp.kicad_pcb 패드 좌표, 2026-10-27 다시 계산):
+    CAN U17 1 번 = USB 쪽 끝(앞에서 보면 왼쪽) · UART U14 1 번 = 뒤(안테나) 쪽 끝(U14 패드 1 y 104.53 < 4 번 108.28, 앞 가장자리 = y 큰 쪽)."""
+    front, left = dual_view("front"), dual_view("left")
+    img, (fb, lb) = joined([front[:2], left[:2]], 820)
+    back_on_left = sum(left[2]["right"][i] * (0, 1, 0)[i] for i in range(3)) < 0     # 왼쪽 옆면 그림에서 뒤(+y)가 왼쪽인가
+    uart = ["GND", "TX", "RX", "5V"]
+    ut = ("h", word_cells(uart, [1, 2, 3, 4])) if back_on_left else ("h", word_cells(uart[::-1], [4, 3, 2, 1]))
+    sh.caption("USB · CAN end (left) and UART side (right)")
+    sh.board(img, [
+        it(fb((-6.6, 2.6, -24, -24, 52.8, 56.1)), "USB", "Type-C", ("one", "USB 2.0", BLUE)),         # USB-C 입구(렌더에서 잼 — 몸통 상자는 고정 다리까지 커서 CAN 과 겹침)
+        it(fb((3.86, 12.56, -24, -24, 52.67, 57.23)), "CAN", GH4, ("h", word_cells(["GND", "CAN_L", "CAN_H", "5V"], [1, 2, 3, 4])), "L"),
+        it(lb((-16.2, -16.2, -5.755, 2.945, 52.6, 57.23)), "UART", GH4, ut, "L" if back_on_left else "R")], img_w=1100)
+
+
 def m10(sh):
     img, b = photo_m10()
     sh.board(img, [
@@ -140,8 +181,7 @@ def m10(sh):
 
 PRODUCTS = {
     "x20d": ("gnss_AP-RTK-X20D_pinout.png", "AP-RTK X20D Pinout", READS + "; number = pin on the R3 board.", LEG_P1, x20d),
-    "dual": ("gnss_AP-RTK-dual_pinout.png", "AP-RTK dual Pinout", READS + " (UART: top → bottom); number = pin on the X-RTK2HP V6.0 board.",
-             LEG_P1, dual_like("gnss_AP-RTK-dual_device.png", GH4, "Type-C")),
+    "dual": ("gnss_AP-RTK-dual_pinout.png", "AP-RTK dual Pinout", READS + "; number = pin on the X-RTK2HP V6.0 board.", LEG_P1, dual),
     "g5h": ("gnss_AP-RTK-G5H_pinout.png", "AP-RTK G5H Pinout", READS + " (UART: top → bottom); number = pin on the G5H board.",
             LEG_P1, dual_like("gnss_AP-RTK-G5H_device.png", "4-Pin · JST-GH · receiver COM2", "Type-C · MCU bootloader / DFU")),
     "m10": ("gnss_X_G10C_pinout.png", "AP-M10 Pinout",
@@ -160,7 +200,7 @@ def render(key, out_dir):
 
 
 if __name__ == "__main__":
-    opts = {"--out", "--x20d"}
+    opts = {"--out", "--x20d", "--dual"}
     keys = [a for i, a in enumerate(ARGS) if not a.startswith("--") and (i == 0 or ARGS[i - 1] not in opts)]
     out_dir = ARGS[ARGS.index("--out") + 1] if "--out" in ARGS else IMG
     for k in (keys or list(PRODUCTS)):
