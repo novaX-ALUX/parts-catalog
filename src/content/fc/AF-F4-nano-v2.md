@@ -1,7 +1,15 @@
 ---
 name: AF-F4 nano v2
 tagline: Compact F4 Flight Controller · External GPS/Compass Port · ArduPilot
-image: /images/products/fc_F4_nano_v2.png
+image: /images/products/fc_AF-F4-nano-v2.png
+gallery:
+  - { src: /images/products/fc_AF-F4-nano-v2_iso.png, caption: Isometric }
+  - { src: /images/products/fc_AF-F4-nano-v2_front.png, caption: Front }
+  - { src: /images/products/fc_AF-F4-nano-v2_back.png, caption: Back }
+  - { src: /images/products/fc_AF-F4-nano-v2_left.png, caption: Left }
+  - { src: /images/products/fc_AF-F4-nano-v2_right.png, caption: Right }
+  - { src: /images/products/fc_AF-F4-nano-v2_top.png, caption: Top }
+  - { src: /images/products/fc_AF-F4-nano-v2_bottom.png, caption: Bottom }
 pictureKey: fc_F4_nano_v2
 order: 12
 manuals:
