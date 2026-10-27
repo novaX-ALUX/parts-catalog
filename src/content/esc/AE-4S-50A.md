@@ -21,7 +21,7 @@ specs:
   - { key: Weight, value: "14.8 g" }
   - { key: Voltage Range, value: "3 – 4S LiPo (12.6 – 16.8 V)" }
   - { key: Constant Current, value: "50 A" }
-  - { key: Burst Current, value: "60 A for 10 s (55 A for 1 min)" }
+  - { key: Burst Current, value: "60 A (10 s)" }
   - { key: Capacitor, value: "470 µF / 50 V" }
   - { key: PWM Frequency, value: "24 – 48 kHz (Bluejay 96 kHz)" }
   - { key: Supported Protocols, value: "DShot150 / 300 / 600, MultiShot, OneShot" }
