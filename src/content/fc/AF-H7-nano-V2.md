@@ -123,7 +123,10 @@ firmwareNotes: |
   No firmware release yet — V2 images will be listed here with the board. V2 keeps the AF-H7 nano serial mapping above, adds the ESC current (PC1) and telemetry (SERIAL7) inputs, and defaults to the Betaflight motor order (FRAME_TYPE 12).
 gallery:
   - { src: /images/products/fc_AF-H7-nano-V2_iso.png, caption: "Isometric — 3D render, design stage" }
+  - { src: /images/products/fc_AF-H7-nano-V2_front.png, caption: Front }
+  - { src: /images/products/fc_AF-H7-nano-V2_back.png, caption: Back }
+  - { src: /images/products/fc_AF-H7-nano-V2_left.png, caption: Left }
+  - { src: /images/products/fc_AF-H7-nano-V2_right.png, caption: Right }
   - { src: /images/products/fc_AF-H7-nano-V2_top.png, caption: Top }
   - { src: /images/products/fc_AF-H7-nano-V2_bottom.png, caption: Bottom }
-  - { src: /images/products/fc_AF-H7-nano-V2_iso_bottom.png, caption: Isometric bottom }
 ---

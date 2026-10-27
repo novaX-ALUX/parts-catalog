@@ -1,7 +1,15 @@
 ---
 name: AF-F4 nano
 tagline: Compact F4 Flight Controller · Compatible Model X Blade
-image: /images/products/fc_F405_nano.png
+image: /images/products/fc_AF-F4-nano.png
+gallery:
+  - { src: /images/products/fc_AF-F4-nano_iso.png, caption: Isometric }
+  - { src: /images/products/fc_AF-F4-nano_front.png, caption: Front }
+  - { src: /images/products/fc_AF-F4-nano_back.png, caption: Back }
+  - { src: /images/products/fc_AF-F4-nano_left.png, caption: Left }
+  - { src: /images/products/fc_AF-F4-nano_right.png, caption: Right }
+  - { src: /images/products/fc_AF-F4-nano_top.png, caption: Top }
+  - { src: /images/products/fc_AF-F4-nano_bottom.png, caption: Bottom }
 pictureKey: fc_F405_nano
 pinoutImage: /images/products/fc_F405_nano_pinout.png
 order: 10

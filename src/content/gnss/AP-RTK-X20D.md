@@ -20,7 +20,7 @@ specs:
   - { key: Firmware, value: "AP_Periph · novaX 1.0.6 engineering release · board ID 6205" }
   - { key: Validation Status, value: "Bench hardware checks passed 2026-09-22 (230400 save, USB and CAN update, heading through the flight controller); outdoor RTK and flight qualification pending" }
 description: |
-  AP-RTK X20D uses one u-blox ZED-X20D all-band receiver and two antennas for RTK positioning and heading. The STM32 forwards the receiver's position and heading plus separate RM3100 compass measurements over DroneCAN to the flight controller; yaw fusion belongs to the flight controller, not the peripheral MCU. Product images are renders of the enclosure design fitted with the R3 PCB, with engraved port and LED names; the gallery also shows the R3 PCB CAD renders. Firmware 1.0.6 is supplied for engineering evaluation, not as production or flight-qualified firmware.
+  AP-RTK X20D uses one u-blox ZED-X20D all-band receiver and two antennas for RTK positioning and heading. The STM32 forwards the receiver's position and heading plus separate RM3100 compass measurements over DroneCAN to the flight controller; yaw fusion belongs to the flight controller, not the peripheral MCU. Product images are renders of the enclosure design (case V1.1) with engraved port and LED names; the gallery also shows the R3 PCB CAD renders. Firmware 1.0.6 is supplied for engineering evaluation, not as production or flight-qualified firmware.
 pinoutImage: /images/products/gnss_AP-RTK-X20D_pinout.png
 pinoutNotes: 'Listed from the last pin to pin 1 (the Pinout image shows each connector as seen and marks pin 1): ① UART (5V · RX · TX · GND) · ② CAN (5V · CAN_H · CAN_L · GND) · ③ DEBUG (GND · TX · RX · SWCLK · SWDIO · 5V) · ④ PPS (PPS · GND · EVENT · GND) · ANT1 · ANT2 (MMCX).'
 firmware:
@@ -86,9 +86,13 @@ configNotes: |
   5. RTK corrections — Inject RTCM corrections from an RTK base station or an NTRIP (CORS) service via the ground station. Wait for the GPS status to reach RTK Fixed for centimeter-level positioning.
   6. Antenna position offset (Position offset table) — The X20D reports its position at ANT1. Measure the Master (ANT1) antenna position relative to the vehicle's center of gravity and enter it in GPS1_POS_X/Y/Z (pre-4.6: GPS_POS1_X/Y/Z): +X forward, +Y right, +Z below the CoG. The table values (0.25 / 0.00 / −0.10) are only an example for the Figure 1 layout — Master on the centerline, 0.25 m (half the 500 mm baseline) ahead of a CoG at the baseline midpoint, antenna 0.10 m above it — so measure your own airframe. This improves position accuracy and is independent of the heading offsets in step 3.
 gallery:
-  - /images/products/gnss_AP-RTK-X20D.png
-  - /images/products/gnss_AP-RTK-X20D_ports.png
-  - /images/products/gnss_AP-RTK-X20D_leds.png
+  - { src: /images/products/gnss_AP-RTK-X20D_iso.png, caption: Isometric }
+  - { src: /images/products/gnss_AP-RTK-X20D_front.png, caption: Front }
+  - { src: /images/products/gnss_AP-RTK-X20D_back.png, caption: Back }
+  - { src: /images/products/gnss_AP-RTK-X20D_left.png, caption: Left }
+  - { src: /images/products/gnss_AP-RTK-X20D_right.png, caption: Right }
+  - { src: /images/products/gnss_AP-RTK-X20D_top.png, caption: Top }
+  - { src: /images/products/gnss_AP-RTK-X20D_bottom.png, caption: Bottom }
   - /images/products/gnss_AP-RTK-X20D_R3_top_isometric.png
   - /images/products/gnss_AP-RTK-X20D_R3_bottom_isometric.png
   - /images/products/gnss_AP-RTK-X20D_R3_top.png

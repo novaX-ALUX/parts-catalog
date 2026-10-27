@@ -1,7 +1,15 @@
 ---
 name: AF-H7 nano
 tagline: High-Performance H7 Flight Controller · 2–8S LiPo
-image: /images/products/fc_Matek_H743_Slim_V4.png
+image: /images/products/fc_AF-H7-nano.png
+gallery:
+  - { src: /images/products/fc_AF-H7-nano_iso.png, caption: Isometric }
+  - { src: /images/products/fc_AF-H7-nano_front.png, caption: Front }
+  - { src: /images/products/fc_AF-H7-nano_back.png, caption: Back }
+  - { src: /images/products/fc_AF-H7-nano_left.png, caption: Left }
+  - { src: /images/products/fc_AF-H7-nano_right.png, caption: Right }
+  - { src: /images/products/fc_AF-H7-nano_top.png, caption: Top }
+  - { src: /images/products/fc_AF-H7-nano_bottom.png, caption: Bottom }
 pictureKey: fc_Matek_H743_Slim_V4
 pinoutImage: /images/products/fc_AF-H7_nano_firmware_ports.svg
 order: 20
