@@ -3,6 +3,14 @@ name: AP-M10
 ndaa: true
 tagline: Compact GNSS Module with Integrated Compass
 image: /images/products/gnss_X_G10C.png
+gallery:
+  - { src: /images/products/gnss_AP-M10_iso.png, caption: "Board inside the case — Isometric" }
+  - { src: /images/products/gnss_AP-M10_front.png, caption: "Board inside the case — Front" }
+  - { src: /images/products/gnss_AP-M10_back.png, caption: "Board inside the case — Back" }
+  - { src: /images/products/gnss_AP-M10_left.png, caption: "Board inside the case — Left" }
+  - { src: /images/products/gnss_AP-M10_right.png, caption: "Board inside the case — Right" }
+  - { src: /images/products/gnss_AP-M10_top.png, caption: "Board inside the case — Top" }
+  - { src: /images/products/gnss_AP-M10_bottom.png, caption: "Board inside the case — Bottom" }
 pictureKey: gnss_X_G10C
 order: 10
 manuals:

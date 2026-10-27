@@ -88,10 +88,11 @@ configParams:
 configNotes: |
   Both ports read the same shunt; use one of them, or both as BATT and BATT2. After the first power-up compare the reported voltage and current with a meter and fine-tune BATT_VOLT_MULT and BATT_AMP_PERVLT (analog) or BATT_SHUNT (I2C).
 gallery:
-  - /images/products/pmu_APMU-12S-100A.png
-  - /images/products/pmu_APMU-12S-100A_input.png
-  - /images/products/pmu_APMU-12S-100A_top.png
-  - /images/products/pmu_APMU-12S-100A_bottom.png
-  - /images/products/pmu_APMU-12S-100A_cad_top.png
-  - /images/products/pmu_APMU-12S-100A_cad_bottom.png
+  - { src: /images/products/pmu_APMU-12S-100A_iso.png, caption: Isometric }
+  - { src: /images/products/pmu_APMU-12S-100A_front.png, caption: Front }
+  - { src: /images/products/pmu_APMU-12S-100A_back.png, caption: Back }
+  - { src: /images/products/pmu_APMU-12S-100A_left.png, caption: Left }
+  - { src: /images/products/pmu_APMU-12S-100A_right.png, caption: Right }
+  - { src: /images/products/pmu_APMU-12S-100A_top.png, caption: Top }
+  - { src: /images/products/pmu_APMU-12S-100A_bottom.png, caption: Bottom }
 ---
