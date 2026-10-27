@@ -16,6 +16,7 @@ order: 12
 manuals:
   - { label: "한국어", file: /manuals/fc_AF-F4-nano-v2_manual_ko.pdf }
   - { label: English, file: /manuals/fc_AF-F4-nano-v2_manual_en.pdf }
+  - { label: "User Guide (booklet)", file: /manuals/fc_AF-F4-nano-v2_user_guide.pdf }
 specs:
   - { key: MCU, value: "STM32F405" }
   - { key: IMU, value: "ICM-42688-P" }

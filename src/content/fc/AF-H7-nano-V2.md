@@ -4,6 +4,8 @@ tagline: H7 Flight Controller · 2–8S LiPo · 10-pin ESC Port with Current and
 image: /images/products/fc_AF-H7-nano-V2.png
 order: 21
 comingSoon: true
+manuals:
+  - { label: "User Guide (booklet)", file: /manuals/fc_AF-H7-nano-V2_user_guide.pdf }
 specs:
   - { key: MCU, value: "STM32H743VIH6, 480 MHz (1 MB RAM, 2 MB Flash)" }
   - { key: IMU, value: "2× ICM-42688-P" }
