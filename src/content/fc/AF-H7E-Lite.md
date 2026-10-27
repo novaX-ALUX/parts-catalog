@@ -7,6 +7,7 @@ order: 41
 manuals:
   - { label: "한국어", file: /manuals/fc_AF-H7E-Lite_manual_ko.pdf }
   - { label: English, file: /manuals/fc_AF-H7E-Lite_manual_en.pdf }
+  - { label: "User Guide (booklet)", file: /manuals/fc_AF-H7E-Lite_user_guide.pdf }
 comingSoon: true
 specs:
   - key: MCU
@@ -46,7 +47,7 @@ specs:
   - key: Ethernet
     value: 100 Mbps x 1 Port
   - key: Size
-    value: 42.7 × 63.2 × 29.2 mm (concept case)
+    value: 44.5 × 64.5 × 28.6 mm (production case)
   - key: Mount Hole
     value: 16 × 30 mm / M3 (4 blind holes in the base, 3 mm thread)
   - key: Supported F/W
