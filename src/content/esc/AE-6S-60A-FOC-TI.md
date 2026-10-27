@@ -2,15 +2,6 @@
 name: AE-6S 60A FOC TI
 ndaa: true
 tagline: TI C2000 Sensorless-FOC ESC · 6S LiPo
-image: /images/products/esc_AE-6S-60A-FOC-TI.png
-gallery:
-  - { src: /images/products/esc_AE-6S-60A-FOC-TI_iso.png, caption: Isometric }
-  - { src: /images/products/esc_AE-6S-60A-FOC-TI_front.png, caption: Front }
-  - { src: /images/products/esc_AE-6S-60A-FOC-TI_back.png, caption: Back }
-  - { src: /images/products/esc_AE-6S-60A-FOC-TI_left.png, caption: Left }
-  - { src: /images/products/esc_AE-6S-60A-FOC-TI_right.png, caption: Right }
-  - { src: /images/products/esc_AE-6S-60A-FOC-TI_top.png, caption: Top }
-  - { src: /images/products/esc_AE-6S-60A-FOC-TI_bottom.png, caption: Bottom }
 order: 27
 manuals:
   - { label: "한국어", file: /manuals/esc_AE-6S-60A-FOC-TI_manual_ko.pdf }
