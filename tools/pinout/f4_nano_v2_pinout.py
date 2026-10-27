@@ -8,7 +8,9 @@
     ESC 9핀(P11) 왼→오 = 9…1 번(CUR · S4 · S3 · S2 · S1 · + · + · − · −, 보드 실크 "C 4 3 2 1 + + − −" 와 같음) ·
     GPS 6핀(P3) 위→아래 = 6…1 번(− · + · TX · RX · SCL · SDA) · BEC 8핀(J1) 위→아래 = 8…1 번(− · SCL · SDA · LED · TX · RX · TX · RX)
   BEC 보드 = PCB 가 저장소에 없다 → 제조사 그림 표 그대로(번호 · ① 없음).
-바탕: FC = 카탈로그 제품 사진 public/images/products/fc_F4_nano_v2.png · BEC 보드 = src/f4_nano_v2_bec_vendor.png
+바탕: FC = 카탈로그 윗면 렌더 public/images/products/fc_AF-F4-nano-v2_top.png(2026-10-27 이사님 #o2ac037c4 "이 사진들도 같이 렌더링해서
+      일관성 맞추라고" — 제품 사진과 같은 렌더. 상자 = 옛 사진 fc_F4_nano_v2.png 의 검증된 상자를 검은 판 테두리 맞춤으로 옮긴 것,
+      방향 같음 · 미리보기/catalog-render/pinout_rebase.py) · BEC 보드 = src/f4_nano_v2_bec_vendor.png(3D 없음 — 제조사 사진 그대로)
       (git 의 옛 fc_F4_nano_v2_pinout_bottom.png 에서 보드 사진만 잘라 둔 것 — 제조사 파란 점선은 여기서 지운다. 출력 파일을 다시 읽지 않는다).
 실행: python f4_nano_v2_pinout.py [출력 폴더]   → fc_F4_nano_v2_pinout.png
 """
@@ -44,10 +46,11 @@ def v(words, pins=None):
     return ("v", word_cells(words.split(), pins))
 
 
-FC = [   # (이름, 상자 px (x0, x1, y0, y1) — fc_F4_nano_v2.png 1024 × 974, 부제, 표, 1 번 끝, 자리)
-    ("ESC Interface", (281, 556, 37, 156), "9-Pin · JST-SH · to the 4-in-1 ESC", h("CUR S4 S3 S2 S1 + + − −", list(range(9, 0, -1))), "R", "T"),
-    ("GPS", (860, 975, 220, 425), "6-Pin · JST-SH · USART1 + I2C1", v("− + TX RX SCL SDA", list(range(6, 0, -1))), "B", "R"),
-    ("BEC", (860, 978, 445, 700), "8-Pin · JST-SH · to the BEC board", v("− SCL SDA LED TX RX TX RX", list(range(8, 0, -1))), "B", "R"),
+FC_REG = (180, 1420, 0, 1200)   # fc_AF-F4-nano-v2_top.png 1600 × 1200 — 판 235…1364 · 35…1164 px
+FC = [   # (이름, 상자 px (x0, x1, y0, y1) — fc_AF-F4-nano-v2_top.png, 부제, 표, 1 번 끝, 자리)
+    ("ESC Interface", (489, 836, 16, 168), "9-Pin · JST-SH · to the 4-in-1 ESC", h("CUR S4 S3 S2 S1 + + − −", list(range(9, 0, -1))), "R", "T"),
+    ("GPS", (1220, 1365, 250, 512), "6-Pin · JST-SH · USART1 + I2C1", v("− + TX RX SCL SDA", list(range(6, 0, -1))), "B", "R"),
+    ("BEC", (1220, 1369, 537, 864), "8-Pin · JST-SH · to the BEC board", v("− SCL SDA LED TX RX TX RX", list(range(8, 0, -1))), "B", "R"),
 ]
 # BEC 보드: src 그림 좌표 = 옛 그림(1250 × 1217) 좌표 − 잘라 낸 원점(190, 215)
 OX, OY = 190, 215
@@ -64,15 +67,17 @@ BEC = [
 
 
 def main():
-    fc = load_rgb(os.path.join(IMG, "fc_F4_nano_v2.png"))
+    fc = load_rgb(os.path.join(IMG, "fc_AF-F4-nano-v2_top.png"))
     bec = bec_board()
     sh = Sheet()
     sh.header("AF-F4 nano v2 Pinout",
-              "Each table lists the pins left → right (side connectors: top → bottom) as you see them in the photo.",
+              "Each table lists the pins left → right (side connectors: top → bottom) as you see them in the picture.",
               [("1", RED), "= pin 1, the red 1 in its table (FC board)", "+ = power    − = GND    blue = signal"])
     sh.caption("FC board — top")
-    sh.board(region(fc, 0, fc.shape[1], 0, fc.shape[0]),
-             [{"box": b, "name": n, "sub": s, "table": t, "p1": p1, "side": sd} for n, b, s, t, p1, sd in FC], img_w=820)
+    x0, _, y0, _ = FC_REG
+    sh.board(region(fc, *FC_REG),
+             [{"box": (b[0] - x0, b[1] - x0, b[2] - y0, b[3] - y0), "name": n, "sub": s, "table": t, "p1": p1, "side": sd}
+              for n, b, s, t, p1, sd in FC], img_w=820)
     sh.caption("BEC board — connector names as printed by the maker (no pin numbers)")
     sh.board(bec, [{"box": (b[0] - OX, b[1] - OX, b[2] - OY, b[3] - OY), "name": n, "sub": s or None, "table": t, "p1": None,
                     "side": sd, "row": rw} for n, b, s, t, sd, rw in BEC], img_w=780)

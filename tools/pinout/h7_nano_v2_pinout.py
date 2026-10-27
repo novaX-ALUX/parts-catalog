@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """AF-H7 nano V2 핀아웃 한 장 — 윗면 3D 렌더 + 커넥터 표, 아랫면 3D 렌더 + 땜 패드 표 (AF-F4 nano v2 와 같은 배치).
 
 이사님 2026-10-24 #oa01b41c3 "깃에 v2 넣어서 커밍순으로 하고 이런 핀아웃까지 제대로 만들어" (보기 = AF-F4 nano v2 핀아웃).
@@ -6,9 +6,10 @@
   커넥터 = hardware/kicad/AFH7NANO/AFH7NANO_V2.kicad_pcb 의 부품 자리(mm) · 핀 신호 = 이 저장소 src/content/fc/AF-H7-nano-V2.md 의
   pinTable(정본 — 여기서는 읽기만) · 핀 1 끝 = 같은 판의 1 번 패드 자리.
   땜 패드(아랫면, 1.5 × 2.0 mm) = 같은 판의 번호 없는 협력사 패드와 그 넷 · 인쇄 글자는 협력사 실크 그대로(사진에 보임).
-바탕 = public/images/products/fc_AF-H7-nano-V2_{top,bottom}.png (V2 판 KiCad 3D 렌더, 1768 px, 정면 직교).
-  mm → px: 빈 판 렌더(투명)의 판 테두리 = 74…1693 · 70…1689 px ↔ 판 129.226…167.776 · 85.729…124.279 mm (42.02 px/mm).
-  아랫면은 좌우가 거울(x px = 1693 − …).
+바탕 = public/images/products/fc_AF-H7-nano-V2_{top,bottom}.png (카탈로그 렌더 1600 × 1200, 정면 직교 — 2026-10-27 이사님 #o2ac037c4
+  "이 사진들도 같이 렌더링해서 일관성 맞추라고" → 제품 사진과 같은 검은 판 렌더).
+  mm → px: 검은 판 테두리 = 234…1365 · 34…1165 px ↔ 판 129.226…167.776 · 85.729…124.279 mm (29.339 px/mm), 그림은 x 180…1420 만
+  잘라 쓴다(CROP). 아랫면은 좌우가 거울(x px = 1365 − …), 판 자리는 윗면과 같다.
 실행: python h7_nano_v2_pinout.py [출력 폴더]   → fc_AF-H7-nano-V2_pinout.png
 """
 import os
@@ -22,7 +23,8 @@ CAT = os.path.normpath(os.path.join(HERE, "..", ".."))
 IMG = os.path.join(CAT, "public", "images", "products")
 MD = os.path.join(CAT, "src", "content", "fc", "AF-H7-nano-V2.md")
 OUT = sys.argv[1] if len(sys.argv) > 1 else IMG
-S, X0, Y0, PX0, PY0, PX1 = 42.02, 129.226, 85.729, 74, 70, 1693
+CROP = (180, 1420, 0, 1200)
+S, X0, Y0, PX0, PY0, PX1 = 29.339, 129.226, 85.729, 234 - CROP[0], 34, 1365 - CROP[0]
 
 
 def box(x0, y0, x1, y1, bottom=False):
@@ -92,13 +94,13 @@ def main():
                   "side": "T"})
     items.append({"box": box(155.88, 92.08, 158.71, 96.73), "name": "VTX power", "sub": "jumper JP2 · cut 12V side, bridge VBAT",
                   "table": words("VBAT VTX 12V", "v"), "p1": None, "side": "R"})
-    sh.board(region(top, 0, top.shape[1], 0, top.shape[0]), items, img_w=760)
+    sh.board(region(top, *CROP), items, img_w=760)
     sh.caption("Bottom — solder pads (seen from below, so left and right are swapped)")
-    sh.board(region(bot, 0, bot.shape[1], 0, bot.shape[0]),
+    sh.board(region(bot, *CROP),
              [{"box": box(*b, bottom=True), "name": n, "sub": s, "table": t, "p1": None, "side": sd} for n, s, b, t, sd in PADS],
              img_w=700)
     sh.caption("Bottom — option and production pads (seen from below)")
-    sh.board(region(bot, 0, bot.shape[1], 0, bot.shape[0]),
+    sh.board(region(bot, *CROP),
              [{"box": box(*b, bottom=True), "name": n, "sub": s, "table": t, "p1": None, "side": sd} for n, s, b, t, sd in OPT],
              img_w=700)
     sh.note(["5V on GPS, RC, CAN, the top pads and the PWM-column pad is the USB-or-battery rail: it is on with USB alone.",
