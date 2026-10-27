@@ -16,14 +16,14 @@ specs:
   - { key: Heading, value: "Receiver ANT1-to-ANT2 baseline (UBX-NAV-DAHEADING v2) sent as RelPosHeading; the autopilot computes heading with GPS1_MB_OFS as for AP-RTK dual (firmware v1.0.6+)" }
   - { key: Update Rate, value: "Firmware requests 5 Hz navigation at 230400 baud; end-to-end CAN rate requires measurement" }
   - { key: Comm. Protocol, value: "DroneCAN — position, ardupilot.gnss.RelPosHeading (v1.0.6+) and separate magnetometer data" }
-  - { key: I/O Ports, value: "2× MMCX antenna · CAN · UART (RTCM input) · DEBUG (SWD + console) · PPS/EVENT · USB-C (MCU)" }
+  - { key: I/O Ports, value: "2× MMCX antenna · CAN · UART (RTCM input) · USB-C (MCU) — PPS/EVENT and DEBUG (SWD + console) stay on the board, closed by the case" }
   - { key: PCB, value: "R3 · 33.00 × 45.17 mm · 4 layers · 0.8 mm" }
   - { key: Firmware, value: "AP_Periph · novaX 1.0.6 engineering release · board ID 6205" }
   - { key: Validation Status, value: "Bench hardware checks passed 2026-09-22 (230400 save, USB and CAN update, heading through the flight controller); outdoor RTK and flight qualification pending" }
 description: |
   AP-RTK X20D uses one u-blox ZED-X20D all-band receiver and two antennas for RTK positioning and heading. The STM32 forwards the receiver's position and heading plus separate RM3100 compass measurements over DroneCAN to the flight controller; yaw fusion belongs to the flight controller, not the peripheral MCU. Product images are renders of the enclosure design (case V1.1) with engraved port and LED names; the gallery also shows the R3 PCB CAD renders. Firmware 1.0.6 is supplied for engineering evaluation, not as production or flight-qualified firmware.
 pinoutImage: /images/products/gnss_AP-RTK-X20D_pinout.png
-pinoutNotes: 'Listed from the last pin to pin 1 (the Pinout image shows each connector as seen and marks pin 1): ① UART (5V · RX · TX · GND) · ② CAN (5V · CAN_H · CAN_L · GND) · ③ DEBUG (GND · TX · RX · SWCLK · SWDIO · 5V) · ④ PPS (PPS · GND · EVENT · GND) · ANT1 · ANT2 (MMCX).'
+pinoutNotes: 'Listed from pin 1 (the Pinout image shows each connector as seen and marks pin 1; final R4 board, standard order): ① UART (5V · RX · TX · GND) · ② CAN (5V · CAN_H · CAN_L · GND) · ANT1 · ANT2 (MMCX). PPS/EVENT and DEBUG are on the board only; the case closes them.'
 firmware:
   - kind: "AP_Periph (DroneCAN update)"
     file: /firmware/gnss/AP-RTK-X20D/AP-RTK_X20D-v1.0.6.bin

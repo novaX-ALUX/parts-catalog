@@ -73,14 +73,19 @@ test('X20D is a separate R3 engineering product with its own heading contract', 
   }
 });
 
-test('X20D pinout matches the R3 netlist in the AP-RTK dual form (pin N → pin 1; CAN/UART/PPS pin 1 = GND, DEBUG pin 1 = 5 V)', () => {
+test('X20D pinout = final R4 board in case V1.1 (standard order, pin 1 = 5 V; PPS and DEBUG closed by the case)', () => {
   const x20 = product('gnss', 'AP-RTK-X20D');
   assert.match(x20.pinoutImage, /gnss_AP-RTK-X20D_pinout\.png$/);
   assert.equal(x20.pinTable, undefined, 'same Pinout tab form as AP-RTK dual: drawing + one-line notes');
-  for (const pins of ['① UART (5V · RX · TX · GND)', '② CAN (5V · CAN_H · CAN_L · GND)',
-                      '③ DEBUG (GND · TX · RX · SWCLK · SWDIO · 5V)', '④ PPS (PPS · GND · EVENT · GND)']) {
+  // R4 (gnss/AP-RTK_X20D hardware/R4/pinmap_R4.json): U14 1 5V · 2 RTCM_IN (RX) · 3 USART6_TX (TX) · 4 GND;
+  // U16 1 5V · 2 CAN_H · 3 CAN_L · 4 GND. R3 had them reversed (pin 1 = GND).
+  assert.match(x20.pinoutNotes, /^Listed from pin 1 /);
+  for (const pins of ['① UART (5V · RX · TX · GND)', '② CAN (5V · CAN_H · CAN_L · GND)']) {
     assert.ok(x20.pinoutNotes.includes(pins), pins);
   }
+  // 2026-10-27 director: the final product has no PPS or DEBUG port — circuit only, closed by the case.
+  assert.doesNotMatch(x20.pinoutNotes, /③|④/);
+  assert.match(spec(x20, 'I/O Ports'), /closed by the case/);
 });
 
 test('catalog status flags: G5H withdrawn, X20D and AF-H7E Lite announced as coming soon', () => {
