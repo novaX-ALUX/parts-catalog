@@ -1,5 +1,6 @@
 ---
 name: AF-H7 nano V2
+ndaa: true
 tagline: H7 Flight Controller · 2–8S LiPo · 10-pin ESC Port with Current and Telemetry · 5 V / 12 V 2 A
 image: /images/products/fc_AF-H7-nano-V2.png
 order: 21
