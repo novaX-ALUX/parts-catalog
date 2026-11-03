@@ -6,6 +6,8 @@ import Tabs from '../../components/Tabs.astro';
 import FirmwareTable from '../../components/FirmwareTable.astro';
 import Linkify from '../../components/Linkify.astro';
 import ManualPanel from '../../components/ManualPanel.astro';
+import ConfigPanel from '../../components/ConfigPanel.astro';
+import PinTable from '../../components/PinTable.astro';
 import Gallery from '../../components/Gallery.astro';
 import { CATEGORY_LABEL } from '../../content.config';
 
@@ -16,6 +18,8 @@ export async function getStaticPaths() {
 const { item } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const d = item.data;
+// Configuration tab only for ESCs that carry setup data (DroneCAN ESCs: FC and ESC parameters).
+const hasConfig = Boolean(d.configParams?.length || d.configNotes || d.configImages?.length);
 const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
   ? d.pinoutImages
   : (d.pinoutImage ? [d.pinoutImage] : []);
@@ -51,6 +55,7 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
         <Tabs tabs={[
           {id:'pinout', label:'Pinout'},
           {id:'firmware', label:'Firmware'},
+          ...(hasConfig ? [{id:'config', label:'Configuration'}] : []),
           {id:'manual', label:'Manual'},
           {id:'gallery', label:'Gallery'}
         ]}>
@@ -62,9 +67,10 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
                 ))}
               </div>
             ) : (
-              <div class="panel-empty">Pinout coming soon</div>
+              !d.pinTable && <div class="panel-empty">Pinout coming soon</div>
             )}
             {d.pinoutNotes && <div class="prose panel-notes"><p><Linkify text={d.pinoutNotes} /></p></div>}
+            <PinTable connectors={d.pinTable} />
           </div>
 
           <div class="tab-panel" data-panel="firmware">
@@ -75,6 +81,12 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
             )}
             {d.firmwareNotes && <div class="prose panel-notes"><p><Linkify text={d.firmwareNotes} /></p></div>}
           </div>
+
+          {hasConfig && (
+            <div class="tab-panel" data-panel="config">
+              <ConfigPanel images={d.configImages} params={d.configParams} notes={d.configNotes} name={d.name} />
+            </div>
+          )}
 
           <div class="tab-panel" data-panel="manual">
             <ManualPanel manuals={d.manuals} name={d.name} />

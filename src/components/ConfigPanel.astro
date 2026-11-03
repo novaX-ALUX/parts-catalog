@@ -1,0 +1,52 @@
+---
+// Configuration tab body shared by the GNSS, PMU and ESC pages: figures (optional caption), the parameter table with
+// section rows, and the numbered setup notes.
+import Linkify from './Linkify.astro';
+interface Figure { src: string; caption?: string }
+interface Param { name: string; value: string; note?: string; section?: string }
+interface Props { images?: (string | Figure)[]; params?: Param[]; notes?: string; name: string }
+const { images, params, notes, name } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+{(images && images.length > 0) && (
+  <div class="panel-images" style="margin-bottom: 24px;">
+    {images.map((img, i) => {
+      const src = typeof img === 'string' ? img : img.src;
+      const caption = typeof img === 'string' ? undefined : img.caption;
+      return (
+        <figure class="config-figure">
+          <div class="panel-image"><img src={`${base}${src}`} alt={`${name} configuration figure ${i + 1}`} /></div>
+          <figcaption><strong>Figure {i + 1}</strong>{caption ? ` — ${caption}` : ''}</figcaption>
+        </figure>
+      );
+    })}
+  </div>
+)}
+{(params && params.length > 0) && (
+  <table class="cfg-table">
+    <thead>
+      <tr><th>Parameter</th><th>Value</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      {params.map((p, i) => {
+        const prev = i > 0 ? params[i - 1].section : undefined;
+        const showSection = p.section && p.section !== prev;
+        return (
+          <Fragment>
+            {showSection && (
+              <tr class="cfg-section"><td colspan="3">{p.section}</td></tr>
+            )}
+            <tr>
+              <td><code>{p.name}</code></td>
+              <td><code>{p.value}</code></td>
+              <td>{p.note ?? ''}</td>
+            </tr>
+          </Fragment>
+        );
+      })}
+    </tbody>
+  </table>
+)}
+{notes
+  ? <div class="prose panel-notes"><p class="cfg-steps"><Linkify text={notes} /></p></div>
+  : (!images && !params && <div class="panel-empty">Configuration notes coming soon</div>)}

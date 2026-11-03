@@ -5,6 +5,7 @@ import SpecTable from '../../components/SpecTable.astro';
 import Tabs from '../../components/Tabs.astro';
 import Linkify from '../../components/Linkify.astro';
 import ManualPanel from '../../components/ManualPanel.astro';
+import ConfigPanel from '../../components/ConfigPanel.astro';
 import PinTable from '../../components/PinTable.astro';
 import Model3D from '../../components/Model3D.astro';
 import Gallery from '../../components/Gallery.astro';
@@ -78,48 +79,7 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
           )}
 
           <div class="tab-panel" data-panel="config">
-            {(d.configImages && d.configImages.length > 0) && (
-              <div class="panel-images" style="margin-bottom: 24px;">
-                {d.configImages.map((img, i) => {
-                  const src = typeof img === 'string' ? img : img.src;
-                  const caption = typeof img === 'string' ? undefined : img.caption;
-                  return (
-                    <figure class="config-figure">
-                      <div class="panel-image"><img src={`${base}${src}`} alt={`${d.name} configuration figure ${i + 1}`} /></div>
-                      <figcaption><strong>Figure {i + 1}</strong>{caption ? ` — ${caption}` : ''}</figcaption>
-                    </figure>
-                  );
-                })}
-              </div>
-            )}
-            {(d.configParams && d.configParams.length > 0) && (
-              <table class="cfg-table">
-                <thead>
-                  <tr><th>Parameter</th><th>Value</th><th>Description</th></tr>
-                </thead>
-                <tbody>
-                  {d.configParams.map((p, i) => {
-                    const prev = i > 0 ? d.configParams![i - 1].section : undefined;
-                    const showSection = p.section && p.section !== prev;
-                    return (
-                      <Fragment>
-                        {showSection && (
-                          <tr class="cfg-section"><td colspan="3">{p.section}</td></tr>
-                        )}
-                        <tr>
-                          <td><code>{p.name}</code></td>
-                          <td><code>{p.value}</code></td>
-                          <td>{p.note ?? ''}</td>
-                        </tr>
-                      </Fragment>
-                    );
-                  })}
-                </tbody>
-              </table>
-            )}
-            {d.configNotes
-              ? <div class="prose panel-notes"><p class="cfg-steps"><Linkify text={d.configNotes} /></p></div>
-              : (!d.configImages && !d.configParams && <div class="panel-empty">Configuration notes coming soon</div>)}
+            <ConfigPanel images={d.configImages} params={d.configParams} notes={d.configNotes} name={d.name} />
           </div>
 
           <div class="tab-panel" data-panel="manual">
