@@ -3,17 +3,8 @@ import Layout from '../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import { publicDir } from 'astro:config/server';
 import { readFirmwareMetadata } from '../lib/firmware-metadata.mjs';
-import FirmwareTable from '../components/FirmwareTable.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-
-// ESC tab: an ESC is written through the autopilot (a DroneCAN firmware updater, or the 4-way ESC passthrough for AM32),
-// not over this page's USB link, so the tab offers every ESC download grouped by product, with the steps per kind.
-const escProducts = (await getCollection('esc'))
-  .filter((e) => (e.data.firmware ?? []).length > 0)
-  .sort((a, b) => a.data.name.localeCompare(b.data.name, 'en', { numeric: true, sensitivity: 'base' }));
-const escNames = (re: RegExp) => escProducts.filter((e) => (e.data.firmware ?? []).some((f) => re.test(f.kind))).map((e) => e.data.name);
-const dronecanEsc = escNames(/DroneCAN/i), am32Esc = escNames(/AM32/i);
 
 // Gather every firmware asset that opts into the web Update tool (has method + webPath).
 // The collection a product lives in IS its category, so a new product category needs no
@@ -62,7 +53,19 @@ rows.sort((a, b) =>
 // app+bootloader flashed to board_id 6201 over serial, then a full DFU erase+write+leave→boot).
 // Windows needs the one-time WinUSB (Zadig) step on the df11 device, same as F4/H7.
 const WEB_UPDATE_FAMILIES = ['F4', 'F7', 'H7'];
-const fwRows = rows.filter((r) => r.method !== 'dfu' && WEB_UPDATE_FAMILIES.includes(r.family));
+// ESC — an ESC is written through the autopilot (a DroneCAN firmware updater, or the AM32 4-way ESC passthrough), not over
+// this page's USB link. Its files still sit in the same list under "ESC" (2026-11-06 #odeea33e6 "esc 항목을 여기에"): picking
+// one turns the action button into a download and the log shows how to update that kind of ESC.
+const escHow = (kind: string) => (/DroneCAN/i.test(kind) ? 'dronecan' : /SWD|JTAG/i.test(kind) ? 'swd' : 'am32');
+const ESC_TAG: Record<string, string> = { dronecan: 'DroneCAN', am32: 'AM32 4-way', swd: 'SWD' };
+const escRows: Row[] = (await getCollection('esc'))
+  .sort((a, b) => a.data.name.localeCompare(b.data.name, 'en', { numeric: true, sensitivity: 'base' }))
+  .flatMap((e) => (e.data.firmware ?? []).map((fw) => ({
+    product: e.data.name, version: fw.version, kind: fw.kind, method: escHow(fw.kind),
+    path: /^https?:\/\//.test(fw.file) ? fw.file : base + fw.file, file: fw.file.split('/').pop() || '',
+    size: fw.size ?? '', family: '', mcu: '', signed: false, cat: 'esc', vehicle: '', group: 'esc',
+  })));
+const fwRows = [...rows.filter((r) => r.method !== 'dfu' && WEB_UPDATE_FAMILIES.includes(r.family)), ...escRows];
 const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.includes(r.family));
 
 // Group the rows for display. An empty category or vehicle is never drawn: the navigation
@@ -97,11 +100,9 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
       <div class="seg" role="tablist">
         <button data-mode="fw" class="on">⚡ Firmware Update <span class="tag">· normal</span></button>
         <button data-mode="dfu">🛠 DFU Recovery <span class="tag">· blank / bricked</span></button>
-        <button data-mode="esc">🔩 ESC <span class="tag">· DroneCAN / AM32</span></button>
       </div>
 
-      <p class="mode-note" data-note="fw">Normal update over USB — device stays running, no jumper. Switch to <b>DFU Recovery</b> only if the board is blank or won't boot.</p>
-      <p class="mode-note" data-note="esc" hidden>ESC firmware is written through the autopilot, not over this page's USB link. Download the file for your ESC below, then follow the steps for its kind. Each product page's <b>Firmware</b> tab has the details.</p>
+      <p class="mode-note" data-note="fw">Normal update over USB — device stays running, no jumper. Switch to <b>DFU Recovery</b> only if the board is blank or won't boot. <b>ESC</b>: pick it on the left — the button downloads the file and the log shows how to update it through the autopilot.</p>
       <p class="mode-note" data-note="dfu" hidden><b>Pick a recovery image (<code>_with_bl.hex</code>) below</b>, then click <b>🛠 Enter DFU</b> to put a running board into USB DFU — buttonless (verified on AF-F4, AF-F7, and AF-H7E). Windows needs a one-time WinUSB driver (Zadig).</p>
 
       <div class="banner" data-banner="fw">
@@ -116,23 +117,8 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
         <div class="step"><b>③ Flash</b>Click ⚡ Flash (DFU) — the browser asks you to pick the STM32 DFU device (0483:DF11) once, then erase → write → verify. On <b>AF-H7E</b> the app then boots automatically. Chrome/Edge desktop.</div>
         <div class="step warn"><b>Windows</b>WebUSB needs a one-time WinUSB driver (Zadig) on the DFU device.</div>
       </div>
-      <div class="banner" data-banner="esc" hidden>
-        <div class="step"><b>① Download</b>Find your ESC below and download its update file — the <code>.bin</code> for a DroneCAN ESC, the application <code>.hex</code> for an AM32 ESC.</div>
-        <div class="step"><b>② DroneCAN ESC</b>{dronecanEsc.join(' · ')}: autopilot on USB, disarmed, motor stopped. Send the <code>.bin</code> with a DroneCAN firmware updater — Mission Planner: SETUP → Optional Hardware → DroneCAN/UAVCAN → MAVlink-CAN1 → Start → the ESC's Menu → Update Firmware.</div>
-        <div class="step"><b>③ AM32 ESC</b>{am32Esc.join(' · ')}: flash the application <code>.hex</code> through the autopilot's 4-way ESC passthrough with the AM32 ESC configurator.</div>
-        <div class="step warn"><b>Blank board</b>Bootloader and merged <code>.hex</code> files are for a blank or unbootable ESC over SWD/JTAG with the case open — not for normal updates.</div>
-      </div>
 
-      <div class="escpane" data-escpane hidden>
-        {escProducts.map((e) => (
-          <div class="card escprod">
-            <div class="head"><a href={`${base}/esc/${e.id}/`}>{e.data.name}</a> <span class="n">{(e.data.firmware ?? []).length} files</span></div>
-            <FirmwareTable items={e.data.firmware ?? []} productName={e.data.name} />
-          </div>
-        ))}
-      </div>
-
-      <div class="picker" data-fcui>
+      <div class="picker">
         <nav class="catnav" aria-label="Firmware categories">
           <button class="on" data-side="all" data-n-fw={fwRows.length} data-n-dfu={dfuRows.length}>All <span>{fwRows.length}</span></button>
           {nav.map((n) => (
@@ -155,12 +141,12 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
                     ...(g.subs.length ? g.subs : [g]).flatMap((s) => [
                       ...(g.subs.length ? [<tr class="grp lvl2" data-grp={s.key}><td colspan="5">{s.label} <span class="n">{s.rows.length}</span></td></tr>] : []),
                       ...s.rows.map((r) => (
-                        <tr class="fwrow" data-method={r.method} data-path={r.path} data-name={`${r.product} ${r.version}`} data-family={r.family} data-mcu={r.mcu} data-signed={r.signed ? "1" : "0"} data-group={r.group}>
+                        <tr class="fwrow" data-method={r.cat === 'esc' ? undefined : r.method} data-path={r.path} data-name={`${r.product} ${r.version}`} data-family={r.family} data-mcu={r.mcu} data-signed={r.signed ? "1" : "0"} data-group={r.group} data-esc={r.cat === 'esc' ? r.method : undefined} data-file={r.file}>
                           <td><span class="rad" data-radio></span></td>
-                          <td class="pname">{r.product}</td>
+                          <td class="pname">{r.product}{r.cat === 'esc' && <div class="ekind">{r.kind}</div>}</td>
                           <td>{r.vehicle ? <span class={`veh ${r.vehicle}`}>{vehicleLabel(r.vehicle)}</span> : <span class="veh none">—</span>}</td>
                           <td>{r.version}</td>
-                          <td><code>{r.file}</code> <span class="mtag">{r.method}</span>{r.size && <span class="fsize">{r.size}</span>}</td>
+                          <td><code>{r.file}</code> <span class="mtag">{r.cat === 'esc' ? ESC_TAG[r.method] : r.method}</span>{r.size && <span class="fsize">{r.size}</span>}</td>
                         </tr>
                       )),
                     ]),
@@ -175,20 +161,20 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
         </div>
       </div>
 
-      <div class="row-connect" data-fcui>
+      <div class="row-connect">
         <button id="connect" class="btn btn-line">🔌 Connect</button>
         <button id="softdfu" class="btn btn-line" hidden title="실행 중인 보드를 소프트웨어로 ROM DFU에 진입시킴 (AF-F4 ≥ v0.2.2 / T10 ≥ v0.3.2 / nano v2 ≥ v1.0.1 / AF-F7 ≥ v0.2.4 / AF-H7E ≥ v0.2.2)">🛠 Enter DFU</button>
         <button id="dfuconnect" class="btn btn-line" hidden title="보드가 DFU(0483:DF11)에 있을 때 WebUSB 장치 선택 팝업을 새 클릭으로 열어 연결 (브라우저 제스처 요구 우회)">🔌 Connect DFU device</button>
         <span id="status" class="chip">Not connected</span>
       </div>
 
-      <div class="actions" data-fcui>
+      <div class="actions">
         <button id="flash" class="btn btn-primary" disabled>⚡ Update firmware</button>
         <button id="reloadpage" class="btn btn-line" type="button" title="Clear caches + refresh the page (F5) — releases the USB/COM port and re-detects the device">🔄 Reload</button>
         <span class="hint" id="flowhint">reboot to bootloader → erase → program → verify → boot</span>
       </div>
 
-      <div class="log" id="log" data-fcui><div class="bar"><i id="bar"></i></div><div id="loglines"><span class="pend">Connect a device and pick firmware to begin.</span></div></div>
+      <div class="log" id="log"><div class="bar"><i id="bar"></i></div><div id="loglines"><span class="pend">Connect a device and pick firmware to begin.</span></div></div>
     </div>
   </section>
 </Layout>
@@ -257,12 +243,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
   .log .bar i { display: block; height: 100%; width: 0; background: var(--blue, #1a73e8); transition: width .15s; }
   .log .ok { color: #5fd08a; } .log .pend { color: #6f7888; } .log .err { color: #ef6f6f; }
   .fsize { margin-left: 8px; color: var(--ink-4, #888); font-size: 12px; white-space: nowrap; }
-  .escpane { display: grid; gap: 16px; margin-bottom: 22px; }
-  .escprod:hover { transform: none; }
-  .escprod .head { padding: 12px 14px; font-weight: 700; font-size: 14px; border-bottom: 1px solid var(--line); }
-  .escprod .head a { color: var(--ink); text-decoration: none; }
-  .escprod .head a:hover { text-decoration: underline; }
-  .escprod .head .n { color: var(--ink-4); font-weight: 600; margin-left: 6px; font-size: 12.5px; }
+  .fwsel .ekind { font-size: 11.5px; font-weight: 500; color: var(--ink-4); white-space: normal; margin-top: 2px; }
 </style>
 
 <script>
@@ -276,13 +257,13 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
   let mode: 'fw' | 'dfu' = 'fw';
-  let escOn = false;            // 🔩 ESC tab: download list only — the USB flashing controls are hidden, `mode` is left as it was
   let conn: any = null;
   // Serial tab: true once 🔌 Connect has rebooted the running app into its bootloader. The board is
   // now on a NEW COM port the browser hasn't granted, so the next step is ⚡ Update — which opens the
   // picker for that port and flashes. Reset on firmware/port re-selection and tab switch.
   let serialRebooted = false;
   let selectedPath: string | null = null;
+  let escPick: HTMLElement | null = null; // a picked ESC row: no USB link here — the button downloads the file instead
   let droppedFile: File | null = null;
   let selectedFamily: string | null = null; // F4/F7/H7 of the picked catalog firmware (DFU guard)
   let selectedName: string | null = null;
@@ -302,6 +283,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
     const dconn = $('#dfuconnect') as HTMLButtonElement;
     [soft, dconn, flashBtn, connectBtn].forEach((b) => b.classList.remove('pulse'));
     dconn.hidden = true; connectBtn.hidden = true;                       // Connect buttons merged into the action
+    if (escPick) { soft.hidden = true; flashBtn.classList.add('pulse'); return; } // ESC: only ⬇ Download
     const picked = !!(selectedPath || droppedFile);
     if (mode === 'dfu') {
       soft.disabled = false;
@@ -364,23 +346,13 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
       const sw = (navigator as any).serviceWorker;
       if (sw) { const rs = await sw.getRegistrations(); await Promise.all(rs.map((r: any) => r.unregister())); }
     } catch { /* ignore */ }
-    location.replace(location.pathname + '?mode=' + (escOn ? 'esc' : mode) + '&r=' + Date.now());
+    location.replace(location.pathname + '?mode=' + mode + '&r=' + Date.now());
   });
 
   // ---- mode toggle ----
   document.querySelectorAll<HTMLButtonElement>('.seg button').forEach((b) => b.addEventListener('click', () => {
     document.querySelectorAll('.seg button').forEach((x) => x.classList.remove('on'));
     b.classList.add('on');
-    escOn = b.dataset.mode === 'esc';
-    document.querySelectorAll<HTMLElement>('[data-fcui]').forEach((n) => (n.hidden = escOn));
-    ($('[data-escpane]') as HTMLElement).hidden = !escOn;
-    if (escOn) {
-      document.querySelectorAll('[data-note]').forEach((n) => (n as HTMLElement).hidden = (n as HTMLElement).dataset.note !== 'esc');
-      document.querySelectorAll('[data-banner]').forEach((n) => (n as HTMLElement).hidden = (n as HTMLElement).dataset.banner !== 'esc');
-      if (conn) { conn.close?.(); conn = null; }
-      setStatus('Not connected');
-      return;
-    }
     mode = (b.dataset.mode as 'fw' | 'dfu');
     document.querySelectorAll('[data-note]').forEach((n) => (n as HTMLElement).hidden = (n as HTMLElement).dataset.note !== mode);
     document.querySelectorAll('[data-banner]').forEach((n) => (n as HTMLElement).hidden = (n as HTMLElement).dataset.banner !== mode);
@@ -393,6 +365,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
     ($('#dfuconnect') as HTMLElement).hidden = true; // deprecated: "Connect DFU" is merged into the Flash button
     connectBtn.hidden = true; // both tabs connect-on-action (Update/Flash opens the picker); guide() keeps this hidden
     // reset connection/selection on mode switch (different transport)
+    escPick = null;
     if (conn) { conn.close?.(); conn = null; }
     serialRebooted = false;
     selectedPath = null; droppedFile = null;
@@ -546,8 +519,37 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
   // After a Reload, restore the saved mode (carried in ?mode=…) so USB re-detects on the
   // right transport — WebSerial for FW, WebUSB for DFU.
   const startMode = new URLSearchParams(location.search).get('mode');
-  if (startMode === 'dfu' || startMode === 'esc') {   // ?mode=esc also opens the ESC tab straight from a link
-    (document.querySelector(`.seg button[data-mode="${startMode}"]`) as HTMLButtonElement)?.click();
+  if (startMode === 'dfu') {
+    (document.querySelector('.seg button[data-mode="dfu"]') as HTMLButtonElement)?.click();
+  } else if (startMode === 'esc') {   // ?mode=esc opens the list on the ESC category (link from the ESC pages)
+    (document.querySelector('.catnav button[data-side="esc"]') as HTMLButtonElement)?.click();
+  }
+
+  // ---- ESC rows: download + the steps for that kind (an ESC is updated through the autopilot, not over this USB link) ----
+  const ESC_STEPS: Record<string, string[]> = {
+    dronecan: ['DroneCAN ESC: connect the autopilot over USB, disarm it and stop the motor (the ESC refuses an update otherwise).',
+      'Mission Planner → SETUP → Optional Hardware → DroneCAN/UAVCAN → MAVlink-CAN1 → Start → the ESC\'s Menu → Update Firmware → pick this file.',
+      'The ESC restarts with the new firmware; its node name / software version shows it.'],
+    am32: ['AM32 ESC: flash this file through the autopilot\'s 4-way ESC passthrough with the AM32 ESC configurator.'],
+    swd: ['Blank or unbootable ESC only: this image is written over SWD/JTAG with the case open — not a normal update.'],
+  };
+  function setEscPick(row: HTMLElement | null) {
+    escPick = row;
+    flashBtn.textContent = row ? '⬇ Download firmware' : (mode === 'dfu' ? '⚡ Flash (DFU)' : '⚡ Update firmware');
+    $('#flowhint').textContent = row ? 'ESC: download the file, then update it through the autopilot (steps in the log below)'
+      : (mode === 'dfu' ? 'erase → write → verify → leave DFU' : 'reboot to bootloader → erase → program → verify → boot');
+    if (row) {
+      if (conn) { conn.close?.(); conn = null; }
+      setStatus('ESC — no USB connection needed here');
+      log(`${row.dataset.name} · ${row.dataset.file}`, 'ok');
+      (ESC_STEPS[row.dataset.esc || ''] || []).forEach((s) => log('→ ' + s, 'pend'));
+    }
+  }
+  function escDownload(row: HTMLElement) {
+    const a = document.createElement('a');
+    a.href = row.dataset.path || ''; a.download = row.dataset.file || '';
+    document.body.appendChild(a); a.click(); a.remove();
+    log(`Downloaded ${row.dataset.file} — now follow the steps above.`, 'ok');
   }
 
   // ---- row selection ----
@@ -557,6 +559,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
     selectedPath = row.dataset.path || null; droppedFile = null;
     selectedFamily = row.dataset.family || null; selectedName = row.dataset.name || null;
     selectedSigned = row.dataset.signed === '1';
+    setEscPick(row.dataset.esc ? row : null);
     serialRebooted = false; // re-selecting firmware restarts the Connect→Update sequence
     // If we were auto-reconnected to a DFU device of a DIFFERENT chip (e.g. an F4 sitting in DFU
     // while the user now picks F7 firmware), release it so we neither flash nor stay "connected"
@@ -585,6 +588,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
   ['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('over'); }));
   drop.addEventListener('drop', (e) => { const f = (e as DragEvent).dataTransfer?.files?.[0]; if (f) pickFile(f); });
   function pickFile(f: File) {
+    setEscPick(null);
     droppedFile = f; selectedPath = null;
     selectedFamily = null; selectedName = null; // dropped file → no catalog family to match against
     ($('#softdfu') as HTMLElement).hidden = true; // unknown family for a dropped file → no software DFU button
@@ -695,6 +699,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
 
   // ---- flash ----
   flashBtn.addEventListener('click', async () => {
+    if (escPick) { escDownload(escPick); return; }       // ESC row: download only, never a USB flash
     // Serial tab: 🔌 Connect must run first — it opens the picker AND reboots the app into the
     // bootloader (or recognises a bootloader port). Don't silently connect here, or we'd grab the
     // app port and bypass that. (DFU tab keeps connect-on-action below.)
