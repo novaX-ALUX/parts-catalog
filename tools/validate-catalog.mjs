@@ -81,7 +81,6 @@ export async function validateCatalog(root, { remote = false } = {}) {
   const checked = new Set();
   const downloads = new Map();
   const expectedRows = new Map();
-  const catalogDownloads = new Set();   // every site-relative firmware download (the Update page ESC rows must be one of these)
   const counts = { products: 0, assets: 0, firmware: 0, signatures: 0, pages: 0, links: 0, updaterRows: 0, remote: 0 };
   const check = (label, fn) => { try { return fn(); } catch (error) { errors.push(`${label}: ${error.message}`); } };
   const publicAsset = (name) => {
@@ -109,7 +108,7 @@ export async function validateCatalog(root, { remote = false } = {}) {
         check(`${data.name} ${fw.kind}`, () => {
           if (Boolean(fw.method) !== Boolean(fw.webPath)) throw new Error('method and webPath must be specified together');
           let bytes;
-          if (fw.file.startsWith('/')) { bytes = publicAsset(fw.file); catalogDownloads.add(base + fw.file); }
+          if (fw.file.startsWith('/')) bytes = publicAsset(fw.file);
           else if (!/^https:\/\//.test(fw.file)) throw new Error('Download URL must use HTTPS');
           if (bytes && fw.file.endsWith('.hex')) validateHex(bytes.toString());
           if (bytes && fw.file.endsWith('.apj')) validateApj(bytes.toString());
@@ -169,13 +168,6 @@ export async function validateCatalog(root, { remote = false } = {}) {
           else if (!path.posix.extname(target)) target += '/index.html';
           exactFile(distRoot, target);
           counts.links++;
-        });
-      }
-      if (attrs['data-esc']) {
-        // ESC rows on the Update page are downloads only: never a USB updater row, always a published catalog file.
-        check(`${relative} ESC download ${attrs['data-path']}`, () => {
-          if (attrs['data-method']) throw new Error('An ESC row must not be a USB updater row');
-          if (!catalogDownloads.has(attrs['data-path'])) throw new Error('ESC download is not a catalog firmware file');
         });
       }
       if (attrs['data-method'] && attrs['data-path']) {
