@@ -73,6 +73,8 @@ firmware:
     size: "47.9 KB"
     sha256: "c834c9f5446bd6fd4a3d5c125cf5746f7858e28ed507396bb01732b424a5a03f"
     notes: "Motor-control app for the TI F28027F. Send it over DroneCAN with the autopilot disarmed and the motor stopped: the CAN chip reads the file header and hands the file to the motor chip's bootloader (about 45 s). The ESC restarts and its node name shows AE14S_60A_V1.62. Works on every AE-14S 60A FOC."
+    method: esc-setup
+    webPath: /firmware/esc/ae-14s-60a-foc/novaX_AE-14S-60A-FOC_MotorChip_v1.62_App_CAN.bin
   - kind: "CAN chip app (.bin · DroneCAN update)"
     file: /firmware/esc/ae-14s-60a-foc/novaX_AE-14S-60A-FOC_CANChip_v1.14_App_CAN.bin
     version: "1.14"

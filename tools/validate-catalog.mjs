@@ -121,7 +121,8 @@ export async function validateCatalog(root, { remote = false } = {}) {
             // This existing product is required to stay signed after a move.
             if (path.basename(file) === 'AF-F4-nano-v2.md') publicAsset(fw.webPath + '.aff4t10.json');
             const mcu = data.specs?.find((s) => s.key === 'MCU')?.value ?? '';
-            if (/[FH][47]/i.test(mcu)) expectedRows.set(base + fw.webPath, fw);
+            // FC images by MCU family; ESC Setup tab rows (stored ESC files, the handheld itself) whatever their MCU
+            if (/[FH][47]/i.test(mcu) || /^esc-setup/.test(fw.method)) expectedRows.set(base + fw.webPath, fw);
           }
           if (bytes && fw.sha256 && sha256(bytes) !== fw.sha256.toLowerCase()) throw new Error('Catalog SHA-256 mismatch');
           if (fw.file.startsWith('https://')) {

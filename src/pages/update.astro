@@ -16,6 +16,8 @@ const CATEGORIES = [
   { key: 'motor', label: 'Motor' },
   { key: 'camera', label: 'Camera' },
 ] as const;
+// Display categories: the collections plus 'ESC tool' (the ESC Setup handheld's own firmware, kept in the esc collection).
+const SHOW = [...CATEGORIES.slice(0, 3), { key: 'esctool', label: 'ESC tool' }, ...CATEGORIES.slice(3)];
 const all = (await Promise.all(
   CATEGORIES.map(async (c) => (await getCollection(c.key)).map((e) => ({ entry: e, cat: c.key as string })))
 )).flat();
@@ -26,7 +28,7 @@ const VEHICLES = [
   { key: 'copter', label: 'Multicopter' },
   { key: 'plane', label: 'VTOL / Plane' },
 ] as const;
-type Row = { product: string; version: string; kind: string; method: string; path: string; file: string; size: string; family: string; mcu: string; signed: boolean; cat: string; vehicle: string; group: string };
+type Row = { product: string; version: string; kind: string; method: string; path: string; file: string; size: string; family: string; mcu: string; signed: boolean; cat: string; vehicle: string; group: string; sha256?: string };
 const rows: Row[] = [];
 for (const { entry: e, cat } of all) {
   // The DFU chip guard needs each board's MCU family (F4/F7/H7), read from its specs.
@@ -38,7 +40,8 @@ for (const { entry: e, cat } of all) {
       // Every novaX flight-controller image without a vehicle in its name is a Copter build
       // (fc/scripts/build_ap.sh defaults to copter); only dual-vehicle boards carry the suffix.
       const vehicle = cat !== 'fc' ? '' : (/Plane/i.test(fw.kind) || /-Plane/.test(file) ? 'plane' : 'copter');
-      rows.push({ product: e.data.name, version: fw.version, kind: fw.kind, method: fw.method, path: base + fw.webPath, file, family, mcu, cat, vehicle, group: vehicle ? `${cat}:${vehicle}` : cat, ...readFirmwareMetadata(publicDir, fw.webPath) });
+      const rcat = fw.method === 'esc-setup-self' ? 'esctool' : cat;
+      rows.push({ product: e.data.name, version: fw.version, kind: fw.kind, method: fw.method, path: base + fw.webPath, file, family, mcu, cat: rcat, vehicle, group: vehicle ? `${rcat}:${vehicle}` : rcat, sha256: fw.sha256, ...readFirmwareMetadata(publicDir, fw.webPath) });
     }
   }
 }
@@ -53,16 +56,19 @@ rows.sort((a, b) =>
 // app+bootloader flashed to board_id 6201 over serial, then a full DFU erase+write+leave→boot).
 // Windows needs the one-time WinUSB (Zadig) step on the df11 device, same as F4/H7.
 const WEB_UPDATE_FAMILIES = ['F4', 'F7', 'H7'];
-const fwRows = rows.filter((r) => r.method !== 'dfu' && WEB_UPDATE_FAMILIES.includes(r.family));
-const dfuRows = rows.filter((r) => r.method === 'dfu' && WEB_UPDATE_FAMILIES.includes(r.family));
+// ESC Setup rows: files the handheld keeps for ESCs ('esc-setup', under ESC) and the handheld's own firmware
+// ('esc-setup-self', under ESC tool). Both go over Web Serial to the handheld (esc/ESC-Setup-Portable), whatever the MCU.
+const isEscSetup = (r: Row) => r.method === 'esc-setup' || r.method === 'esc-setup-self';
+const fwRows = rows.filter((r) => isEscSetup(r) || (r.method !== 'dfu' && WEB_UPDATE_FAMILIES.includes(r.family)));
+const dfuRows = rows.filter((r) => !isEscSetup(r) && r.method === 'dfu' && WEB_UPDATE_FAMILIES.includes(r.family));
 
 // Group the rows for display. An empty category or vehicle is never drawn: the navigation
 // grows by itself as products ship, instead of listing placeholders that read as "0".
-const label = (key: string) => CATEGORIES.find((c) => c.key === key)?.label
+const label = (key: string) => SHOW.find((c) => c.key === key)?.label
   ?? VEHICLES.find((v) => v.key === key)?.label ?? key;
 type Group = { key: string; label: string; rows: Row[]; subs: Group[] };
 function tree(list: Row[]): Group[] {
-  return CATEGORIES.map((c) => {
+  return SHOW.map((c) => {
     const inCat = list.filter((r) => r.cat === c.key);
     const subs = VEHICLES
       .map((v) => ({ key: `${c.key}:${v.key}`, label: v.label, rows: inCat.filter((r) => r.vehicle === v.key), subs: [] }))
@@ -94,7 +100,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
       <p class="mode-note" data-note="dfu" hidden><b>Pick a recovery image (<code>_with_bl.hex</code>) below</b>, then click <b>🛠 Enter DFU</b> to put a running board into USB DFU — buttonless (verified on AF-F4, AF-F7, and AF-H7E). Windows needs a one-time WinUSB driver (Zadig).</p>
 
       <div class="banner" data-banner="fw">
-        <div class="step"><b>① Pick firmware</b>Plug in USB-C (no jumper, no BOOT0) and select the <code>.apj</code> below.</div>
+        <div class="step"><b>① Pick firmware</b>Plug in USB-C (no jumper, no BOOT0) and select the <code>.apj</code> below. ESC / ESC tool rows go to the <b>ESC Setup</b> handheld.</div>
         <div class="step"><b>② Connect</b>Click 🔌 Connect and pick your board's port (<code>ArduPilot</code>) in the popup.</div>
         <div class="step"><b>③ Update</b>Click ⚡ Update firmware — it reboots to the bootloader and flashes.</div>
         <div class="step good"><b>Driver</b>None — standard USB serial (CDC). Chrome/Edge desktop.</div>
@@ -129,7 +135,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
                     ...(g.subs.length ? g.subs : [g]).flatMap((s) => [
                       ...(g.subs.length ? [<tr class="grp lvl2" data-grp={s.key}><td colspan="5">{s.label} <span class="n">{s.rows.length}</span></td></tr>] : []),
                       ...s.rows.map((r) => (
-                        <tr class="fwrow" data-method={r.method} data-path={r.path} data-name={`${r.product} ${r.version}`} data-family={r.family} data-mcu={r.mcu} data-signed={r.signed ? "1" : "0"} data-group={r.group}>
+                        <tr class="fwrow" data-method={r.method} data-path={r.path} data-sha256={r.sha256 ?? ''} data-name={`${r.product} ${r.version}`} data-family={r.family} data-mcu={r.mcu} data-signed={r.signed ? "1" : "0"} data-group={r.group}>
                           <td><span class="rad" data-radio></span></td>
                           <td class="pname">{r.product}</td>
                           <td>{r.vehicle ? <span class={`veh ${r.vehicle}`}>{vehicleLabel(r.vehicle)}</span> : <span class="veh none">—</span>}</td>
@@ -238,12 +244,15 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
   import { parseIntelHex } from '../scripts/update/intel-hex';
   import { Px4Updater } from '../scripts/update/serial-px4';
   import { parseApj, parseBin } from '../scripts/update/apj';
+  import { EscSetup, reopenAfterRestart, sha256hex } from '../scripts/update/esc-setup';
 
   const BUILD = '2026-07-21c * REVERTED the H7E leave-jump auto-boot (it did NOT boot from the browser and left the board stuck in DFU). H7E DFU again RESTORES BOOT_CM7_ADD0=0x08000000 so a power-cycle boots the app. DFU device picker stays consistent with serial (Flash (DFU) always shows the picker).';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
   let mode: 'fw' | 'dfu' = 'fw';
+  let selectedMethod: string | null = null;     // 'esc-setup' / 'esc-setup-self' rows talk to the ESC Setup handheld
+  const viaHandheld = () => selectedMethod === 'esc-setup' || selectedMethod === 'esc-setup-self';
   let conn: any = null;
   // Serial tab: true once 🔌 Connect has rebooted the running app into its bootloader. The board is
   // now on a NEW COM port the browser hasn't granted, so the next step is ⚡ Update — which opens the
@@ -254,13 +263,15 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
   let selectedFamily: string | null = null; // F4/F7/H7 of the picked catalog firmware (DFU guard)
   let selectedName: string | null = null;
   let selectedSigned = false;   // this catalog artifact ships an Ed25519 manifest
+  let selectedSha = '';         // catalog sha256 of the picked row (checked before it goes to the ESC Setup handheld)
 
   const log = (m: string, cls = '') => { const d = document.createElement('div'); if (cls) d.className = cls; d.textContent = m; logEl.appendChild(d); logEl.scrollTop = 1e9; };
   const progress = (done: number, total: number) => { barEl.style.width = total ? `${Math.round((done / total) * 100)}%` : '0'; };
   const setStatus = (t: string, cls = '') => { statusEl.textContent = t; statusEl.className = 'chip ' + cls; };
   // Both tabs connect-on-action: the Update/Flash button opens the device picker itself, so it
   // is enabled as soon as a firmware is picked — no separate Connect / Connect DFU step.
-  const refreshFlashEnabled = () => { flashBtn.disabled = !(selectedPath || droppedFile); guide(); };
+  let handheldBusy = false;     // an ESC Setup transfer is running: nothing else may start on that port
+  const refreshFlashEnabled = () => { flashBtn.disabled = handheldBusy || !(selectedPath || droppedFile); guide(); };
 
   // ---- next-step guidance: enable + pulse the ONE button to click next; disable/hide the rest
   // so a step can't be done out of order or by mistake. Runs on every state change. ----
@@ -339,6 +350,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
     document.querySelectorAll('.seg button').forEach((x) => x.classList.remove('on'));
     b.classList.add('on');
     mode = (b.dataset.mode as 'fw' | 'dfu');
+    selectedMethod = null;
     document.querySelectorAll('[data-note]').forEach((n) => (n as HTMLElement).hidden = (n as HTMLElement).dataset.note !== mode);
     document.querySelectorAll('[data-banner]').forEach((n) => (n as HTMLElement).hidden = (n as HTMLElement).dataset.banner !== mode);
     document.querySelectorAll('[data-list]').forEach((n) => (n as HTMLElement).hidden = (n as HTMLElement).dataset.list !== mode);
@@ -508,11 +520,20 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
 
   // ---- row selection ----
   document.querySelectorAll<HTMLElement>('.fwrow').forEach((row) => row.addEventListener('click', () => {
+    if (handheldBusy) { log('Wait — the ESC Setup transfer is still running.', 'pend'); return; }
     row.parentElement!.querySelectorAll('.fwrow').forEach((r) => r.classList.remove('sel'));
     row.classList.add('sel');
     selectedPath = row.dataset.path || null; droppedFile = null;
     selectedFamily = row.dataset.family || null; selectedName = row.dataset.name || null;
     selectedSigned = row.dataset.signed === '1';
+    selectedMethod = row.dataset.method || null;
+    selectedSha = row.dataset.sha256 || '';
+    if (viaHandheld() && conn && !(conn instanceof EscSetup)) { try { conn.close?.(); } catch { /* ignore */ } conn = null; setStatus('Not connected'); }
+    if (!viaHandheld() && conn instanceof EscSetup) { conn.close(); conn = null; setStatus('Not connected'); }
+    flashBtn.textContent = selectedMethod === 'esc-setup' ? '💾 Save to ESC Setup' : mode === 'dfu' ? '⚡ Flash (DFU)' : '⚡ Update firmware';
+    ($('#flowhint') as HTMLElement).textContent = selectedMethod === 'esc-setup' ? 'download → sha256 → stored in the handheld (it checks 5A A5 · length · CRC) → on the handheld: ESC → Update'
+      : selectedMethod === 'esc-setup-self' ? 'download → sha256 → staged in the handheld → CRC-32 → it copies itself and restarts (keep USB in)'
+      : mode === 'dfu' ? 'erase → write → verify → leave DFU' : 'reboot to bootloader → erase → program → verify → boot';
     serialRebooted = false; // re-selecting firmware restarts the Connect→Update sequence
     // If we were auto-reconnected to a DFU device of a DIFFERENT chip (e.g. an F4 sitting in DFU
     // while the user now picks F7 firmware), release it so we neither flash nor stay "connected"
@@ -541,7 +562,16 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
   ['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('over'); }));
   drop.addEventListener('drop', (e) => { const f = (e as DragEvent).dataTransfer?.files?.[0]; if (f) pickFile(f); });
   function pickFile(f: File) {
-    droppedFile = f; selectedPath = null;
+    if (handheldBusy) { log('Wait — the ESC Setup transfer is still running.', 'pend'); return; }
+    droppedFile = f; selectedPath = null; selectedSha = '';
+    // an ESC _ota.bin (bytes 4..5 = 5A A5) or an ESC Setup image (H743 vector table) goes to the handheld
+    f.slice(0, 8).arrayBuffer().then((a) => {
+      const u = new Uint8Array(a), dv = new DataView(a);
+      selectedMethod = (u.length === 8 && u[4] === 0x5a && u[5] === 0xa5) ? 'esc-setup'
+        : (u.length === 8 && (dv.getUint32(0, true) >>> 24) === 0x20 && (dv.getUint32(4, true) >>> 24) === 0x08) ? 'esc-setup-self' : null;
+      if (viaHandheld()) log(selectedMethod === 'esc-setup' ? '→ an ESC motor-chip file: it goes to the ESC Setup handheld' : '→ an ESC Setup firmware image: it updates the handheld itself', 'pend');
+      flashBtn.textContent = selectedMethod === 'esc-setup' ? '💾 Save to ESC Setup' : mode === 'dfu' ? '⚡ Flash (DFU)' : '⚡ Update firmware';
+    });
     selectedFamily = null; selectedName = null; // dropped file → no catalog family to match against
     ($('#softdfu') as HTMLElement).hidden = true; // unknown family for a dropped file → no software DFU button
     document.querySelectorAll('.fwrow').forEach((r) => r.classList.remove('sel'));
@@ -552,6 +582,14 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
   // ---- connect ----
   connectBtn.addEventListener('click', async () => {
     try {
+      if (mode === 'fw' && viaHandheld()) {
+        // ESC Setup handheld (USB 1209:0001): its own line protocol, no bootloader step
+        if (conn) { try { await conn.close?.(); } catch { /* ignore */ } conn = null; }
+        conn = await EscSetup.request();
+        await showHandheld(conn);
+        refreshFlashEnabled();
+        return;
+      }
       if (mode === 'dfu') {
         conn = await STM32Dfu.connect();
         setStatus('● ' + conn.chipLabel(), 'ok');
@@ -654,6 +692,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
     // Serial tab: 🔌 Connect must run first — it opens the picker AND reboots the app into the
     // bootloader (or recognises a bootloader port). Don't silently connect here, or we'd grab the
     // app port and bypass that. (DFU tab keeps connect-on-action below.)
+    if (mode === 'fw' && viaHandheld()) { await toHandheld(); return; }
     if (mode !== 'dfu' && !conn && !serialRebooted) {
       log('→ Click 🔌 Connect first (the pulsing button) and pick your board\'s port.', 'pend');
       return;
@@ -741,4 +780,44 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
     }
     flashBtn.disabled = false;
   });
+
+
+  // ---------------- ESC Setup handheld (rows 'esc-setup' / 'esc-setup-self') ----------------
+  async function showHandheld(d: EscSetup) {
+    const v = await d.version(), st = await d.stored();
+    setStatus(`● ESC-Setup-Portable v${v} · stored: ${st ?? 'none'}`, 'ok');
+    log(`Connected: ESC-Setup-Portable v${v} — stored ESC file: ${st ?? 'none'}`, 'ok');
+    return v;
+  }
+  async function toHandheld() {
+    if (!(conn instanceof EscSetup)) { log("→ Click 🔌 Connect first and pick 'ESC-Setup-Portable'.", 'pend'); return; }
+    handheldBusy = true; flashBtn.disabled = true; connectBtn.disabled = true; progress(0, 1);
+    try {
+      const buf = droppedFile ? await droppedFile.arrayBuffer() : await (await fetch(selectedPath!, { cache: 'no-store' })).arrayBuffer();
+      const data = new Uint8Array(buf);
+      const name = droppedFile ? droppedFile.name : (selectedPath!.split('/').pop() || 'file.bin');
+      const sha = await sha256hex(data);
+      if (selectedSha && sha !== selectedSha.toLowerCase()) throw new Error(`sha256 mismatch (${sha}) — not sent`);
+      log(`Loaded ${name} · ${data.length.toLocaleString('en-US')} B · sha256 ${sha.slice(0, 8)}…${sha.slice(-4)}${selectedSha ? ' ✓' : ' (local file)'}`, 'ok');
+      if (selectedMethod === 'esc-setup') {
+        const t0 = performance.now();
+        const r = await conn.storeEscFile(data, name, progress);
+        log(`Handheld: ${r} (${((performance.now() - t0) / 1000).toFixed(1)} s)`, 'ok');
+        log('Done — now on the handheld: ESC → Update → this version → yes', 'ok');
+        await showHandheld(conn);
+      } else {
+        const before = await conn.version();
+        const r = await conn.updateSelf(data, progress);
+        log(`Handheld: ${r} — copying over itself and restarting …`, 'ok');
+        setStatus('restarting …', 'pend');
+        conn = await reopenAfterRestart(log);
+        if (conn) { const v = await showHandheld(conn); log(`ESC Setup firmware ${before} → ${v}${v === before ? ' (same version, rewritten)' : ''}`, 'ok'); }
+      }
+    } catch (e: any) {
+      const m = String(e?.message || e);
+      log(/err commands/.test(m) && selectedMethod === 'esc-setup-self'
+        ? 'This handheld is older than 0.0.20 and cannot update itself — use 🛠 DFU Recovery once (BOOT button).' : 'Failed: ' + m, 'err');
+    }
+    handheldBusy = false; connectBtn.disabled = false; refreshFlashEnabled();
+  }
 </script>

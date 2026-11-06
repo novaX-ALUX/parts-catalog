@@ -72,7 +72,9 @@ const firmwareItem = z.object({
   // `webPath` is a same-origin path under public/ the browser loads (release URLs
   // are CORS-blocked, so the flashable image is mirrored locally). When absent the
   // asset is download-only and not offered in the Update tool.
-  method: z.enum(['dfu', 'ardupilot', 'novax-fc']).optional(),
+  //   'esc-setup' — ESC firmware file stored in the ESC Setup handheld over Web Serial (it updates ESCs over CAN)
+  //   'esc-setup-self' — the ESC Setup handheld's own firmware over Web Serial (no DFU driver)
+  method: z.enum(['dfu', 'ardupilot', 'novax-fc', 'esc-setup', 'esc-setup-self']).optional(),
   webPath: z.string().optional()
 });
 
