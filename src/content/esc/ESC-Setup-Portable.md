@@ -8,12 +8,12 @@ specs:
   - { key: Interface, value: "DroneCAN (CAN 2.0 · 1 Mbit) · USB-C serial" }
 firmware:
   - kind: "ESC Setup firmware (.bin · USB serial, no DFU driver)"
-    file: /firmware/esc/esc-setup-portable/ESC-Setup-Portable_v0.0.20.bin
-    version: "0.0.20"
+    file: /firmware/esc/esc-setup-portable/ESC-Setup-Portable_v0.0.22.bin
+    version: "0.0.22"
     date: "2026-11-06"
-    size: "65.2 KB"
-    sha256: "ce260807781a63a81f4a6748d4cedc2ffe3c78b1a2162596aa99d0541270ecb4"
-    notes: "The device stages it, checks CRC-32 and the vector table, then copies it over itself (about 3 s). Needs device 0.0.20 or later; older ones or a cut-off copy: BOOT-button DFU. Source: esc/ESC-Setup-Portable commit 3d1dace."
+    size: "68.6 KB"
+    sha256: "0fb8f6a8b4155334d387e8e458aaee679efe094913a15deec3ffab6ca9dd3570"
+    notes: "The device stages it, checks CRC-32 and the vector table, then copies it over itself (about 3 s). Needs device 0.0.20 or later; older ones or a cut-off copy: BOOT-button DFU. Adds auto_cal on its own screen (stop with any button) and checks a write again when the ESC answers late (prop_align). Source: esc/ESC-Setup-Portable commit 780c0af."
     method: esc-setup-self
-    webPath: /firmware/esc/esc-setup-portable/ESC-Setup-Portable_v0.0.20.bin
+    webPath: /firmware/esc/esc-setup-portable/ESC-Setup-Portable_v0.0.22.bin
 ---
