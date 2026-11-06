@@ -13,7 +13,7 @@ firmware:
     date: "2026-11-06"
     size: "68.6 KB"
     sha256: "0fb8f6a8b4155334d387e8e458aaee679efe094913a15deec3ffab6ca9dd3570"
-    notes: "The device stages it, checks CRC-32 and the vector table, then copies it over itself (about 3 s). Needs device 0.0.20 or later; older ones or a cut-off copy: BOOT-button DFU. Adds auto_cal on its own screen (stop with any button) and checks a write again when the ESC answers late (prop_align). Source: esc/ESC-Setup-Portable commit 780c0af."
+    notes: "The device stages it, checks CRC-32 and the vector table, then copies it over itself (about 3 s). Needs device 0.0.20 or later; older ones or a cut-off copy: BOOT-button DFU. Adds auto_cal on its own screen (stop with any button) and checks a write again when the ESC answers late (prop_align). Source: esc/ESC-Setup-Portable commit 5461892."
     method: esc-setup-self
     webPath: /firmware/esc/esc-setup-portable/ESC-Setup-Portable_v0.0.22.bin
 ---
