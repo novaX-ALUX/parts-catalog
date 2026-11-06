@@ -33,7 +33,7 @@ pinTable:
       - { pin: "–", signal: PWM, function: "PWM throttle 1040–1940 µs, optically isolated — used only when can_pwm = 1" }
       - { pin: "–", signal: PWM−, function: "Return of the PWM input — to the ground pin of the same autopilot servo output" }
   - name: Motor leads
-    type: 16 AWG · motor end
+    type: orange · 16 AWG · motor end
     pins:
       - { pin: A, signal: MOT_A, function: "Motor phase — any order; after auto_cal keep the order and set the direction with dir" }
       - { pin: B, signal: MOT_B, function: "Motor phase" }
@@ -62,12 +62,34 @@ specs:
   - { key: Motors, value: "novaX AM-6212 / AM-6215 with encoder (28 poles), measured on the aircraft with auto_cal" }
   - { key: Wires, value: "Battery 14 AWG · motor 16 AWG · CAN cable with JST-GH 4P plug · encoder cable with round 6-pin plug" }
   - { key: Size, value: "84 × 35 × 20 mm (aluminium case, rubber grommet on every wire)" }
-  - { key: Firmware, value: "novaX FOC App V1.40 · DroneCAN 1.13, updated over DroneCAN" }
+  - { key: Firmware, value: "novaX FOC App V1.62 (motor chip) · DroneCAN 1.14 with CAN bootloader V1.2 (CAN chip), both updated over DroneCAN" }
 description: |
   AE-14S 60A FOC is a field-oriented-control ESC for 6–14S heavy-lift aircraft, sealed in an aluminium case. A TI C2000 (TMS320F28027F) runs the motor and an STM32F103 talks DroneCAN to the autopilot. Throttle comes over isolated DroneCAN on a JST-GH 4P cable; voltage, current, rpm, temperature and fault flags go back the same way. A second cable with a round 6-pin plug reads the motor's magnetic encoder, so the ESC measures the motor on the aircraft (auto_cal) and can park the propeller at a stored angle (prop_align). Over-current is limited every switching cycle and heat only lowers the current limit (never below 50 %), so an overloaded or hot ESC keeps the motor turning to land; only a real short circuit switches the motor off, and it is retried. Firmware updates go over DroneCAN with the case closed.
-firmwareNotes: "Firmware is updated over DroneCAN through the autopilot — the case stays closed. Current release: App V1.40 with DroneCAN 1.13; the DroneCAN node name shows the app version (AE14S_60A_V1.40). Update files are supplied by novaX."
+firmware:
+  - kind: "Motor chip app (.bin · DroneCAN update)"
+    file: /firmware/esc/ae-14s-60a-foc/novaX_AE-14S-60A-FOC_MotorChip_v1.62_App_CAN.bin
+    version: "1.62"
+    date: "2026-11-05"
+    size: "47.9 KB"
+    sha256: "c834c9f5446bd6fd4a3d5c125cf5746f7858e28ed507396bb01732b424a5a03f"
+    notes: "Motor-control app for the TI F28027F. Send it over DroneCAN with the autopilot disarmed and the motor stopped: the CAN chip reads the file header and hands the file to the motor chip's bootloader (about 45 s). The ESC restarts and its node name shows AE14S_60A_V1.62. Works on every AE-14S 60A FOC."
+  - kind: "CAN chip app (.bin · DroneCAN update)"
+    file: /firmware/esc/ae-14s-60a-foc/novaX_AE-14S-60A-FOC_CANChip_v1.14_App_CAN.bin
+    version: "1.14"
+    date: "2026-11-05"
+    size: "32.6 KB"
+    sha256: "fae1afcec9d9d61d6243167a67e52bf2a17a3892432da5b6f6559b1f4522e001"
+    notes: "DroneCAN app for the STM32F103 (the CAN side). Same update path as the motor chip file — the ESC tells the two files apart by their header and refuses any other file without erasing anything. Needs the CAN-chip bootloader V1.2 (ESCs whose DroneCAN software version is 1.14 or newer). An ESC on 1.13 has no CAN bootloader: it takes the SWD file below once. Adds sound_off."
+  - kind: "CAN chip bootloader + app (Intel HEX · SWD)"
+    file: /firmware/esc/ae-14s-60a-foc/novaX_AE-14S-60A-FOC_CANChip_v1.14_BootApp_SWD.hex
+    version: "1.14"
+    date: "2026-11-05"
+    size: "130.4 KB"
+    sha256: "d3eef7659cbdff973c51df2aed7192f602ce66a8893b8e9be5a60e2ad9bf217b"
+    notes: "CAN bootloader V1.2 + app V1.14 in one Intel HEX, written once over SWD (ST-LINK) with the case open — for a new board and for an ESC still on 1.13. Parameters start at their defaults (esc_index 0, node_id 0). After this the CAN chip updates over DroneCAN like the motor chip."
+firmwareNotes: "Firmware is updated over DroneCAN through the autopilot — the case stays closed. Latest: motor chip app V1.62 and CAN chip 1.14 with CAN bootloader V1.2 (2026-11-05). Disarm the autopilot and stop the motor (the ESC refuses an update otherwise), then send the .bin with a DroneCAN firmware updater — Mission Planner (SETUP → Optional Hardware → DroneCAN/UAVCAN → MAVlink-CAN1 → Start, then the ESC's Menu → Update Firmware) or the novaX PC Throttle tool. One file type per chip; the ESC reads the header and sends it to the right chip. The node name shows the motor app version (AE14S_60A_V1.62). A blank or unbootable motor chip is reflashed by novaX over JTAG. The same files are on the Update page."
 configNotes: |
-  Set the autopilot first (parameters below), then give every ESC its number. ESC parameters are DroneCAN parameters: in Mission Planner open SETUP → Optional Hardware → DroneCAN/UAVCAN, choose MAVlink-CAN1 and press Start. Each ESC appears as AE14S_60A_V1.40 — Menu → Parameters, change the value, Write. The ESC refuses a change while its motor turns or the autopilot is armed (the old value comes back), so disarm first.
+  Set the autopilot first (parameters below), then give every ESC its number. ESC parameters are DroneCAN parameters: in Mission Planner open SETUP → Optional Hardware → DroneCAN/UAVCAN, choose MAVlink-CAN1 and press Start. Each ESC appears as AE14S_60A_V1.62 (the motor app version) — Menu → Parameters, change the value, Write. The ESC refuses a change while its motor turns or the autopilot is armed (the old value comes back), so disarm first.
 
   1. Wiring — Battery leads to the power distribution (red +, black −). The three motor leads to the motor in any order. Plug the encoder cable's round 6-pin plug into the motor's encoder cable and the CAN cable's JST-GH 4P plug into the autopilot CAN1 port (its pin 1, 5 V, is not used: the ESC powers its isolated CAN side itself).
   2. Autopilot — Set the ArduPilot parameters in the table and reboot. CAN_D1_UC_ESC_BM marks the outputs that are sent to DroneCAN ESCs (15 = outputs 1–4); CAN_D1_UC_ESC_OF skips that many outputs, so the first marked output becomes ESC 0 (motors on outputs 5–8: BM 240, OF 4).
@@ -87,6 +109,7 @@ configParams:
   - { name: prop_align, value: "0 / 1", section: "ESC (DroneCAN parameters)", note: "1 = store the present propeller angle and hold it at 0 % throttle; 1 again = new angle; 0 = off. Motor stopped, after a passed auto_cal" }
   - { name: auto_cal, value: "1 / 2", section: "ESC (DroneCAN parameters)", note: "1 = measure the motor and calibrate the encoder (about 20 s, slow turn, propeller off, disarmed, cold motor). 2 = forget the measured values (defaults from the next power-up). Reads 0" }
   - { name: can_pwm, value: "0 / 1", section: "ESC (DroneCAN parameters)", note: "Throttle source: 0 = CAN (default), 1 = PWM input (option, see the pinout)" }
+  - { name: sound_off, value: "0 / 1", section: "ESC (DroneCAN parameters)", note: "1 = no start-up tones (do-mi-sol) at power-up; 0 = tones on (default). CAN chip 1.14 or newer" }
   - { name: motor_rs_mohm, value: "read only", section: "ESC (DroneCAN parameters)", note: "Phase resistance measured by auto_cal (mΩ, 0 = none)" }
   - { name: motor_ls_uh, value: "read only", section: "ESC (DroneCAN parameters)", note: "Inductance measured by auto_cal (µH, 0 = none)" }
   - { name: motor_flux_vphz, value: "read only", section: "ESC (DroneCAN parameters)", note: "Flux measured by auto_cal (V/Hz, 0 = none)" }

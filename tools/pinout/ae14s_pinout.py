@@ -30,9 +30,9 @@ WIRES = [
     ("PWM (OPTION)", 0, (779.4, 820.6, 627.4, 668.6), "can_pwm = 1 · optically isolated", "PWM PWM−", None, "T"),
     ("BATTERY +", 0, (858.6, 895.8, 630.2, 667.4), "red · 14 AWG", "+", None, "T"),
     ("CAN", 0, (770.4, 829.6, 976.2, 1082.0), "JST-GH 4P plug · DroneCAN", "NC CAN_H CAN_L GND", "1 2 3 4", "B"),
-    ("MOTOR C", 1, (707.8, 743.8, 628.9, 664.9), "16 AWG", "C", None, "T"),
-    ("MOTOR B", 1, (785.0, 815.0, 632.0, 662.0), "16 AWG", "B", None, "T"),
-    ("MOTOR A", 1, (856.2, 892.2, 628.9, 664.9), "16 AWG", "A", None, "T"),
+    ("MOTOR C", 1, (707.8, 743.8, 628.9, 664.9), "orange · 16 AWG", "C", None, "T"),
+    ("MOTOR B", 1, (785.0, 815.0, 632.0, 662.0), "orange · 16 AWG", "B", None, "T"),
+    ("MOTOR A", 1, (856.2, 892.2, 628.9, 664.9), "orange · 16 AWG", "A", None, "T"),
     ("ENCODER", 1, (790.9, 874.6, 896.9, 1082.0), "round 6-pin plug · SPI", "3V3 GND CS CLK MOSI MISO", None, "B"),
 ]
 
