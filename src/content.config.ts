@@ -149,7 +149,13 @@ const motor = defineCollection({
   })
 });
 
-export const collections = { fc, esc, gnss, camera, motor, pmu };
+// Radio controllers (EdgeTX transmitters). The firmware tab and the Update tool's DFU list work as for FCs.
+const rc = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/rc' }),
+  schema: detailSchema
+});
+
+export const collections = { fc, esc, gnss, camera, motor, pmu, rc };
 
 export const CATEGORY_LABEL: Record<string, string> = {
   fc: 'Flight Controllers',
@@ -157,7 +163,8 @@ export const CATEGORY_LABEL: Record<string, string> = {
   esc: 'ESC',
   pmu: 'PMU',
   motor: 'Motors',
-  camera: 'Cameras & Gimbals'
+  camera: 'Cameras & Gimbals',
+  rc: 'Radio Controllers'
 };
 
-export const CATEGORY_ORDER = ['fc', 'gnss', 'esc', 'pmu', 'motor', 'camera'] as const;
+export const CATEGORY_ORDER = ['fc', 'gnss', 'esc', 'pmu', 'motor', 'camera', 'rc'] as const;

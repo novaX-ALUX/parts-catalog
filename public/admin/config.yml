@@ -135,6 +135,13 @@ collections:
     slug: "{{slug}}"
     fields: *base_fields
 
+  - name: rc
+    label: Radio Controllers
+    folder: src/content/rc
+    create: true
+    slug: "{{slug}}"
+    fields: *base_fields
+
   - name: motor
     label: Motors
     folder: src/content/motor

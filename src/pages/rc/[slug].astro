@@ -1,0 +1,100 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import SpecTable from '../../components/SpecTable.astro';
+import Tabs from '../../components/Tabs.astro';
+import FirmwareTable from '../../components/FirmwareTable.astro';
+import Linkify from '../../components/Linkify.astro';
+import ManualPanel from '../../components/ManualPanel.astro';
+import PinTable from '../../components/PinTable.astro';
+import Gallery from '../../components/Gallery.astro';
+import { CATEGORY_LABEL } from '../../content.config';
+
+export async function getStaticPaths() {
+  const items = (await getCollection('rc')).filter((i) => !i.data.hidden);
+  return items.map((item) => ({ params: { slug: item.id }, props: { item } }));
+}
+const { item } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const d = item.data;
+// Pinout tab supports multiple stacked images; fall back to the single legacy field.
+const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
+  ? d.pinoutImages
+  : (d.pinoutImage ? [d.pinoutImage] : []);
+---
+<Layout title={`${d.name} — novaX Catalog`} activeCategory="rc">
+  <section class="detail-hero">
+    <div class="container">
+      <div class="crumbs"><a href={`${base}/#rc`}>{CATEGORY_LABEL.rc}</a></div>
+      <div class="meta">Product · Catalog 2026</div>
+      <h1>{d.name}{d.comingSoon && <span class="soon">Coming Soon</span>}{d.ndaa && <span class="ndaa">NDAA Available</span>}</h1>
+      {d.tagline && <div class="tag">{d.tagline}</div>}
+    </div>
+  </section>
+
+  <section class="detail-body">
+    <div class="container">
+      {(d.image || d.description || d.specs.length > 0) && (
+      <div class="row">
+        {d.image && (
+          <div class="imgwrap"><img src={`${base}${d.image}`} alt={d.name} /></div>
+        )}
+        <div class="right-col">
+          {d.description && (
+            <div class="spec-card">
+              <div class="head">Description</div>
+              <div class="prose"><p>{d.description}</p></div>
+            </div>
+          )}
+          {d.specs.length > 0 && <SpecTable specs={d.specs} />}
+        </div>
+      </div>
+      )}
+
+      <div class="tabs-section">
+        <Tabs tabs={[
+          {id:'pinout', label:'Pinout'},
+          {id:'firmware', label:'Firmware'},
+          {id:'manual', label:'Manual'},
+          {id:'gallery', label:'Gallery'}
+        ]}>
+          <div class="tab-panel active" data-panel="pinout">
+            {pinoutImgs.length > 0 ? (
+              <div class="panel-images">
+                {pinoutImgs.map((src) => (
+                  <div class="panel-image">
+                    <a href={`${base}${src}`} target="_blank" rel="noopener">
+                      <img src={`${base}${src}`} alt={`${d.name} pinout`} />
+                    </a>
+                  </div>
+                ))}
+                <div class="zoom-hint">Click any image to open full size</div>
+              </div>
+            ) : (
+              !d.pinTable && <div class="panel-empty">Pinout diagram coming soon</div>
+            )}
+            {d.pinoutNotes && <div class="prose panel-notes"><p><Linkify text={d.pinoutNotes} /></p></div>}
+            <PinTable connectors={d.pinTable} />
+          </div>
+
+          <div class="tab-panel" data-panel="firmware">
+            {d.firmware && d.firmware.length > 0 ? (
+              <FirmwareTable items={d.firmware} productName={d.name} />
+            ) : (
+              !d.firmwareNotes && <div class="panel-empty">Firmware downloads coming soon</div>
+            )}
+            {d.firmwareNotes && <div class="prose panel-notes"><p><Linkify text={d.firmwareNotes} /></p></div>}
+          </div>
+
+          <div class="tab-panel" data-panel="manual">
+            <ManualPanel manuals={d.manuals} name={d.name} />
+          </div>
+
+          <div class="tab-panel" data-panel="gallery">
+            <Gallery gallery={d.gallery} image={d.image} name={d.name} />
+          </div>
+        </Tabs>
+      </div>
+    </div>
+  </section>
+</Layout>

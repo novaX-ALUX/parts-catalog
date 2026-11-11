@@ -15,6 +15,7 @@ const CATEGORIES = [
   { key: 'esc', label: 'ESC' },
   { key: 'motor', label: 'Motor' },
   { key: 'camera', label: 'Camera' },
+  { key: 'rc', label: 'Radio' },
 ] as const;
 // Display categories: the collections plus 'ESC tool' (the ESC Setup handheld's own firmware, kept in the esc collection).
 const SHOW = [...CATEGORIES.slice(0, 3), { key: 'esctool', label: 'ESC tool' }, ...CATEGORIES.slice(3)];
@@ -246,7 +247,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
   import { parseApj, parseBin } from '../scripts/update/apj';
   import { EscSetup, reopenAfterRestart, sha256hex } from '../scripts/update/esc-setup';
 
-  const BUILD = '2026-07-21c * REVERTED the H7E leave-jump auto-boot (it did NOT boot from the browser and left the board stuck in DFU). H7E DFU again RESTORES BOOT_CM7_ADD0=0x08000000 so a power-cycle boots the app. DFU device picker stays consistent with serial (Flash (DFU) always shows the picker).';
+  const BUILD = '2026-11-11a * AT-14 radio (EdgeTX) in DFU Recovery: no software Enter DFU for radios; turn the radio off and plug USB-C, then Flash (DFU).';
   const $ = (s: string) => document.querySelector(s) as HTMLElement;
   const logEl = $('#loglines'), barEl = $('#bar') as HTMLElement, statusEl = $('#status');
   const connectBtn = $('#connect') as HTMLButtonElement, flashBtn = $('#flash') as HTMLButtonElement;
@@ -261,6 +262,11 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
   let selectedPath: string | null = null;
   let droppedFile: File | null = null;
   let selectedFamily: string | null = null; // F4/F7/H7 of the picked catalog firmware (DFU guard)
+  let selectedGroup = '';       // catalog group of the picked row ('rc' = EdgeTX radio)
+  // Software Enter DFU is the ArduPilot MAVLink reboot (param4=99): FC boards only. An EdgeTX
+  // radio does not speak MAVLink; it reaches the ST ROM DFU when it is off and USB is plugged in.
+  const isRadio = () => selectedGroup === 'rc';
+  const softDfuOk = () => !isRadio() && (selectedFamily === 'F4' || selectedFamily === 'F7' || selectedFamily === 'H7');
   let selectedName: string | null = null;
   let selectedSigned = false;   // this catalog artifact ships an Ed25519 manifest
   let selectedSha = '';         // catalog sha256 of the picked row (checked before it goes to the ESC Setup handheld)
@@ -285,7 +291,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
       soft.disabled = false;
       if (conn || !picked) { soft.hidden = true; }                       // connected, or pick firmware first
       else {                                                             // picked, not connected
-        const swdfu = (selectedFamily === 'F4' || selectedFamily === 'F7' || selectedFamily === 'H7'); // software Enter DFU verified on F4 + F7 + H7
+        const swdfu = softDfuOk(); // software Enter DFU verified on F4 + F7 + H7 boards (not on radios)
         soft.hidden = !swdfu;                                            // running board → Enter DFU first
         (swdfu ? soft : flashBtn).classList.add('pulse');                // running: Enter DFU; already in DFU: Flash
       }
@@ -418,7 +424,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
     if (mode !== 'dfu') return;
     // Software boot-to-DFU is verified on F4, F7 (AF-F7 Mini, 2026-07-09) and H7 (AF-H7E):
     // param4=99 magic -> ST ROM DFU (0483:df11), then a full DFU erase+write+leave -> boot.
-    if (selectedFamily !== 'F4' && selectedFamily !== 'F7' && selectedFamily !== 'H7') {
+    if (!softDfuOk()) {
       log('Software DFU (Enter DFU) is verified on AF-F4, AF-F7, and AF-H7E — pick a matching recovery image first.', 'err');
       setStatus('Software DFU: F4 / F7 / H7 only', 'err');
       return;
@@ -525,6 +531,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
     row.classList.add('sel');
     selectedPath = row.dataset.path || null; droppedFile = null;
     selectedFamily = row.dataset.family || null; selectedName = row.dataset.name || null;
+    selectedGroup = row.dataset.group || '';
     selectedSigned = row.dataset.signed === '1';
     selectedMethod = row.dataset.method || null;
     selectedSha = row.dataset.sha256 || '';
@@ -548,7 +555,8 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
     // Software-DFU families (F4/F7/H7). Reveal BOTH: 🛠 Enter DFU (running board → software DFU)
     // AND 🔌 Connect DFU device (board ALREADY in DFU — blank board on BOOT0, or a previous run —
     // connects directly without Enter DFU). Both hidden once we're already connected (auto-reconnect).
-    const swdfuFam = (mode === 'dfu' && (selectedFamily === 'F4' || selectedFamily === 'F7' || selectedFamily === 'H7'));
+    const swdfuFam = (mode === 'dfu' && softDfuOk());
+    if (mode === 'dfu' && isRadio()) log('Radio: turn it OFF, connect the top USB-C port (it appears as STM32 BOOTLOADER), then click ⚡ Flash (DFU).', 'pend');
     ($('#softdfu') as HTMLElement).hidden = !swdfuFam || !!conn;
     ($('#dfuconnect') as HTMLElement).hidden = !swdfuFam || !!conn;
     refreshFlashEnabled();
@@ -572,7 +580,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
       if (viaHandheld()) log(selectedMethod === 'esc-setup' ? '→ an ESC motor-chip file: it goes to the ESC Setup handheld' : '→ an ESC Setup firmware image: it updates the handheld itself', 'pend');
       flashBtn.textContent = selectedMethod === 'esc-setup' ? '💾 Save to ESC Setup' : mode === 'dfu' ? '⚡ Flash (DFU)' : '⚡ Update firmware';
     });
-    selectedFamily = null; selectedName = null; // dropped file → no catalog family to match against
+    selectedFamily = null; selectedName = null; selectedGroup = ''; // dropped file → no catalog family to match against
     ($('#softdfu') as HTMLElement).hidden = true; // unknown family for a dropped file → no software DFU button
     document.querySelectorAll('.fwrow').forEach((r) => r.classList.remove('sel'));
     log(`File selected: ${f.name} (${f.size} bytes)`);
@@ -723,7 +731,8 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
           if (mode === 'dfu' && /claim|access|denied|InvalidState|SecurityError|Unable|protected|blocklist/i.test(msg))
             log('→ Windows: this DFU device needs WinUSB. Run Zadig ONCE — "STM32 BOOTLOADER" (0483:DF11) → WinUSB → Install/Replace Driver → then click Flash again.', 'pend');
           else if (mode === 'dfu' && /No device|NotFound|selected/i.test(msg))
-            log('→ No STM32 DFU (0483:DF11) offered. Running board? Click 🛠 Enter DFU first.', 'pend');
+            log(isRadio() ? '→ No STM32 DFU (0483:DF11) offered. Turn the radio OFF, then connect its top USB-C port and click ⚡ Flash (DFU) again.'
+              : '→ No STM32 DFU (0483:DF11) offered. Running board? Click 🛠 Enter DFU first.', 'pend');
           else if (mode !== 'dfu')
             log('→ No serial port. A blank / in-DFU board has no COM port — use the 🛠 DFU Recovery tab.', 'pend');
           flashBtn.disabled = false;
