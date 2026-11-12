@@ -5,14 +5,19 @@ import Gallery from '../components/Gallery.astro';
 import { getCollection } from 'astro:content';
 
 // Desktop programs, one JSON per program under src/content/tools (a new program needs only a new file).
-// Side tabs (the Update page rail) pick one program; its panel shows screenshots and every release,
-// newest first, in the same table as a product's Firmware tab. The URL hash (#<id>) keeps the pick.
+// Side tabs (the Update page rail) pick one program; its panel shows screenshots and the newest file of
+// each type only (the director, 2026-11-12 #oa05df88d: "최신것만"), in the same table as a product's
+// Firmware tab. A type the newest release lacks (a Mac build) shows its newest older file. Older
+// releases stay on GitHub and in the JSON. The URL hash (#<id>) keeps the pick.
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const tools = (await getCollection('tools')).sort((a, b) => a.data.order - b.data.order);
 const mb = (bytes: number) => `${(bytes / 1048576).toFixed(1)} MB`;
-const rowsOf = (t: (typeof tools)[number]) => t.data.releases.flatMap((r) => r.files.map((f) => ({
-  kind: f.kind, version: r.version, date: r.date, size: mb(f.bytes), file: f.file, sha256: f.sha256, notes: f.notes,
-})));
+const rowsOf = (t: (typeof tools)[number]) => {
+  const seen = new Set<string>();
+  return t.data.releases.flatMap((r) => r.files.filter((f) => !seen.has(f.kind) && seen.add(f.kind)).map((f) => ({
+    kind: f.kind, version: r.version, date: r.date, size: mb(f.bytes), file: f.file, sha256: f.sha256, notes: f.notes,
+  })));
+};
 ---
 <Layout title="Tools — novaX Catalog" activeCategory="tool">
   <section class="detail-body">
