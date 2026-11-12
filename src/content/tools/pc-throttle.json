@@ -4,6 +4,10 @@
   "usedFor": "AE-14S and AE-6S ESCs",
   "summary": "Throttle, bench test and firmware update tool for novaX ESCs on a PC, through the FC or a USB-CAN adapter (Windows).",
   "icon": "/images/products/esc_AE-14S-60A-FOC.png",
+  "shots": [
+    { "src": "/images/tools/pc-throttle-main.png", "caption": "Main screen: throttle, ESC status, thrust stand and the live thrust chart" },
+    { "src": "/images/tools/pc-throttle-update.png", "caption": "Update every ESC: all five ESCs on the CAN hub listed, one after another" }
+  ],
   "releases": [
     {
       "version": "2.0.1",
