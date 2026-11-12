@@ -2,8 +2,29 @@
   "name": "PC Throttle",
   "order": 20,
   "usedFor": "AE-14S and AE-6S ESCs",
-  "summary": "Throttle and bench test tool for novaX ESCs on a PC.",
+  "summary": "Throttle, bench test and firmware update tool for novaX ESCs on a PC, through the FC or a USB-CAN adapter (Windows).",
   "icon": "/images/products/esc_AE-14S-60A-FOC.png",
-  "comingSoon": true,
-  "releases": []
+  "releases": [
+    {
+      "version": "2.0.1",
+      "date": "2026-11-12",
+      "changes": "\"Update every ESC\" now lists every ESC on a CAN hub: names are asked one ESC at a time and asked again until they answer (before, 2 of 5 ESCs behind an FC were listed). The version and build are shown in the window.",
+      "notes": "https://github.com/novaX-ALUX/parts-catalog/releases/tag/pc-throttle-v2.0.1",
+      "files": [
+        {
+          "kind": "Windows installer",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/pc-throttle-v2.0.1/novaX-PC-Throttle_2.0.1_x64-setup.exe",
+          "bytes": 2110944,
+          "sha256": "f74e10f154c86f8e87e1fe9813fc3550807829bb76e481e61ef52ef59932fce5"
+        },
+        {
+          "kind": "Windows portable (no install)",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/pc-throttle-v2.0.1/novaX-PC-Throttle_2.0.1_portable.exe",
+          "bytes": 8116224,
+          "sha256": "be052a217acff682606b922d47b28c572bc5ee450a70eb0d9b48c7fbf21dbf63",
+          "notes": "Needs Microsoft Edge WebView2 (built into Windows 11)."
+        }
+      ]
+    }
+  ]
 }
