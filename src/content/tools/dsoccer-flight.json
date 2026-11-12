@@ -3,6 +3,11 @@
   "order": 10,
   "usedFor": "D-Soccer drones and controllers",
   "summary": "Setup, check and firmware update tool for D-Soccer drones (Windows / Mac, works offline).",
+  "icon": "/images/tools/dsoccer-flight-icon.png",
+  "shots": [
+    { "src": "/images/tools/dsoccer-flight-main.png", "caption": "Main screen: drone status, LED team, sensor calibration and live 3D attitude" },
+    { "src": "/images/tools/dsoccer-flight-update.png", "caption": "Firmware update: pick the file, then Update" }
+  ],
   "releases": [
     {
       "version": "2.2.9",

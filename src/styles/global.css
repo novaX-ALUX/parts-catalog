@@ -146,6 +146,20 @@ img { display: block; max-width: 100%; height: auto; }
 .page-head .crumb { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-4); }
 .page-head h1 { font-size: 30px; margin: 8px 0 18px; }
 
+/* === Side tab rail + main column (Update categories · Tool programs) === */
+.picker { display: grid; grid-template-columns: 196px 1fr; gap: 16px; align-items: start; }
+@media (max-width: 760px) { .picker { grid-template-columns: 1fr; } .catnav { display: flex; flex-wrap: wrap; } }
+.catnav { display: block; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.catnav button { display: flex; width: 100%; justify-content: space-between; gap: 10px; border: 0;
+  border-bottom: 1px solid #f1f1f1; background: #fff; padding: 10px 13px; font-size: 13.5px;
+  font-weight: 700; color: var(--ink); text-align: left; cursor: pointer; }
+.catnav button:last-child { border-bottom: 0; }
+.catnav button.sub { padding-left: 26px; font-size: 12.5px; font-weight: 600; color: var(--ink-3); background: #fcfcfd; }
+.catnav button span { color: var(--ink-4); font-weight: 600; }
+.catnav button.on { background: var(--blue, #1a73e8); color: #fff; }
+.catnav button.on span { color: #dbe8ff; }
+@media (max-width: 760px) { .catnav button { width: auto; border-bottom: 0; border-right: 1px solid #f1f1f1; } }
+
 /* === Detail page === */
 .detail-hero { background: var(--ink); color: #fff; padding: 56px 0 48px; }
 .detail-hero .meta { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; opacity: 0.55; margin-bottom: 12px; }

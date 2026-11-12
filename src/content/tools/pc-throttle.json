@@ -3,6 +3,7 @@
   "order": 20,
   "usedFor": "AE-14S and AE-6S ESCs",
   "summary": "Throttle and bench test tool for novaX ESCs on a PC.",
+  "icon": "/images/products/esc_AE-14S-60A-FOC.png",
   "comingSoon": true,
   "releases": []
 }

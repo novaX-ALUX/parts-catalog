@@ -3,7 +3,7 @@
 // The bytes themselves are checked by `npm run validate:remote` (download + SHA-256).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 
 const dir = new URL('../src/content/tools/', import.meta.url);
 const tools = readdirSync(dir).filter((f) => f.endsWith('.json'))
@@ -28,6 +28,14 @@ test('tool list: files live in the release the notes link names', () => {
       assert.match(x.sha256, /^[0-9a-f]{64}$/, `${f} ${m[2]}`);
       assert.ok(!kinds.has(x.kind), `${f} ${r.version} repeats ${x.kind}`);
       kinds.add(x.kind);
+    }
+  }
+});
+
+test('tool list: every side-tab icon and screenshot is a file in public/', () => {
+  for (const { f, t } of tools) {
+    for (const src of [t.icon, ...(t.shots ?? []).map((s) => s.src)]) {
+      assert.ok(src && existsSync(new URL('../public' + src, import.meta.url)), `${f} ${src}`);
     }
   }
 });

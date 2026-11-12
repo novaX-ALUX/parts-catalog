@@ -198,18 +198,6 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
   .chip { font-size: 12.5px; padding: 5px 11px; border-radius: 20px; border: 1px solid var(--line); color: var(--ink-3); }
   .chip.ok { color: #127a2e; border-color: #bfe3c8; background: #f1faf3; }
   .chip.err { color: #b22; border-color: #f0c4c4; background: #fcf2f2; }
-  .picker { display: grid; grid-template-columns: 196px 1fr; gap: 16px; align-items: start; }
-  @media (max-width: 760px) { .picker { grid-template-columns: 1fr; } .catnav { display: flex; flex-wrap: wrap; } }
-  .catnav { display: block; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-  .catnav button { display: flex; width: 100%; justify-content: space-between; gap: 10px; border: 0;
-    border-bottom: 1px solid #f1f1f1; background: #fff; padding: 10px 13px; font-size: 13.5px;
-    font-weight: 700; color: var(--ink); text-align: left; cursor: pointer; }
-  .catnav button:last-child { border-bottom: 0; }
-  .catnav button.sub { padding-left: 26px; font-size: 12.5px; font-weight: 600; color: var(--ink-3); background: #fcfcfd; }
-  .catnav button span { color: var(--ink-4); font-weight: 600; }
-  .catnav button.on { background: var(--blue, #1a73e8); color: #fff; }
-  .catnav button.on span { color: #dbe8ff; }
-  @media (max-width: 760px) { .catnav button { width: auto; border-bottom: 0; border-right: 1px solid #f1f1f1; } }
   .find { display: block; margin-bottom: 10px; }
   .find input { width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 9px;
     padding: 10px 12px; font: inherit; font-size: 13.5px; }

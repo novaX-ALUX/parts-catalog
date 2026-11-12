@@ -173,6 +173,9 @@ const tools = defineCollection({
     order: z.number().default(999),
     usedFor: z.string(),
     summary: z.string(),
+    // side tab picture (app icon, or the product it serves) and screenshots, site paths under public/
+    icon: z.string().regex(/^\/images\/[^?#%]+\.png$/),
+    shots: z.array(z.object({ src: z.string().regex(/^\/images\/[^?#%]+\.png$/), caption: z.string() })).default([]),
     comingSoon: z.boolean().optional().default(false),
     // newest first; each one is a GitHub release whose page carries the change notes
     releases: z.array(z.object({
