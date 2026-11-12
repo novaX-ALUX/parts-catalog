@@ -1,0 +1,50 @@
+{
+ "board": "x20d_r4.PcbDoc",
+ "pcbdoc_sha256": "92ed6771f81314abd34d3cb1eca231dd5fd04dffb8c8a7f81337e8197b282194",
+ "map": {
+  "case_x": "111.530 - pcb_x",
+  "case_y": "pcb_y + -29.400"
+ },
+ "fit_residual_mm": {
+  "J1": -0.02,
+  "J2": 0.02,
+  "USB1": 0.0,
+  "U16": -0.01
+ },
+ "UART_U14": {
+  "view": "left",
+  "right_vector": [
+   0,
+   -1,
+   0
+  ],
+  "pin1_vs_pin4_mm": -3.75,
+  "pin1": "left",
+  "nets": {
+   "1": "COM1-5V",
+   "2": "RTCM_IN",
+   "3": "USART6_TX",
+   "4": "GND"
+  }
+ },
+ "CAN_U16": {
+  "view": "front",
+  "right_vector": [
+   1,
+   0,
+   0
+  ],
+  "pin1_vs_pin4_mm": -3.75,
+  "pin1": "left",
+  "nets": {
+   "1": "COM3-5V",
+   "2": "CAN1_H",
+   "3": "CAN1_L",
+   "4": "GND"
+  }
+ },
+ "antennas_back_view": {
+  "J1": "right",
+  "J2": "left"
+ }
+}

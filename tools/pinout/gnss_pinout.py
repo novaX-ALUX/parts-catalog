@@ -113,7 +113,8 @@ def x20d(sh):
     """최종 제품 = R4 보드 + 케이스 V1.1(2026-10-08) 카탈로그 렌더. 이사님 2026-10-27 #oaa9ef8ba "X20D 최종은 pps, debug 없어. 회로만 있고
     케이스로 막을거야" → 밖에 나온 포트 = UART · CAN · USB · ANT1 · ANT2. 번호 = R4 표준 순서(hardware/R4/pinmap_R4.json:
     U14 1 5V · 2 RTCM_IN = RX · 3 USART6_TX = TX · 4 GND / U16 1 5V · 2 CAN_H · 3 CAN_L · 4 GND — R3 는 거꾸로였다).
-    1 번 끝 = 왼쪽(JST-GH 잠금 창이 위, R3 그림과 같은 자리). 상자 mm = 9 월 케이스 좌표 + (−4.97, −5.00, 0)(x20d_marks.py 8 점 대조)."""
+    1 번 끝 = 왼쪽 — 최종 R4 PcbDoc 패드 좌표로 다시 판정(2026-11-12, cross_verify/x20d_r4_pin1.json: UART 1 번 = 안테나 쪽 끝,
+    CAN 1 번 = USB 쪽 끝, 두 면 그림 모두 왼쪽). 상자 mm = 9 월 케이스 좌표 + (−4.97, −5.00, 0)(x20d_marks.py 8 점 대조)."""
     DX, DY = -4.97, -5.00
     side, sb, _ = cat_view(X20D_RENDER, "x20d", "left")
     sh.caption("UART side")

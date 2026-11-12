@@ -50,3 +50,11 @@ PA15(M5 → LED) · PB7 SDA · PB6 SCL · GND. 사진 방향 = PCB 윗면(Y 위)
 - AF-H7E POWER C = 받침 PCB J13 패드 0A…0F / 0G…0L(GND GND CAN_L CAN_H 5V 5V) — 회로도 U6X-BASE-SCH 의 J28/J27 · MCP2542 CANH/CANL 라벨.
 
 로컬 임시 폴더 경로는 `<scratchpad>`, 파이썬 실행 파일 경로는 `%PY313%` 로 바꿔 적었다(사용자 폴더를 기록에 남기지 않는다).
+
+## 4 차: X20D 최종 R4 보드로 다시 판정(2026-11-12, 이사님 #oc69fa6af "최신자료로 보드 확인해서 핀맵 업데이트")
+X20D 그림의 1 번 끝(왼쪽)은 R3 판정을 R4 로 옮겨 쓴 것이었다. 유거산 10-08 최종 `AP-RTK_X20D_20260906_R4.PcbDoc`(sha256 92ed6771…,
+X20D 저장소 `hardware/R4/` · `pinmap_R4.json` 과 같은 파일)으로 다시 판정했다 — 그림은 그대로 맞다.
+- [x20d_r4_pads.json](x20d_r4_pads.json): 패드 좌표·넷(`altium_pads.py`, remote-run 작업 x20d-r4-pads-1112). 커넥터 U14 UART · U16 CAN · USB1 = 아랫면, 안테나 J1 · J2 = 윗면.
+- [x20d_r4_pin1_check.py](x20d_r4_pin1_check.py) → [x20d_r4_pin1.json](x20d_r4_pin1.json): PCB → 케이스 = `x = 111.53 − pcb x`, `y = pcb y − 29.40`(보드가 뒤집혀 들어감).
+  안테나 두 개로 맞추고 USB · CAN 으로 따로 대조해 남는 차이 0.02 mm 이하. 렌더 cfg 보는 방향(왼쪽 옆면 오른쪽 = −y, 앞면 오른쪽 = +x)으로
+  UART 1 번(5V, 안테나 쪽 끝) = 그림 왼쪽 · CAN 1 번(5V, USB 쪽 끝) = 그림 왼쪽 · 신호 1 5V · 2 RX(RTCM_IN) · 3 TX(USART6_TX) · 4 GND / 1 5V · 2 CAN_H · 3 CAN_L · 4 GND.
