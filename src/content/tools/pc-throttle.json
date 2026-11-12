@@ -1,0 +1,8 @@
+{
+  "name": "PC Throttle",
+  "order": 20,
+  "usedFor": "AE-14S and AE-6S ESCs",
+  "summary": "Throttle and bench test tool for novaX ESCs on a PC.",
+  "comingSoon": true,
+  "releases": []
+}

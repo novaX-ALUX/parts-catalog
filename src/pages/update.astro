@@ -88,7 +88,7 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
 ---
 <Layout title="Firmware Update — novaX Catalog" activeCategory="update">
   <section class="detail-body">
-    <div class="container update-tool">
+    <div class="container update-tool page-head">
       <div class="crumb">Update</div>
       <h1>Firmware Update</h1>
 
@@ -177,8 +177,6 @@ const vehicleLabel = (key: string) => VEHICLES.find((v) => v.key === key)?.label
 <style>
   .update-tool { max-width: 1172px; } /* 960 + the category rail (196) + its gap (16) */
   .update-tool [hidden] { display: none !important; } /* author .banner{display:flex} would otherwise override UA [hidden] */
-  .update-tool .crumb { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-4); }
-  .update-tool h1 { font-size: 30px; margin: 8px 0 18px; }
   .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-bottom: 8px; }
   .seg button { border: 0; background: #fff; padding: 12px 20px; font-size: 14px; font-weight: 600; color: var(--ink-3); cursor: pointer; }
   .seg button.on { background: var(--blue, #1a73e8); color: #fff; }

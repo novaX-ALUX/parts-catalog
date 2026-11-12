@@ -81,7 +81,7 @@ export async function validateCatalog(root, { remote = false } = {}) {
   const checked = new Set();
   const downloads = new Map();
   const expectedRows = new Map();
-  const counts = { products: 0, assets: 0, firmware: 0, signatures: 0, pages: 0, links: 0, updaterRows: 0, remote: 0 };
+  const counts = { products: 0, assets: 0, firmware: 0, tools: 0, toolFiles: 0, signatures: 0, pages: 0, links: 0, updaterRows: 0, remote: 0 };
   const check = (label, fn) => { try { return fn(); } catch (error) { errors.push(`${label}: ${error.message}`); } };
   const publicAsset = (name) => {
     if (!name.startsWith('/') || name.startsWith('//')) throw new Error(`Expected site-relative asset: ${name}`);
@@ -131,6 +131,22 @@ export async function validateCatalog(root, { remote = false } = {}) {
             downloads.set(fw.file, expected);
           }
         });
+      }
+    });
+  }
+
+  // Tool page: desktop installers are GitHub release assets (not in public/), so --remote is what
+  // proves each one downloads and matches its listed SHA-256.
+  for (const file of filesUnder(path.join(root, 'src/content/tools')).filter((f) => f.endsWith('.json'))) {
+    check(path.relative(root, file), () => {
+      const tool = JSON.parse(readFileSync(file, 'utf8'));
+      counts.tools++;
+      for (const release of tool.releases ?? []) for (const item of release.files) {
+        if (!/^https:\/\//.test(item.file)) throw new Error(`Download URL must use HTTPS: ${item.file}`);
+        if (!/^[0-9a-f]{64}$/.test(item.sha256 ?? '')) throw new Error(`Missing SHA-256: ${item.file}`);
+        if (downloads.has(item.file) && downloads.get(item.file) !== item.sha256) throw new Error('Conflicting download hashes');
+        downloads.set(item.file, item.sha256);
+        counts.toolFiles++;
       }
     });
   }

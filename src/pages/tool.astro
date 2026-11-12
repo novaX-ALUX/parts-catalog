@@ -1,0 +1,40 @@
+---
+import Layout from '../layouts/Layout.astro';
+import FirmwareTable from '../components/FirmwareTable.astro';
+import { getCollection } from 'astro:content';
+
+// Desktop programs, one JSON per program under src/content/tools (a new program needs only a new file).
+// Every release of a program stays listed, newest first, in the same table as a product's Firmware tab.
+const tools = (await getCollection('tools')).sort((a, b) => a.data.order - b.data.order);
+const mb = (bytes: number) => `${(bytes / 1048576).toFixed(1)} MB`;
+const rowsOf = (t: (typeof tools)[number]) => t.data.releases.flatMap((r) => r.files.map((f) => ({
+  kind: f.kind, version: r.version, date: r.date, size: mb(f.bytes), file: f.file, sha256: f.sha256, notes: f.notes,
+})));
+---
+<Layout title="Tools — novaX Catalog" activeCategory="tool">
+  <section class="detail-body">
+    <div class="container page-head">
+      <div class="crumb">Tool</div>
+      <h1>Desktop Tools</h1>
+      <div class="prose"><p>PC programs for novaX products. Check the SHA-256 of a download against the one listed here before you run it.</p></div>
+
+      {tools.map((t) => {
+        const latest = t.data.releases[0];
+        return (
+          <div class="section" id={t.id}>
+            <h2>{t.data.name}</h2>
+            <div class="prose">
+              <p>
+                <strong>For:</strong> {t.data.usedFor}<br />
+                {t.data.summary}
+              </p>
+              {latest && <p><strong>What's new in {latest.version}:</strong> {latest.changes}<br /><a href={latest.notes} target="_blank" rel="noopener">Release notes</a></p>}
+            </div>
+            {latest ? <FirmwareTable items={rowsOf(t)} productName={t.data.name} />
+              : <div class="panel-empty">{t.data.comingSoon ? 'Coming soon' : 'No download yet'}</div>}
+          </div>
+        );
+      })}
+    </div>
+  </section>
+</Layout>

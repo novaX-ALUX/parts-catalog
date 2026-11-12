@@ -155,7 +155,37 @@ const rc = defineCollection({
   schema: detailSchema
 });
 
-export const collections = { fc, esc, gnss, camera, motor, pmu, rc };
+// Desktop programs on the Tool page, one JSON file per program. The installers are assets of a
+// GitHub release on this (public) catalog repository: they stay out of git and the Pages site, and
+// an older release is never deleted. `npm run validate:remote` downloads each file and checks its SHA-256.
+const toolFile = z.object({
+  kind: z.string(), // the Type column, OS first: "Windows installer", "macOS (Intel + Apple silicon)"
+  file: z.string().regex(/^https:\/\/github\.com\/novaX-ALUX\/parts-catalog\/releases\/download\/[^/]+\/[^/\s]+$/),
+  bytes: z.number().int().positive(),
+  sha256: z.string().regex(/^[0-9a-f]{64}$/),
+  notes: z.string().optional()
+});
+
+const tools = defineCollection({
+  loader: glob({ pattern: '*.json', base: './src/content/tools' }),
+  schema: z.object({
+    name: z.string(),
+    order: z.number().default(999),
+    usedFor: z.string(),
+    summary: z.string(),
+    comingSoon: z.boolean().optional().default(false),
+    // newest first; each one is a GitHub release whose page carries the change notes
+    releases: z.array(z.object({
+      version: z.string(),
+      date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      changes: z.string(),
+      notes: z.string().regex(/^https:\/\/github\.com\/novaX-ALUX\/parts-catalog\/releases\/tag\/[^/\s]+$/),
+      files: z.array(toolFile).min(1)
+    })).default([])
+  })
+});
+
+export const collections = { fc, esc, gnss, camera, motor, pmu, rc, tools };
 
 export const CATEGORY_LABEL: Record<string, string> = {
   fc: 'Flight Controllers',

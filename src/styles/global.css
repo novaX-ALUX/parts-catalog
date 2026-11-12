@@ -142,6 +142,10 @@ img { display: block; max-width: 100%; height: auto; }
 .card .name { font-size: 16px; font-weight: 600; margin: 6px 0 4px; color: var(--ink); }
 .card .tag { font-size: 12px; color: var(--ink-4); line-height: 1.5; }
 
+/* === Plain page heading on white (Update · Tool): small crumb + title === */
+.page-head .crumb { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-4); }
+.page-head h1 { font-size: 30px; margin: 8px 0 18px; }
+
 /* === Detail page === */
 .detail-hero { background: var(--ink); color: #fff; padding: 56px 0 48px; }
 .detail-hero .meta { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; opacity: 0.55; margin-bottom: 12px; }

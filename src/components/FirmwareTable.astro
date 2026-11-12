@@ -67,6 +67,7 @@ const hrefOf = (f: string) => (isExternal(f) ? f : `${base}${f}`);
     background: #fafafa;
     border-bottom: 1px solid #e2e2e2;
   }
+  .fw-table td:nth-child(2), .fw-table td:nth-child(3), .fw-table td:nth-child(4) { white-space: nowrap; } /* version, date, size: a long SHA-256 must not squeeze "2026-11-11" onto two lines */
   .fw-kind { font-weight: 600; color: #222; }
   .fw-notes { color: #777; font-size: 12.5px; margin-top: 3px; }
   .fw-dl {
