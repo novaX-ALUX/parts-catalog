@@ -10,6 +10,27 @@
   ],
   "releases": [
     {
+      "version": "2.2.11",
+      "date": "2026-11-12",
+      "changes": "The title shows the full version (v2.2.11) instead of only v2.2, so every update is visible on screen. Windows only: on a Mac use the 2.2.9 dmg below.",
+      "notes": "https://github.com/novaX-ALUX/parts-catalog/releases/tag/dsoccer-flight-v2.2.11",
+      "files": [
+        {
+          "kind": "Windows installer",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/dsoccer-flight-v2.2.11/D-Soccer-Flight_2.2.11_x64-setup.exe",
+          "bytes": 9185392,
+          "sha256": "9e92c8ca85ddbe22555dfbb672dbb224c9b657d1691e3e9f5d73ba276712c69c"
+        },
+        {
+          "kind": "Windows portable (no install)",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/dsoccer-flight-v2.2.11/D-Soccer-Flight_2.2.11_portable.exe",
+          "bytes": 16616960,
+          "sha256": "158f5219cede1273832febadf4f68f8e00db072a968009e980ee24ba131cca26",
+          "notes": "Needs Microsoft Edge WebView2 (built into Windows 11)."
+        }
+      ]
+    },
+    {
       "version": "2.2.10",
       "date": "2026-11-12",
       "changes": "The \"Pick from PC\" button in the firmware window moved to the empty top-left corner, so it no longer crowds the offline notice. Windows only: on a Mac use the 2.2.9 dmg below.",
