@@ -47,6 +47,8 @@ test('X20D is a separate R3 engineering product with its own heading contract', 
   assert.equal(x20.order, 22);
   assert.match(x20.image, /gnss_AP-RTK-X20D\.png$/, 'card image = case render');
   assert.ok(x20.gallery.some((g) => /X20D_R3_top_isometric\.png$/.test(g)), 'gallery keeps the R3 PCB renders');
+  // Final R4 PcbDoc outline 33.00 x 45.17 mm, 4 copper layers; production board 1.2 mm (supplier caliper photo 2026-10-27: 1.21 mm).
+  assert.equal(spec(x20, 'PCB'), 'R4 · 33.00 × 45.17 mm · 4 layers · 1.2 mm');
   assert.match(spec(x20, 'Update Rate'), /requires measurement/);
   // firmware v1.0.6+: same antenna layout and autopilot parameters as AP-RTK dual (RelPosHeading, GPS1_MB_OFS)
   assert.match(x20.configNotes, /ANT1 Master at the front, ANT2 Slave at the rear/);

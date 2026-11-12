@@ -17,7 +17,7 @@ specs:
   - { key: Update Rate, value: "Firmware requests 5 Hz navigation at 230400 baud; end-to-end CAN rate requires measurement" }
   - { key: Comm. Protocol, value: "DroneCAN — position, ardupilot.gnss.RelPosHeading (v1.0.6+) and separate magnetometer data" }
   - { key: I/O Ports, value: "2× MMCX antenna · CAN · UART (RTCM input) · USB-C (MCU) — PPS/EVENT and DEBUG (SWD + console) stay on the board, closed by the case" }
-  - { key: PCB, value: "R3 · 33.00 × 45.17 mm · 4 layers · 0.8 mm" }
+  - { key: PCB, value: "R4 · 33.00 × 45.17 mm · 4 layers · 1.2 mm" }
   - { key: Firmware, value: "AP_Periph · novaX 1.0.6 engineering release · board ID 6205" }
   - { key: Validation Status, value: "Bench hardware checks passed 2026-09-22 (230400 save, USB and CAN update, heading through the flight controller); outdoor RTK and flight qualification pending" }
 description: |
