@@ -10,6 +10,27 @@
   ],
   "releases": [
     {
+      "version": "2.2.10",
+      "date": "2026-11-12",
+      "changes": "The \"Pick from PC\" button in the firmware window moved to the empty top-left corner, so it no longer crowds the offline notice. Windows only: on a Mac use the 2.2.9 dmg below.",
+      "notes": "https://github.com/novaX-ALUX/parts-catalog/releases/tag/dsoccer-flight-v2.2.10",
+      "files": [
+        {
+          "kind": "Windows installer",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/dsoccer-flight-v2.2.10/D-Soccer-Flight_2.2.10_x64-setup.exe",
+          "bytes": 9182800,
+          "sha256": "d58f621544a0ffd776b99444bca5f418ad60bea2e761c541b701cf71c993ccad"
+        },
+        {
+          "kind": "Windows portable (no install)",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/dsoccer-flight-v2.2.10/D-Soccer-Flight_2.2.10_portable.exe",
+          "bytes": 16615424,
+          "sha256": "dbf8ff23a5b8f9ff724aa2a805672dc0414e8940ea84c4d22a86783e49d6beaa",
+          "notes": "Needs Microsoft Edge WebView2 (built into Windows 11)."
+        }
+      ]
+    },
+    {
       "version": "2.2.9",
       "date": "2026-11-11",
       "changes": "Button hover, press and selected looks match the original; the ESC list arrow is visible.",
