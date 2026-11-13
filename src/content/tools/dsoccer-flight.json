@@ -10,6 +10,27 @@
   ],
   "releases": [
     {
+      "version": "2.2.13",
+      "date": "2026-11-14",
+      "changes": "Built-in firmware is now controller v1.0.26 and drone v1.3.13 (also on the online list): fixes radio link drops (0.35 s drops about every 20 s on the old hop mode, 1.1 s drops after changing the hop mode, short drops at start-up next to busy Wi-Fi) and the drone yaw rate read with the wrong sign after a hard hit. Update the controller and the drone together. Windows only: on a Mac use the 2.2.11 dmg below, which offers the same firmware online.",
+      "notes": "https://github.com/novaX-ALUX/parts-catalog/releases/tag/dsoccer-flight-v2.2.13",
+      "files": [
+        {
+          "kind": "Windows installer",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/dsoccer-flight-v2.2.13/D-Soccer-Flight_2.2.13_x64-setup.exe",
+          "bytes": 9201407,
+          "sha256": "59c58bec01e3d85d180678f7e00563f5010a27080b6a4de5609dd90695f01574"
+        },
+        {
+          "kind": "Windows portable (no install)",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/dsoccer-flight-v2.2.13/D-Soccer-Flight_2.2.13_portable.exe",
+          "bytes": 16630272,
+          "sha256": "83d0ee68e5ef1168f40194eafc9a4d521cc53db671ffd8cea8467f77ab560575",
+          "notes": "Needs Microsoft Edge WebView2 (built into Windows 11)."
+        }
+      ]
+    },
+    {
       "version": "2.2.12",
       "date": "2026-11-13",
       "changes": "Controller firmware v1.0.23 (built in and on the online list): left, back and yaw-left work again (v1.0.16 cut negative stick values to 0) and the joystick screen shows MODE1 / MODE2 the right way round. Windows only: on a Mac use the 2.2.11 dmg below, which offers v1.0.23 online.",
