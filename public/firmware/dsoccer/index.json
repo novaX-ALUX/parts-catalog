@@ -4,13 +4,13 @@
  "firmware": [
   {
    "device": "controller",
-   "name": "DSoccer_Controller_v1.0.16_261109",
-   "file": "DSoccer_Controller_v1.0.16_261109_App.ax",
+   "name": "DSoccer_Controller_v1.0.23_261113",
+   "file": "DSoccer_Controller_v1.0.23_261113_App.ax",
    "model": "0x000D2002",
-   "version": "1.0.16",
-   "date": "2026-11-09",
-   "size": 94672,
-   "sha256": "d8bb5f54c0bdcd3efe0d362dd7515c01ecb728dab2bf6c136a813e5a37d5fbd1"
+   "version": "1.0.23",
+   "date": "2026-11-13",
+   "size": 109780,
+   "sha256": "f083d4a0d03ca994d6add0a22e5c9b79b6985089b863dfa7bb19a101c9bf421f"
   },
   {
    "device": "controller",
