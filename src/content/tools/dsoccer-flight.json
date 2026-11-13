@@ -10,6 +10,27 @@
   ],
   "releases": [
     {
+      "version": "2.2.12",
+      "date": "2026-11-13",
+      "changes": "Controller firmware v1.0.23 (built in and on the online list): left, back and yaw-left work again (v1.0.16 cut negative stick values to 0) and the joystick screen shows MODE1 / MODE2 the right way round. Windows only: on a Mac use the 2.2.11 dmg below, which offers v1.0.23 online.",
+      "notes": "https://github.com/novaX-ALUX/parts-catalog/releases/tag/dsoccer-flight-v2.2.12",
+      "files": [
+        {
+          "kind": "Windows installer",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/dsoccer-flight-v2.2.12/D-Soccer-Flight_2.2.12_x64-setup.exe",
+          "bytes": 9195538,
+          "sha256": "bb101e69f4ba12f9ff0e27d2a708e678dbe3cb6c6e8267c29adeaa05e63edadc"
+        },
+        {
+          "kind": "Windows portable (no install)",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/dsoccer-flight-v2.2.12/D-Soccer-Flight_2.2.12_portable.exe",
+          "bytes": 16626688,
+          "sha256": "0a9fa8c15d6cd7fef069d754a57c193a24fbfeb4fa0a45787acc35258662eeef",
+          "notes": "Needs Microsoft Edge WebView2 (built into Windows 11)."
+        }
+      ]
+    },
+    {
       "version": "2.2.11",
       "date": "2026-11-12",
       "changes": "The title shows the full version (v2.2.11) instead of only v2.2, so every update is visible on screen.",
