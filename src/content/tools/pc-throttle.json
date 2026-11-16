@@ -10,6 +10,27 @@
   ],
   "releases": [
     {
+      "version": "2.1.0",
+      "date": "2026-11-16",
+      "changes": "Flight test \"VTOL lift mission\" drives the four lift ESCs (0-3) together; if any one goes silent, faults, draws over 30 A or does not turn within 2 s, all four stop. Other profiles and the slider still drive the chosen ESC.",
+      "notes": "https://github.com/novaX-ALUX/parts-catalog/releases/tag/pc-throttle-v2.1.0",
+      "files": [
+        {
+          "kind": "Windows installer",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/pc-throttle-v2.1.0/novaX-PC-Throttle_2.1.0_x64-setup.exe",
+          "bytes": 2122459,
+          "sha256": "48dd65a60fafd9aeae9e56b4468ec586708dd7de77c5d995f4470a2e5ebe39cf"
+        },
+        {
+          "kind": "Windows portable (no install)",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/pc-throttle-v2.1.0/novaX-PC-Throttle_2.1.0_portable.exe",
+          "bytes": 8160768,
+          "sha256": "eaaf3411cd4293522c438faf22948a61c06b5653f2e55f1450fc5b508f8a7cb2",
+          "notes": "Needs Microsoft Edge WebView2 (built into Windows 11)."
+        }
+      ]
+    },
+    {
       "version": "2.0.1",
       "date": "2026-11-12",
       "changes": "\"Update every ESC\" now lists every ESC on a CAN hub: names are asked one ESC at a time and asked again until they answer (before, 2 of 5 ESCs behind an FC were listed). The version and build are shown in the window.",
