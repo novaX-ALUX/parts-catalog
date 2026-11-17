@@ -11,7 +11,7 @@ manuals:
 specs:
   - { key: MCU, value: "STM32F405" }
   - { key: IMU, value: "ICM-42688-P" }
-  - { key: Barometer, value: "SPL06 (current novaX hardware definition)" }
+  - { key: Barometer, value: "SPL06-001 (Goertek) — NDAA build: Infineon DPS368 on the same pads, with firmware that enables the DPS310 driver" }
   - { key: Gimbal, value: "AG-F4-1A (MNT_TYPE 13)" }
   - { key: Operating Voltage, value: "9 – 25 V DC" }
   - { key: USB Input, value: "USB Type-C (Firmware & Power)" }
