@@ -74,6 +74,16 @@
   },
   {
    "device": "drone",
+   "name": "DSoccer_Drone_v1.10.0_261117",
+   "file": "DSoccer_Drone_v1.10.0_261117_App.ax",
+   "model": "0x000D1003",
+   "version": "1.10.0",
+   "date": "2026-11-17",
+   "size": 83020,
+   "sha256": "3fb366cc86be60e51e9329561dbf6d9febfe96f7b0f4eb2142996b846b9d8a35"
+  },
+  {
+   "device": "drone",
    "name": "DSoccer_Drone_v1.9.2_261117",
    "file": "DSoccer_Drone_v1.9.2_261117_App.ax",
    "model": "0x000D1003",

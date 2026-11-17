@@ -10,6 +10,27 @@
   ],
   "releases": [
     {
+      "version": "2.8.0",
+      "date": "2026-11-17",
+      "changes": "Built-in firmware is now drone v1.10.0 and controller v1.2.1 (also on the online list). New drone motor mixer: the throttle stays where the stick is and thrust is straightened with the drone's measured motor curve, so hard roll, pitch and yaw moves no longer lift the drone. PID tab: Throttle Assist (0-100 %, default 0) replaces Attitude Priority; raise it for faster yaw spins and stronger hard moves at the cost of some climb. Thrust Linear (default 100) now means how much of the measured motor curve is used. Yaw heading hold default 3 to 2. Motor order must be 1234 (from drone v1.8.1). Update the controller and the drone together. Windows only: on a Mac use the 2.2.11 dmg below, which offers the same firmware online (no bootloader step).",
+      "notes": "https://github.com/novaX-ALUX/parts-catalog/releases/tag/dsoccer-flight-v2.8.0",
+      "files": [
+        {
+          "kind": "Windows installer",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/dsoccer-flight-v2.8.0/D-Soccer-Flight_2.8.0_x64-setup.exe",
+          "bytes": 9378730,
+          "sha256": "c0b89e6c208eeb989942e1be5d57b1653132fe716a05206e766fa77a4147ec6b"
+        },
+        {
+          "kind": "Windows portable (no install)",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/dsoccer-flight-v2.8.0/D-Soccer-Flight_2.8.0_portable.exe",
+          "bytes": 17201664,
+          "sha256": "a3600f6cceac71b866914ddc78b6b9bce01a2f4ad3ba2ad4632824721bdd7dc7",
+          "notes": "Needs Microsoft Edge WebView2 (built into Windows 11)."
+        }
+      ]
+    },
+    {
       "version": "2.7.1",
       "date": "2026-11-17",
       "changes": "Built-in firmware is now drone v1.9.2 and controller v1.2.1 (also on the online list). Drone motor pins now match the app's motor picture with the default order 1234 (1 front-right, 2 rear-right, 3 rear-left, 4 front-left): before the first flight after the update, make sure the motor order is 1234. New motor mixer with thrust linearization and defaults from test flights; the factory test mode is off. PID tab: Thrust Linear and Attitude Priority settings, help on every value, ranges around the defaults; TPA removed. ESC firmware and settings go through the drone (drone v1.8.0 or later). The window title shows the version. Update the controller and the drone together. Windows only: on a Mac use the 2.2.11 dmg below, which offers the same firmware online (no bootloader step).",
