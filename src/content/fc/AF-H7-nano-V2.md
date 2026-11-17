@@ -1,7 +1,7 @@
 ---
 name: AF-H7 nano V2
 ndaa: true
-tagline: H7 Flight Controller · 2–8S LiPo · 10-pin ESC Port with Current and Telemetry · 5 V / 12 V 2 A
+tagline: H7 Flight Controller · 2–8S LiPo · 10-pin ESC Port with Current and Telemetry · 5 V 1.5 A · 12 V 1.2 A
 image: /images/products/fc_AF-H7-nano-V2.png
 order: 21
 comingSoon: true
@@ -14,12 +14,12 @@ specs:
   - { key: Compass, value: "IST8310 (onboard)" }
   - { key: OSD, value: "AT7456E analog OSD — camera in, VTX out" }
   - { key: Operating Voltage, value: "2–8S LiPo (up to 33.6 V) · both regulators rated 60 V, 36 V TVS on the battery input" }
-  - { key: Output Voltage, value: "5 V / 2 A · 12 V / 2 A (VTX, DJI O3) · 5 V port rail for GPS, receiver and CAN that also runs from USB alone" }
-  - { key: ESC Port, value: "10-pin JST-SH: GND · GND · VBAT · VBAT · M1–M4 · CUR · TEL — straight 1:1 cable to the novaX AE-8S-60A 4-in-1 V2 ESC" }
-  - { key: Current & Telemetry, value: "ESC current on the ESC port (PC1, 40 A per volt, same scale as the ESC) · ESC telemetry on SERIAL7 (UART7 RX)" }
+  - { key: Output Voltage, value: "5 V / 1.5 A with 6.5 V or more at the FC battery input · 12 V / 1.2 A with 13.5 V or more at the FC battery input (VTX, DJI O3) — below that the output follows the battery · 5 V port rail for GPS, receiver and CAN that also runs from USB alone (unplug those devices, or use a USB-C supply of 1.5 A or more)" }
+  - { key: ESC Port, value: "10-pin JST-SH: VBAT · VBAT · GND · GND · M1–M4 · CUR · TEL — straight 1:1 cable to the novaX AE-8S-60A 4-in-1 V2 ESC" }
+  - { key: Current & Telemetry, value: "ESC current on the ESC port (PC1, 101 A per volt in ArduPilot, 99 in Betaflight — matched to the ESC) · ESC telemetry on SERIAL7 (UART7 RX)" }
   - { key: PWM Output, value: "10 motor/servo channels (M1–M4 on the ESC port and pads, S5–S10 on pads) + 1 WS2812 LED pad" }
   - { key: Motor Order, value: "Betaflight order out of the box — 1 rear right · 2 front right · 3 rear left · 4 front left; ArduPilot default FRAME_TYPE 12 (BetaFlightX), so the 1:1 ESC cable needs no remapping" }
-  - { key: Power Select Pads, value: "Camera 5 V or VBAT · VTX 12 V or VBAT — 3-pad solder jumpers on the bottom (cut and bridge); VBAT only for devices rated for the pack" }
+  - { key: Power Select Pads, value: "Camera 5 V or VBAT (JP1 on the bottom) · analog VTX 12 V or VBAT (JP2 on the top) — 3-pad solder jumpers: cut 1-2, then bridge 2-3 (never all three); VBAT only for devices rated for the pack" }
   - { key: Buzzer / Switch, value: "BZ+ pad (5 V or 12 V by solder jumper) and BZ− on a 30 V 5.8 A MOSFET — a buzzer, or on/off for another device (ArduPilot relay · Betaflight PINIO)" }
   - { key: Production Pads, value: "VBUS · D+ · D− · GND · BOOT0 · 3V3 test pads on a 2.54 mm row — flashing jigs program several boards over one USB hub, no button" }
   - { key: Serial Mapping, value: "SERIAL1 = USART1 · SERIAL2 = USART2 · SERIAL3 = USART3 · SERIAL4 = UART4 · SERIAL6 = USART6 · SERIAL7 = UART7 · SERIAL8 = UART8 (USB = SERIAL0)" }
@@ -29,24 +29,25 @@ specs:
   - { key: Blackbox, value: "microSD card" }
   - { key: Size, value: "38.5 × 38.5 mm" }
   - { key: Mount Hole, value: "30.5 × 30.5 mm / Ø4 mm" }
-  - { key: Core Chips, value: "MCU ST · IMU TDK · barometer Infineon · regulators MPS (USA) · LDOs and CAN TI — non-Chinese makers; the analog OSD chip is the exception" }
-  - { key: Validation Status, value: "Design stage — schematic and part placement done and checked (all nets pin for pin, 3 identical passes); routing and samples next. No firmware release yet." }
+  - { key: Core Chips, value: "MCU ST · IMU TDK · barometer Infineon · regulators MPS (USA) · LDOs and CAN TI · capacitors Samsung / Murata · resistors Yageo · 27 MHz crystal TXC — non-Chinese makers; the analog OSD chip (no non-Chinese part is made), the two 100 V input capacitors, the 12 V coil, the OR diodes, a few connectors, the LEDs, the boot button and the SD / USB-C sockets are the exceptions until the next board revision" }
+  - { key: Validation Status, value: "Design done — schematic, placement and routing (2026-11-04) checked pin for pin; first 20 samples in production. No firmware release yet." }
 description: |
-  AF-H7 nano V2 is the next revision of AF-H7 nano. It keeps the STM32H743 core, the two ICM-42688-P IMUs and the 30.5 mm mounting, and replaces the ESC wiring with one 10-pin connector: battery, four motor signals, ESC current and ESC telemetry on a straight 1:1 cable, the same pin numbers as the novaX AE-8S-60A 4-in-1 V2 ESC. Both regulators are now rated 60 V for 8S and give 2 A each (5 V and 12 V). The GPS, receiver and CAN ports also run from USB alone, so the aircraft can be set up on the bench without a battery, and the CAN port uses a 3.3 V CAN FD transceiver for the same reason. Every port follows the common pin order (Betaflight connector standard, Pixhawk CAN).
+  AF-H7 nano V2 is the next revision of AF-H7 nano. It keeps the STM32H743 core, the two ICM-42688-P IMUs and the 30.5 mm mounting, and replaces the ESC wiring with one 10-pin connector: battery, four motor signals, ESC current and ESC telemetry on a straight 1:1 cable, the same pin numbers as the novaX AE-8S-60A 4-in-1 V2 ESC. Both regulators are now rated 60 V for 8S and give 5 V 1.5 A and 12 V 1.2 A. The GPS, receiver and CAN ports also run from USB alone (unplug those devices, or use a USB-C supply of 1.5 A or more), so the aircraft can be set up on the bench without a battery, and the CAN port uses a 3.3 V CAN FD transceiver for the same reason. Every port follows the common pin order (Betaflight connector standard, Pixhawk CAN).
 pinoutImages:
   - /images/products/fc_AF-H7-nano-V2_pinout.png
 pinoutNotes: |
   Figure: top connectors, then the bottom solder pads seen from below (left and right swapped). Pin numbers are the connector's own pin 1, marked with a red 1.
-  The 5 V on GPS, RC and CAN is the USB-or-battery rail; the camera 5 V is the battery 5 V regulator; 12 V and VBAT come only from the battery. The camera and VTX supplies can be moved to VBAT with their bottom solder jumpers. UART4 goes to both the DJI O3 and OpenIPC connectors — use one of them. Motor pads M1–M4 are the ESC port's M1–M4 (Betaflight order).
+  The 5 V on GPS, RC and CAN is the USB-or-battery rail; the camera 5 V is the battery 5 V regulator; 12 V and VBAT come only from the battery. The camera and VTX supplies can be moved to VBAT with their solder jumpers (JP1 on the bottom, JP2 on the top). JP2 moves only the analog VTX; the digital (DJI) VTX port stays on 12 V. UART4 goes to both the DJI O3 and OpenIPC connectors — use one of them. Motor pads M1–M4 are the ESC port's M1–M4 (Betaflight order).
+  Battery floor: 12 V / 1.2 A with 13.5 V or more at the FC battery input, 5 V / 1.5 A with 6.5 V or more at the FC battery input; below that the outputs follow the battery. The OSD shows the battery from the FC's own divider, and the OSD battery reading can be about 6.0 % high before calibration (calculated at 6.5 V at the FC battery input) — keep 14.5 V / 7.0 V on an uncalibrated OSD. Below the floor the 12 V output gives an analog VTX at most 9.9 W on an empty 3S.
 pinTable:
   - name: ESC
     type: JST-SH 1.0 mm 10P (JST SM10B-SRSS-TB)
-    mapping: Straight 1:1 cable to the AE-8S-60A 4-in-1 V2 ESC · M1–M4 = PWM1–4 · CUR to PC1 (40 A per volt) · TEL to SERIAL7 (UART7 RX)
+    mapping: Straight 1:1 cable to the AE-8S-60A 4-in-1 V2 ESC · M1–M4 = PWM1–4 · CUR to PC1 (101 A per volt in ArduPilot, 99 in Betaflight) · TEL to SERIAL7 (UART7 RX)
     pins:
-      - { pin: 1, signal: GND, function: "Ground" }
-      - { pin: 2, signal: GND, function: "Ground" }
-      - { pin: 3, signal: VBAT, function: "Battery voltage from the ESC" }
-      - { pin: 4, signal: VBAT, function: "Battery voltage from the ESC" }
+      - { pin: 1, signal: VBAT, function: "Battery voltage from the ESC" }
+      - { pin: 2, signal: VBAT, function: "Battery voltage from the ESC" }
+      - { pin: 3, signal: GND, function: "Ground" }
+      - { pin: 4, signal: GND, function: "Ground" }
       - { pin: 5, signal: M1, function: "Motor 1 (PWM1 · PB0)" }
       - { pin: 6, signal: M2, function: "Motor 2 (PWM2 · PB1)" }
       - { pin: 7, signal: M3, function: "Motor 3 (PWM3 · PA0)" }
@@ -61,13 +62,13 @@ pinTable:
       - { pin: 2, signal: SCL, function: "I2C1 clock (compass)" }
       - { pin: 3, signal: RX, function: "USART3 RX — from the GPS TX" }
       - { pin: 4, signal: TX, function: "USART3 TX — to the GPS RX" }
-      - { pin: 5, signal: 5V, function: "5 V (on with USB alone)" }
+      - { pin: 5, signal: 5V, function: "5 V (also on USB alone: unplug devices or use a 1.5 A USB-C supply)" }
       - { pin: 6, signal: GND, function: "Ground" }
   - name: RC
     type: JST-SH 1.0 mm 4P
     mapping: SERIAL6 (USART6) — ELRS / CRSF or SBUS receiver
     pins:
-      - { pin: 1, signal: 5V, function: "5 V (on with USB alone)" }
+      - { pin: 1, signal: 5V, function: "5 V (also on USB alone: unplug devices or use a 1.5 A USB-C supply)" }
       - { pin: 2, signal: GND, function: "Ground" }
       - { pin: 3, signal: RX, function: "USART6 RX — receiver TX / SBUS" }
       - { pin: 4, signal: TX, function: "USART6 TX — receiver RX" }
@@ -75,7 +76,7 @@ pinTable:
     type: JST-SH 1.0 mm 4P
     mapping: SERIAL1 TX (USART1) — 12 V analog VTX, OSD video out and VTX control
     pins:
-      - { pin: 1, signal: 12V, function: "12 V by default, or VBAT with solder jumper JP2" }
+      - { pin: 1, signal: 12V, function: "12 V by default, or VBAT with solder jumper JP2 (top)" }
       - { pin: 2, signal: GND, function: "Ground" }
       - { pin: 3, signal: VIDEO, function: "Video out (with OSD)" }
       - { pin: 4, signal: TX, function: "USART1 TX — SmartAudio / Tramp" }
@@ -83,7 +84,7 @@ pinTable:
     type: JST-SH 1.0 mm 3P
     mapping: Analog camera in — the OSD overlays it
     pins:
-      - { pin: 1, signal: 5V, function: "5 V by default (battery 5 V regulator), or VBAT with solder jumper JP1" }
+      - { pin: 1, signal: 5V, function: "5 V by default (battery 5 V regulator), or VBAT with solder jumper JP1 (bottom)" }
       - { pin: 2, signal: GND, function: "Ground" }
       - { pin: 3, signal: VIDEO, function: "Camera video in" }
   - name: DJI O3
@@ -110,7 +111,7 @@ pinTable:
     type: JST-GH 1.25 mm 4P
     mapping: CAN1 (FDCAN1) — Pixhawk CAN order, TI TCAN3413
     pins:
-      - { pin: 1, signal: 5V, function: "5 V (on with USB alone)" }
+      - { pin: 1, signal: 5V, function: "5 V (also on USB alone: unplug devices or use a 1.5 A USB-C supply)" }
       - { pin: 2, signal: CAN_H, function: "CAN high" }
       - { pin: 3, signal: CAN_L, function: "CAN low" }
       - { pin: 4, signal: GND, function: "Ground" }

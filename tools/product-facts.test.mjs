@@ -298,7 +298,8 @@ test('AF-H7 nano V2: coming soon after AF-H7 nano, ESC port = AE-8S-60A 4-in-1 V
   assert.equal(v2.order, product('fc', 'AF-H7-nano').order + 1, 'V2 card sits right after AF-H7 nano');
   assert.equal(v2.firmware, undefined, 'no firmware before the board is released');
   const pins = (name) => v2.pinTable.find((c) => c.name === name).pins.map((p) => `${p.pin}:${p.signal}`).join(' ');
-  assert.equal(pins('ESC'), '1:GND 2:GND 3:VBAT 4:VBAT 5:M1 6:M2 7:M3 8:M4 9:CUR 10:TEL');
+  // board option A2 (fc/AF-H7-nano-V2 v2_changes.CONN_V2 = ESC P2): 1·2 VBAT · 3·4 GND — the card had the old option A order until 2026-11-17
+  assert.equal(pins('ESC'), '1:VBAT 2:VBAT 3:GND 4:GND 5:M1 6:M2 7:M3 8:M4 9:CUR 10:TEL');
   assert.equal(pins('GPS'), '1:SDA 2:SCL 3:RX 4:TX 5:5V 6:GND', 'novaX AP-M10 order');
   assert.equal(pins('RC'), '1:5V 2:GND 3:RX 4:TX', 'Betaflight serial');
   assert.equal(pins('DJI O3'), '1:12V 2:GND 3:TX 4:RX 5:GND 6:SBUS', 'Betaflight digital VTX');
