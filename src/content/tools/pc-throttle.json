@@ -10,6 +10,27 @@
   ],
   "releases": [
     {
+      "version": "2.1.1",
+      "date": "2026-11-17",
+      "changes": "Fix: an ESC that was not being driven beeped \"signal lost\" (fault throttle_loss). In the VTOL lift mission the pusher (ESC 4) beeped the whole run. Every ESC on the bus now gets 0 in each throttle command, as ArduPilot does. Parameter writes are unaffected.",
+      "notes": "https://github.com/novaX-ALUX/parts-catalog/releases/tag/pc-throttle-v2.1.1",
+      "files": [
+        {
+          "kind": "Windows installer",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/pc-throttle-v2.1.1/novaX-PC-Throttle_2.1.1_x64-setup.exe",
+          "bytes": 2123315,
+          "sha256": "45f3a36da1adc8f4d9a40d67d233a7246711ad1ddd09fb9b5516291f7445511b"
+        },
+        {
+          "kind": "Windows portable (no install)",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/pc-throttle-v2.1.1/novaX-PC-Throttle_2.1.1_portable.exe",
+          "bytes": 8159744,
+          "sha256": "f7d9838825d499c6323ef1df8cad64d8c98b2614406da2e6c245bca82964a8a6",
+          "notes": "Needs Microsoft Edge WebView2 (built into Windows 11)."
+        }
+      ]
+    },
+    {
       "version": "2.1.0",
       "date": "2026-11-16",
       "changes": "Flight test \"VTOL lift mission\" drives the four lift ESCs (0-3) together; if any one goes silent, faults, draws over 30 A or does not turn within 2 s, all four stop. Other profiles and the slider still drive the chosen ESC.",
