@@ -10,6 +10,27 @@
   ],
   "releases": [
     {
+      "version": "2.7.1",
+      "date": "2026-11-17",
+      "changes": "Built-in firmware is now drone v1.9.2 and controller v1.2.1 (also on the online list). Drone motor pins now match the app's motor picture with the default order 1234 (1 front-right, 2 rear-right, 3 rear-left, 4 front-left): before the first flight after the update, make sure the motor order is 1234. New motor mixer with thrust linearization and defaults from test flights; the factory test mode is off. PID tab: Thrust Linear and Attitude Priority settings, help on every value, ranges around the defaults; TPA removed. ESC firmware and settings go through the drone (drone v1.8.0 or later). The window title shows the version. Update the controller and the drone together. Windows only: on a Mac use the 2.2.11 dmg below, which offers the same firmware online (no bootloader step).",
+      "notes": "https://github.com/novaX-ALUX/parts-catalog/releases/tag/dsoccer-flight-v2.7.1",
+      "files": [
+        {
+          "kind": "Windows installer",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/dsoccer-flight-v2.7.1/D-Soccer-Flight_2.7.1_x64-setup.exe",
+          "bytes": 9375146,
+          "sha256": "90e57c132368cb89b7ebd8d72058df3e46d04dd43c457d2892f75451675f3e80"
+        },
+        {
+          "kind": "Windows portable (no install)",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/dsoccer-flight-v2.7.1/D-Soccer-Flight_2.7.1_portable.exe",
+          "bytes": 17201664,
+          "sha256": "6828f72a06f52e63d13bffb18b62c374edd6e2e3ab80785be23da4780a257d8d",
+          "notes": "Needs Microsoft Edge WebView2 (built into Windows 11)."
+        }
+      ]
+    },
+    {
       "version": "2.5.1",
       "date": "2026-11-16",
       "changes": "Firmware update now also updates the bootloader through the chip's USB update mode (needs controller v1.2.0 or drone v1.7.0, which the same run installs first). On Windows the app offers to install the USB driver for that mode the first time (one administrator prompt). Built-in firmware is now controller v1.2.0 and drone v1.7.0 (also on the online list): 2 kHz drone control with retuned defaults, attitude-mode fix, 1 Mbps fast radio mode, and the controller screen no longer flips, inverts or freezes. Update the controller and the drone together. Windows only: on a Mac use the 2.2.11 dmg below, which offers the same firmware online (no bootloader step).",

@@ -4,6 +4,16 @@
  "firmware": [
   {
    "device": "controller",
+   "name": "DSoccer_Controller_v1.2.1_261117",
+   "file": "DSoccer_Controller_v1.2.1_261117_App.ax",
+   "model": "0x000D2002",
+   "version": "1.2.1",
+   "date": "2026-11-17",
+   "size": 114484,
+   "sha256": "4faf0068a2937b2ed0daaf2a64bb8618d39cbcb7e4b7e37a22ee75c470dcf1a6"
+  },
+  {
+   "device": "controller",
    "name": "DSoccer_Controller_v1.2.0_261116",
    "file": "DSoccer_Controller_v1.2.0_261116_App.ax",
    "model": "0x000D2002",
@@ -61,6 +71,26 @@
    "date": "2024-10-04",
    "size": 96281,
    "sha256": "1f6f51b5e92af2f7caa965c2bf848f0198d2d4795124faa79c449f061f82d838"
+  },
+  {
+   "device": "drone",
+   "name": "DSoccer_Drone_v1.9.2_261117",
+   "file": "DSoccer_Drone_v1.9.2_261117_App.ax",
+   "model": "0x000D1003",
+   "version": "1.9.2",
+   "date": "2026-11-17",
+   "size": 83220,
+   "sha256": "9eddab7f77acc80964c62da03b31873ffde07c177ca51e019dd1f632e09e6d94"
+  },
+  {
+   "device": "drone",
+   "name": "DSoccer_Drone_v1.8.1_261116",
+   "file": "DSoccer_Drone_v1.8.1_261116_App.ax",
+   "model": "0x000D1003",
+   "version": "1.8.1",
+   "date": "2026-11-16",
+   "size": 83032,
+   "sha256": "3d69639477744dbae289ee82a2af0e69f89fe37af06a0f4c841f349cbea0343d"
   },
   {
    "device": "drone",
