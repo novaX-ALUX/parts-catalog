@@ -16,6 +16,7 @@ manuals:
   - { label: "한국어", file: /manuals/esc_AE-4S-50A_manual_ko.pdf }
   - { label: English, file: /manuals/esc_AE-4S-50A_manual_en.pdf }
 specs:
+  - { key: MCU, value: "EFM8BB21F16G (Silicon Labs, 8-bit)" }
   - { key: Size, value: "44.7 × 42.5 mm (board)" }
   - { key: Mounting Hole, value: "30.5 × 30.5 mm / Φ 4 mm" }
   - { key: Weight, value: "14.8 g" }

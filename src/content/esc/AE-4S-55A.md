@@ -9,6 +9,7 @@ manuals:
   - { label: "한국어", file: /manuals/esc_AE-4S-55A_manual_ko.pdf }
   - { label: English, file: /manuals/esc_AE-4S-55A_manual_en.pdf }
 specs:
+  - { key: MCU, value: "EFM8BB21F16G (Silicon Labs, 8-bit)" }
   - { key: Size, value: "45.5 × 52.2 mm" }
   - { key: Mounting Hole, value: "30 × 30 mm / Φ 4 mm" }
   - { key: Weight, value: "14.8 g" }
@@ -20,5 +21,5 @@ specs:
   - { key: Supported Protocols, value: "DShot150 / 300 / 600, MultiShot, OneShot" }
   - { key: Firmware, value: "BLHeli-S, novaX ef 1.0" }
 description: |
-  AE-4S 55A is a compact 4S 32-bit ESC delivering 55 A continuous current in a 45.5 × 52.2 mm footprint. Supports BLHeli-S and novaX ef 1.0 firmware. Designed for Blade8-class platforms requiring lightweight power delivery.
+  AE-4S 55A is a compact 4S ESC with an 8-bit EFM8BB21 MCU, delivering 55 A continuous current in a 45.5 × 52.2 mm footprint. Supports BLHeli-S and novaX ef 1.0 firmware. Designed for Blade8-class platforms requiring lightweight power delivery.
 ---

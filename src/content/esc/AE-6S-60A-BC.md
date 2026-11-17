@@ -10,7 +10,7 @@ manuals:
   - { label: "한국어", file: /manuals/esc_AE-6S-60A-BC_manual_ko.pdf }
   - { label: English, file: /manuals/esc_AE-6S-60A-BC_manual_en.pdf }
 specs:
-  - { key: MCU, value: "AT32F415KBU7 (128 KB Flash)" }
+  - { key: MCU, value: "AT32F415KBU7 (128 KB Flash) — NDAA build: non-Chinese MCU and gate driver, in design" }
   - { key: Mounting Hole, value: "45 × 52 mm / Φ 4 mm" }
   - { key: Weight, value: "18.5 g" }
   - { key: Voltage Range, value: "4 – 6S LiPo (16.8 – 25.2 V)" }

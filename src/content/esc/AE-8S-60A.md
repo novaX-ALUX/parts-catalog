@@ -10,7 +10,7 @@ manuals:
   - { label: English, file: /manuals/esc_AE-8S-60A_manual_en.pdf }
 specs:
   - key: MCU
-    value: AT32F415KBU7 (128 KB Flash)
+    value: AT32F415KBU7 (128 KB Flash) — NDAA build (V2) uses ST STM32F051K8U6 with TI DRV8300 gate drivers and its own AM32 F051 firmware
   - key: Mounting Hole
     value: 56 × 57 mm / Φ 4 mm
   - key: Weight
@@ -24,7 +24,7 @@ specs:
   - key: BDShot
     value: Supported
   - key: Current Sensor
-    value: Supported
+    value: Inside the ESC only — the 8-pin FC connector has no current pin, so the flight controller cannot read it (current output to the FC comes with V2)
   - key: BEC Output
     value: None
   - key: Capacitor
