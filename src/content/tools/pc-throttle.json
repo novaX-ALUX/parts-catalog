@@ -10,6 +10,27 @@
   ],
   "releases": [
     {
+      "version": "2.2.0",
+      "date": "2026-11-17",
+      "changes": "New \"Auto-cal every ESC\" button next to \"Update every ESC\": auto-cals the ESCs one at a time in esc_index order, with the same bench check before each (about 22 s each, the motor turns). ESCs that report the name \"AE_16S_60A\" (motor-chip app V1.46-V1.50) are recognised as AE-14S. Includes the 2.1.1 pusher-beep fix.",
+      "notes": "https://github.com/novaX-ALUX/parts-catalog/releases/tag/pc-throttle-v2.2.0",
+      "files": [
+        {
+          "kind": "Windows installer",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/pc-throttle-v2.2.0/novaX-PC-Throttle_2.2.0_x64-setup.exe",
+          "bytes": 2134258,
+          "sha256": "6f16e9dc957fc179fbed497c21b6cafbe6e11a2e12ec88c34b4a03a8544841f4"
+        },
+        {
+          "kind": "Windows portable (no install)",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/pc-throttle-v2.2.0/novaX-PC-Throttle_2.2.0_portable.exe",
+          "bytes": 8202240,
+          "sha256": "4df1f834930e68b95dda58663dcf69dcc260c4ed1d397baa42b707bf9573e101",
+          "notes": "Needs Microsoft Edge WebView2 (built into Windows 11)."
+        }
+      ]
+    },
+    {
       "version": "2.1.1",
       "date": "2026-11-17",
       "changes": "Fix: an ESC that was not being driven beeped \"signal lost\" (fault throttle_loss). In the VTOL lift mission the pusher (ESC 4) beeped the whole run. Every ESC on the bus now gets 0 in each throttle command, as ArduPilot does. Parameter writes are unaffected.",
