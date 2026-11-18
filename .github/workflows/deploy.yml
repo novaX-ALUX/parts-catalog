@@ -24,7 +24,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - run: npm audit --audit-level=high
+      - run: node tools/audit-check.mjs   # npm audit 높음·심각 — tools/audit-allow.json 에 이유·기한을 적은 경보만 뺌
       - run: npm test
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3

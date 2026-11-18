@@ -1,0 +1,9 @@
+[
+  {
+    "id": "GHSA-fc5q-39xc-vjpf",
+    "package": "picomatch (via astro, vite, tinyglobby, fdir, anymatch, unstorage)",
+    "reason": "ReDoS in glob matching used only by the build tools; the deployed site is static files and does not contain picomatch. No fixed picomatch release exists yet (all versions <= 4.0.7 affected) and astro 7.4.12 still depends on it.",
+    "added": "2026-11-18",
+    "until": "2026-12-31"
+  }
+]
