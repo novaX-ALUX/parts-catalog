@@ -335,7 +335,7 @@ function __wbg_get_imports() {
             const ret = arg0.call(arg1, arg2);
             return ret;
         }, arguments); },
-        __wbg_close_51040eafa99eae1d: function(arg0) {
+        __wbg_close_a82f22fecc511bd3: function(arg0) {
             arg0.close();
         },
         __wbg_length_186163212ffe79c3: function(arg0) {
@@ -364,7 +364,7 @@ function __wbg_get_imports() {
                 state0.a = 0;
             }
         },
-        __wbg_now_855a0bbc62ef9562: function(arg0) {
+        __wbg_now_b21714eb50ca24b4: function(arg0) {
             const ret = arg0.now();
             return ret;
         },
@@ -386,11 +386,11 @@ function __wbg_get_imports() {
         __wbg_queueMicrotask_4a1a4d8dd332373b: function(arg0) {
             queueMicrotask(arg0);
         },
-        __wbg_read_94dcdd03db0a4187: function(arg0, arg1, arg2) {
+        __wbg_read_4a47e8086fc2e22a: function(arg0, arg1, arg2) {
             const ret = arg0.read(arg1 >>> 0, arg2);
             return ret;
         },
-        __wbg_reopen_d491c321c0ca8884: function(arg0) {
+        __wbg_reopen_1f7b6e7551a83fa6: function(arg0) {
             const ret = arg0.reopen();
             return ret;
         },
@@ -398,7 +398,7 @@ function __wbg_get_imports() {
             const ret = Promise.resolve(arg0);
             return ret;
         },
-        __wbg_sleep_c888a2c041a47db7: function(arg0, arg1) {
+        __wbg_sleep_c184b6ccd1ff2aa7: function(arg0, arg1) {
             const ret = arg0.sleep(arg1);
             return ret;
         },
@@ -430,7 +430,7 @@ function __wbg_get_imports() {
             const ret = arg0.then(arg1);
             return ret;
         },
-        __wbg_write_7a9f5fd571322231: function(arg0, arg1, arg2) {
+        __wbg_write_0fd32958cf15ab5a: function(arg0, arg1, arg2) {
             var v0 = getArrayU8FromWasm0(arg1, arg2).slice();
             wasm.__wbindgen_free(arg1, arg2 * 1, 1);
             const ret = arg0.write(v0);

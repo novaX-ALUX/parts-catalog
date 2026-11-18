@@ -118,14 +118,14 @@ export function initMotor(root) {
     isOpen = true;
     warn.rot = warn.out = false; render(); // MotorWarning.OnEnable
     requestOrder(); // Motor_Controller.OnEnable (원본은 탭 토글에서도 한 번 더 보냈다)
-    setMotorMask(true);
+    setMotorMask(true, "motor");
   }
   function close() {
     isOpen = false;
     if (store.connected) { ctl.stop(); setTimeout(() => store.connected && ctl.stop(), 20); } // 안전 정지(원본에 없음)
     rot.disable(); out.disable(); // Motor_Direction · MotorOutput.OnDisable
     warn.rot = warn.out = false; render(); // MotorWarning.OnDisable
-    setMotorMask(false);
+    setMotorMask(false, "motor");
   }
   on("page", (name) => { if (name === "motor") open(); else if (isOpen) close(); });
   on("link", ({ prev, now }) => {

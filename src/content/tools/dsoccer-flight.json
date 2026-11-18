@@ -10,6 +10,27 @@
   ],
   "releases": [
     {
+      "version": "2.12.0",
+      "date": "2026-11-18",
+      "changes": "Controller tab, stick curves: one row per curve with a graph in the same shape as the controller's CALIB screen and S1-S6 on the right; the graph shows the deadzone and the end, and the points move inward by the deadzone. CRASH HOLD is a 0-100 strength with an (i) help (0 off, 1-50 keep the attitude, 51-100 also self-righting; old 1 = 50 and 2 = 100 behave as before; other values need drone v1.11.0). Motor tab shows the same notice as the ESC tab whenever no drone is connected by USB. Built-in firmware is now drone v1.11.0 and controller v1.5.0 (also on the online list). Update both. Windows only: on a Mac use the 2.2.11 dmg below, which offers the same firmware online (no bootloader step).",
+      "notes": "https://github.com/novaX-ALUX/parts-catalog/releases/tag/dsoccer-flight-v2.12.0",
+      "files": [
+        {
+          "kind": "Windows installer",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/dsoccer-flight-v2.12.0/D-Soccer-Flight_2.12.0_x64-setup.exe",
+          "bytes": 9404393,
+          "sha256": "afb4c7be48506bf043d25fa05294b165c18305fc89d7f2268b99d28fcd6f5ec6"
+        },
+        {
+          "kind": "Windows portable (no install)",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/dsoccer-flight-v2.12.0/D-Soccer-Flight_2.12.0_portable.exe",
+          "bytes": 17258496,
+          "sha256": "d18487b1376d457014e60d3143b02d6ca99b1c0400f3fa463e2350ba05567738",
+          "notes": "Needs Microsoft Edge WebView2 (built into Windows 11)."
+        }
+      ]
+    },
+    {
       "version": "2.9.0",
       "date": "2026-11-18",
       "changes": "Controller tab: stick deadzone in % for roll/pitch, yaw and throttle, with a graph per axis showing what goes to the drone after the deadzone, SPEED and the stick curves (the same DZ lines are on the controller's SETUP > FUNCTION menu). Drone settings with only the controller connected: PID values, PID reset to defaults and crash hold can be changed with only the controller on USB; the controller keeps them and sends them when it links with a drone on standby, then reads the drone back (the PID tab and CRASH HOLD show kept, sending or not taken). Built-in firmware is now controller v1.3.0 (also on the online list); the drone stays at v1.10.1. Update the controller. Controller v1.3.0: JOY RESET no longer wipes the stick curves, SET DEFAULT also clears kept drone settings, a failed settings save is retried instead of lost. Windows only: on a Mac use the 2.2.11 dmg below, which offers the same firmware online (no bootloader step).",

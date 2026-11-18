@@ -40,7 +40,9 @@ export function mockApi() {
   const CK = ["option", "controlSpeed", "position", "team", ...["rnp", "yaw", "thr"].flatMap((k) => [1, 2, 3, 4, 5, 6].map((n) => k + n))];
   let ctrlCfg = [0x1e, 3, 5, 1, 12, 25, 37, 50, 75, 100, 12, 25, 37, 50, 75, 100, 20, 38, 55, 68, 92, 100];
   const ctrlMsg = () => ({ type: "ConfigurationController", ...Object.fromEntries(CK.map((k, i) => [k, ctrlCfg[i]])) });
-  window.__mockHold ??= 0;
+  window.__mockHold ??= 0;   // 드론 충돌 자세 유지 세기 0 ~ 100(드론 1.11.0)
+const holdOf = (p) => (p[1] & 0x80 ? p[1] & 0x7f : [0, 50, 100][p[0]] ?? 255);   // 꾸러미 → 세기(옛 앱은 단계만)
+const holdMsg = (s) => ({ type: "Configuration", modeCrashHold: s === 0 ? 0 : s <= 50 ? 1 : 2, reserved: 0x80 | s });
   const msg = (m, ms = 30) => setTimeout(() => connected && emit({ kind: "message", msg: m }), ms);
   const escCfg = (i) => (window.__mockEsc ?? "novax") === "blheli"
     ? { type: "EscConfigBLHeliS", motorIndex: i, Eep_FW_Main_Revision: 16, Eep_FW_Sub_Revision: 7, Eep_Layout_Revision: 7, Eep_Pgm_Startup_Pwr: 9,
@@ -68,12 +70,12 @@ export function mockApi() {
     if (ctl13 && dt === DT.Request && p[0] === DT.DroneSettingState) { msg({ type: "DroneSettingState", link: window.__mockLink, pid: pidStep, crashHold: holdStep }); return; }
     if (ctl13 && window.__mockLink !== 1 && dt === DT.PidConfigure) { pidBox = p.slice(0, 20); pidStep = 1; return; }
     if (ctl13 && window.__mockLink !== 1 && dt === DT.Request && p[0] === DT.PidConfigure) { msg(pidMsg(pidBox ?? DRONE_PID)); return; }
-    if (ctl13 && window.__mockLink !== 1 && dt === DT.Configuration && p.length === 2) { window.__mockHold = p[0]; holdStep = 1; return; }
+    if (ctl13 && window.__mockLink !== 1 && dt === DT.Configuration && p.length === 2) { const s = holdOf(p); if (s <= 100) { window.__mockHold = s; holdStep = 1; } return; }
     if (ctl13 && window.__mockLink === 1 && (pidStep || holdStep)) { pidStep = 0; holdStep = 0; }
     if (dt === DT.Request && p[0] === DT.PidConfigure) { msg(pidMsg(pidBox ?? DRONE_PID)); return; }
-    if (dt === DT.Request && p[0] === DT.Configuration) { if (to === 0x20) msg(ctrlMsg()); else if (window.__mockHold !== null) msg({ type: "Configuration", modeCrashHold: window.__mockHold, reserved: 0 }); return; }
+    if (dt === DT.Request && p[0] === DT.Configuration) { if (to === 0x20) msg(ctrlMsg()); else if (window.__mockHold !== null) msg(holdMsg(window.__mockHold)); return; }
     if (dt === DT.Configuration && to === 0x20 && p.length === 22) { ctrlCfg = p.slice(); msg(ctrlMsg()); return; }
-    if (dt === DT.Configuration && p.length === 2) { if (window.__mockHold !== null && p[0] < 3) window.__mockHold = p[0]; return; }
+    if (dt === DT.Configuration && p.length === 2) { const s = holdOf(p); if (window.__mockHold !== null && s <= 100) window.__mockHold = s; return; }
     if (dt === DT.Request && p[0] === DT.MotorOrder) {
       msg({ type: "MotorOrder", motorOrder });
       msg({ type: "MotorKV", motor1KV: 1800, motor2KV: 1810, motor3KV: 1820, motor4KV: 1830 });

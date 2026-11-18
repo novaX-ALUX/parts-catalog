@@ -12,9 +12,16 @@
 .ct-note { position: absolute; left: 34px; top: 618px; width: 452px; height: 60px; display: flex; align-items: center; font-size: 16px; color: var(--text-dim); }
 
 .ct-c { position: absolute; left: 24px; width: 130px; height: 30px; display: flex; align-items: center; font-size: 18px; white-space: nowrap; }
-.ct-s { position: absolute; width: 26px; height: 30px; display: flex; align-items: center; justify-content: flex-end; font-size: 14px; color: var(--text-dim); }
-.ct-row { width: 270px; }
-.ct-row > .sbtn.plus { left: 246px; }
+.ct-s { position: absolute; width: 26px; height: 22px; display: flex; align-items: center; justify-content: flex-end; font-size: 14px; color: var(--text-dim); }
+.ct-c2 { left: 24px; }   /* 조종 곡선: 곡선마다 한 줄 — 이름 · 그래프(조종기 CALIB 칸과 같은 가로:세로 64:37) · 오른쪽 S1~S6 값(세로) */
+.ct-cal { position: absolute; left: 160px; width: 260px; height: 150px; cursor: pointer; background: rgba(0, 0, 0, .18); border-radius: 6px; }
+.ct-row2 { width: 120px; height: 22px; }
+.ct-row2 > .srange { display: none; }   /* 조종기처럼 값 + ▲▼(- +) 만 */
+.ct-row2 > .sbtn.plus { left: 96px; }
+.ct-row2 > .sval.pill { height: 22px; border-radius: 7px; font-size: 12px; }   /* 6줄이 그래프 높이(150)에 들어가게 */
+.ct-row2 > .sbtn { top: 1px; }
+.ct-s.on { color: #fff; font-weight: 500; }   /* 고른 점 */
+.ct-legend { position: absolute; left: 640px; right: 24px; top: 80px; font-size: 14px; line-height: 1.6; color: var(--text-dim); white-space: pre-line; }
 #ct-apply { left: 940px; top: 498px; width: 140px; height: 40px; font-size: 16px; border-width: 1px; border-radius: 5.9px; }
 
 #ct-reset .btn-line { left: 40px; width: 280px; height: 50px; font-size: 18px; border-width: 1px; border-radius: 5.9px; }
@@ -25,6 +32,9 @@
 .ct-dzrow { width: 216px; }
 .ct-dzrow > .sbtn.plus { left: 196px; }
 .ct-dzrow.ct-off { opacity: .3; pointer-events: none; }
+.ct-holdrow { width: 280px; }   /* CRASH HOLD 세기 0 ~ 100(드론 1.11.0) */
+.ct-holdrow > .sbtn.plus { left: 256px; }
+.ct-holdrow.ct-off { opacity: .3; pointer-events: none; }
 .ct-dzold { position: absolute; left: 24px; right: 24px; top: 232px; font-size: 14px; text-align: center; color: var(--text-dim); }
 .ct-help { font-size: 16px; color: var(--text-dim); cursor: help; }
 .ct-pend { top: 668px; color: var(--accent); }

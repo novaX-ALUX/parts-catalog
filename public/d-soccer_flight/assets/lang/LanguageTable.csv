@@ -322,3 +322,28 @@ DZ THR：底部此范围 = 0，顶部此范围 = 最大。
 220,드론과 연결 안 됨 — 마지막으로 받은 값,Drone not connected — last values received,ドローン未接続 — 最後に受け取った値,未连接无人机 — 最后收到的值
 221,웹판에서는 아직 안 되는 기능입니다 — PC판을 써 주세요,Not available in the web version yet — please use the PC version,ウェブ版ではまだ使えません — PC版をお使いください,网页版暂不支持此功能 — 请使用电脑版
 222,이 브라우저는 USB 연결을 못 합니다 — 크롬·엣지·이고 브라우저에서 열어 주세요,This browser cannot use USB — please open it in Chrome / Edge / ego,このブラウザはUSB接続できません — Chrome・Edge・egoで開いてください,此浏览器无法连接USB — 请用Chrome、Edge或ego打开
+223,"그래프 = 조종기 SETUP 의 CALIB 화면과 같음 · 가로 = 막대(가운데 → 끝 · 스로틀은 바닥 → 꼭대기) · 세로 = 드론에 가는 값
+회색 = 데드존(FUNCTION 의 DZ) · 주황 = 끝(최대) · 그래프의 점이나 값 칸을 눌러 고르고 - + 로 바꿈 · SPEED 는 아래 그래프에","Same graph as the controller's SETUP CALIB screen · across = stick (center → end, throttle bottom → top) · up = value sent to the drone
+Gray = deadzone (DZ in FUNCTION) · orange = end (max) · pick a point on the graph or its box and change it with - + · SPEED is in the graphs below","コントローラー SETUP の CALIB 画面と同じグラフ · 横 = スティック(中央 → 端 · スロットルは下 → 上) · 縦 = ドローンへ送る値
+灰色 = デッドゾーン(FUNCTION の DZ) · オレンジ = 端(最大) · グラフの点か値の欄を押して選び - + で変更 · SPEED は下のグラフ","与遥控器 SETUP 的 CALIB 画面相同的图 · 横 = 摇杆(中间 → 末端 · 油门为下 → 上) · 纵 = 发送给无人机的值
+灰色 = 死区(FUNCTION 的 DZ) · 橙色 = 末端(最大) · 点击图上的点或数值栏选择，用 - + 修改 · SPEED 见下方图"
+224,"충돌 자세 유지 세기(0 ~ 100)
+0 = 끔 · 지금까지와 같은 비행
+1 ~ 50 = 자세를 놓치지 않게: 부딪혀 크게 돌아도 위아래를 잃지 않음(전의 1 = 50)
+51 ~ 100 = 그것 + 부딪혀 돌면 스스로 바로 세움 · 클수록 세게 되잡음(전의 2 = 100)
+0 · 50 · 100 이 아닌 값은 드론 펌웨어 1.11.0 이상이 받습니다","Crash hold strength (0 - 100)
+0 = off · same flight as before
+1 - 50 = keep the attitude: the drone does not lose up and down after a hard hit (old 1 = 50)
+51 - 100 = that plus self-righting after a hit, stronger the higher (old 2 = 100)
+Values other than 0, 50 and 100 need drone firmware 1.11.0 or later","衝突姿勢保持の強さ(0 ~ 100)
+0 = オフ · 従来と同じ飛行
+1 ~ 50 = 姿勢を見失わない: 強くぶつかって回っても上下を失わない(旧 1 = 50)
+51 ~ 100 = それ + ぶつかって回ると自分で立て直す · 大きいほど強く(旧 2 = 100)
+0 · 50 · 100 以外はドローンファームウェア 1.11.0 以上が受け付けます","碰撞姿态保持强度(0 ~ 100)
+0 = 关 · 与以前相同的飞行
+1 ~ 50 = 不丢失姿态: 被猛烈撞击旋转后也不丢失上下(旧 1 = 50)
+51 ~ 100 = 再加上撞击旋转后自动回正 · 数值越大回正越强(旧 2 = 100)
+0 · 50 · 100 以外的值需要无人机固件 1.11.0 或以上"
+225,{v} : 자세를 놓치지 않게(1 ~ 50),{v} : Keep the attitude (1 - 50),{v} : 姿勢を見失わない(1 ~ 50),{v} : 不丢失姿态(1 ~ 50)
+226,{v} : 부딪혀 돌면 스스로 바로 세움(51 ~ 100),{v} : Self-righting after a hit (51 - 100),{v} : ぶつかって回ると自分で立て直す(51 ~ 100),{v} : 撞击旋转后自动回正(51 ~ 100)
+227,0 : 끔 (지금까지와 같은 비행),0 : Off (same flight as before),0 : オフ(従来と同じ飛行),0 : 关(与以前相同的飞行)

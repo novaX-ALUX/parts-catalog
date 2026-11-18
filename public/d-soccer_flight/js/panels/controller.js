@@ -4,14 +4,18 @@
 //         DataType.Deadzone — 조종기 3바이트(조종기 1.3.0 부터) · 옛 조종기는 답하지 않음 → 데드존 칸을 막고 그래프는 기본값
 // 드론 설정(충돌 자세)은 조종기만 꽂혀 있어도 바꿀 수 있음 — 조종기 1.3.0 이 맡아 두었다가 드론과 연결되면 보냄(drone_setting.js)
 import { store, on } from "../store.js";
-import { t, applyStatic } from "../i18n.js";
+import { t, applyStatic, onLang } from "../i18n.js";
 import { send, P } from "../proto.js";
 import { notify } from "../shell.js";
 import { sliderRow, buttonTransition } from "../widgets.js";
-import { drawCurve } from "./stick_curve.js";
+import { drawCurve, drawCalib, calibPick } from "./stick_curve.js";
 import { startDroneSetting, stepText, Step } from "../drone_setting.js";
 
-const OPT = P.raw.ConfigurationOption, HOLD = P.raw.CrashHold;
+const OPT = P.raw.ConfigurationOption;
+// 충돌 자세 유지 세기 0 ~ 100(드론 1.11.0 · 조종기 1.5.0) — 꾸러미: 첫 바이트 = 가장 가까운 옛 단계(옛 드론은 이것만) · 둘째 = 0x80 | 세기
+const HOLD_FLAG = 0x80;
+const holdMode = (s) => (s === 0 ? 0 : s <= 50 ? 1 : 2);
+const holdOf = (m) => (m.reserved & HOLD_FLAG ? m.reserved & 0x7f : [0, 50, 100][m.modeCrashHold] ?? null);   // 옛 드론은 단계만 → 0 · 50 · 100
 // [조종기 화면 이름, 값 글자들, 꾸러미에서 읽기, 꾸러미에 쓰기]
 const bit = (mask, onFirst) => [(c) => (((c.option & mask) !== 0) === onFirst ? 0 : 1), (c, i) => { c.option = (i === 0) === onFirst ? c.option | mask : c.option & ~mask; }];
 const FUNC = [
@@ -32,18 +36,22 @@ const DZ = [
   { name: "DZ THR", key: "throttle", curve: "thr", max: 20, def: 7, color: "#54dc91" },
 ];
 
+// 조종 곡선 칸: 곡선마다 한 줄(조종기 CALIB 화면처럼 왼쪽 그래프 + 오른쪽 S1~S6 값 · 그래프 가로:세로 = 조종기 칸 64:37) — 줄 위쪽 끝(px)
+const ROW = (r) => 70 + r * 162;
+
 const seg = (id, items) => `<div class="seg" id="${id}">${items.map((s, i) => `<button data-i="${i}">${s}</button>`).join("")}</div>`;
 
 export function initController(root) {
   root.innerHTML = `
     <div id="ct-func" class="box"><h3>FUNCTION</h3><div class="rule"></div>
       ${FUNC.map(([name, vals], i) => `<div class="ct-k ct-ctl" style="top:${86 + i * 68}px">${name}</div><div class="ct-ctl" style="position:absolute;left:230px;top:${86 + i * 68}px">${seg("ct-f" + i, vals)}</div>`).join("")}
-      <div class="ct-k" style="top:${86 + 7 * 68}px">CRASH HOLD</div><div style="position:absolute;left:230px;top:${86 + 7 * 68}px">${seg("ct-hold", ["X", "1", "2"])}</div>
+      <div class="ct-k" style="top:${86 + 7 * 68}px">CRASH HOLD&nbsp;<span class="ct-help" id="ct-hold-help">ⓘ</span></div><div id="ct-hold" style="position:absolute;left:230px;top:${86 + 7 * 68 + 5}px"></div>
       <div class="ct-note" id="ct-hold-note"></div>
       <div class="ct-note ct-pend" id="ct-hold-pend"></div>
     </div>
     <div id="ct-curve" class="box"><h3 data-i18n="191">조종 곡선</h3><div class="rule"></div>
-      ${CURVES.map(([name], r) => `<div class="ct-c" style="top:${92 + r * 150}px">${name}</div>`).join("")}
+      ${CURVES.map(([name], r) => `<div class="ct-c ct-c2" style="top:${ROW(r)}px">${name}</div><canvas class="ct-cal" id="ct-cal${r}" width="520" height="300" style="top:${ROW(r)}px"></canvas>`).join("")}
+      <div class="ct-legend" data-i18n="223"></div>
       <button class="btn-line" id="ct-apply" data-i18n="192"></button>
     </div>
     <div id="ct-reset" class="box"><h3>RESET</h3><div class="rule"></div>
@@ -59,24 +67,23 @@ export function initController(root) {
   const toCtl = P.DeviceType.Controller, toDrone = P.DeviceType.Drone;
   startDroneSetting();
 
-  // ── 조종 곡선 슬라이더(곡선마다 STEP1~6 · 0~100) ──
-  const rows = {};
-  CURVES.forEach(([, k], r) => [1, 2, 3, 4, 5, 6].forEach((n) => {
-    const el = sliderRow({ min: 0, max: 100, step: 1, decimals: 0, w: 138 });
-    el.classList.add("ct-row");
-    el.style.left = 196 + ((n - 1) % 3) * 306 + "px";
-    el.style.top = 92 + r * 150 + (n <= 3 ? 0 : 52) + "px";
+  // ── 조종 곡선: 곡선마다 그래프(왼쪽) + S1~S6 값(오른쪽 세로 · - + 는 조종기 ▲▼ 와 같은 한 칸) — 조종기 CALIB 화면 배치 ──
+  const rows = {}, labs = {};
+  const sel = [0, 0, 0];   // 곡선마다 고른 점(조종기 화면 첫 자리 = S1)
+  CURVES.forEach(([, k], c) => [1, 2, 3, 4, 5, 6].forEach((n) => {
+    const top = ROW(c) + (n - 1) * 25;   // 조종기 화면처럼 S1~S6 을 세로로(그래프 높이 150 에 6줄)
+    const el = sliderRow({ min: 0, max: 100, step: 1, decimals: 0 });
+    el.classList.add("ct-row2");
+    el.style.left = "472px"; el.style.top = top + "px";
     $("#ct-curve").appendChild(el);
     rows[k + n] = el;
     el.addEventListener("change", () => drawAll());
-  }));
-  // 줄마다 값 칸 왼쪽에 S1~S6(조종기 곡선 화면의 점 이름)
-  CURVES.forEach(([, k], r) => [1, 2, 3, 4, 5, 6].forEach((n) => {
+    el.addEventListener("pointerdown", () => { sel[c] = n - 1; drawAll(); });   // 값 칸을 만지면 그 점을 고름
     const lab = document.createElement("div");
     lab.className = "ct-s"; lab.textContent = "S" + n;
-    lab.style.left = 160 + ((n - 1) % 3) * 306 + "px";
-    lab.style.top = 92 + r * 150 + (n <= 3 ? 0 : 52) + "px";
+    lab.style.left = "436px"; lab.style.top = top + "px";
     $("#ct-curve").appendChild(lab);
+    labs[k + n] = lab;
   }));
 
   // ── 데드존 슬라이더(그래프 밑) ──
@@ -97,10 +104,21 @@ export function initController(root) {
   const bytes = (c) => KEYS.map((k) => c[k] & 0xff);
   const mark = (id, i) => root.querySelectorAll(`#${id} button`).forEach((b, k) => b.classList.toggle("sel", k === i));
   const curveNow = (k) => [1, 2, 3, 4, 5, 6].map((n) => parseInt(rows[k + n].get()) || 0);
+  const dzNow = (i) => (dz ? +dzRows[i].get() || 0 : DZ[i].def);
   function drawAll() {
     const speed = cfg ? cfg.controlSpeed : 3;
-    DZ.forEach((d, i) => drawCurve($("#ct-g" + i), { kind: d.curve, dz: dz ? +dzRows[i].get() || 0 : d.def, speed, curve: curveNow(d.curve), color: d.color }));
+    DZ.forEach((d, i) => {
+      drawCurve($("#ct-g" + i), { kind: d.curve, dz: dzNow(i), speed, curve: curveNow(d.curve), color: d.color });
+      drawCalib($("#ct-cal" + i), { kind: d.curve, dz: dzNow(i), curve: curveNow(d.curve), sel: sel[i], color: d.color });
+      [1, 2, 3, 4, 5, 6].forEach((n) => labs[d.curve + n].classList.toggle("on", n - 1 === sel[i]));
+    });
   }
+  // 그래프에서 점을 눌러 고름(조종기 ◀▶ 와 같은 일)
+  DZ.forEach((d, i) => ($("#ct-cal" + i).onclick = (e) => {
+    const cv = e.currentTarget, r = cv.getBoundingClientRect();
+    sel[i] = calibPick(cv, e.clientX - r.left, d.curve, dzNow(i));
+    drawAll();
+  }));
   const render = () => {
     FUNC.forEach(([, , get], i) => mark("ct-f" + i, cfg ? get(cfg) : -1));
     if (cfg) CURVES.forEach(([, k]) => [1, 2, 3, 4, 5, 6].forEach((n) => rows[k + n].set(cfg[k + n])));
@@ -143,25 +161,38 @@ export function initController(root) {
   $("#ct-def").onclick = () => cmd(P.CommandType.SetDefault, 107);
   [$("#ct-apply"), $("#ct-imu"), $("#ct-joy"), $("#ct-def")].forEach(buttonTransition);
 
-  // ── 충돌 자세 유지(드론 값 — 조종기를 거쳐도, 드론에 바로 꽂아도 같은 꾸러미) ──
-  // 조종기 1.3.0 은 드론과 연결이 안 돼 있어도 받아 맡아 둠 → 드론 값을 몰라도 고를 수 있음
-  let hold = null;
+  // ── 충돌 자세 유지 세기 0 ~ 100(드론 값 — 조종기를 거쳐도, 드론에 바로 꽂아도 같은 꾸러미) ──
+  // 조종기 1.3.0 부터 드론과 연결이 안 돼 있어도 받아 맡아 둠 → 드론 값을 몰라도 고를 수 있음
+  // 옛 드론(1.10.x)은 첫 바이트(단계)만 받음 → 0 · 50 · 100 이 아닌 값은 가장 가까운 단계로 들어가고 그 값(50 등)으로 돌아옴
+  let hold = null, holdTimer = null, holdSetting = false;   // holdSetting: 받은 값을 칸에 넣는 중(그때의 change 는 보내지 않음)
+  const holdRow = sliderRow({ min: 0, max: 100, step: 1, decimals: 0, w: 150 });
+  holdRow.classList.add("ct-holdrow");
+  $("#ct-hold").appendChild(holdRow);
   const renderHold = () => {
-    mark("ct-hold", hold ?? -1);
-    $("#ct-hold-note").dataset.i18n = hold === null ? "194" : ["195", "196", "197"][hold] ?? "194";
+    const usable = hold !== null || !!(store.isController && store.droneSetting);   // 드론 값을 알거나 조종기가 맡아 둘 수 있음
+    holdRow.classList.toggle("ct-off", !usable);
+    if (hold !== null) { holdSetting = true; holdRow.set(hold); holdSetting = false; }
+    const note = $("#ct-hold-note");
+    note.textContent = hold === null ? t(194) : hold === 0 ? t(227) : t(hold <= 50 ? 225 : 226).replace("{v}", hold);
     const s = store.isController ? store.droneSetting : null;
     const n = s ? stepText(s.crashHold, s.link) : null;
-    const pend = $("#ct-hold-pend");
-    pend.textContent = n !== null && s.crashHold !== Step.Done ? t(n) : "";
-    applyStatic($("#ct-func"));
+    $("#ct-hold-pend").textContent = n !== null && s.crashHold !== Step.Done ? t(n) : "";
+    $("#ct-hold-help").title = t(224);
   };
-  root.querySelectorAll("#ct-hold button").forEach((b) => (b.onclick = () => {
-    if (hold === null && !store.droneSetting) return; // 드론 값을 모르고 맡길 수도 없음(옛 드론 · 옛 조종기 · 연결 전)
-    send(P.DataType.Configuration, [+b.dataset.i, 0], toDrone);
-    setTimeout(() => send(P.DataType.Request, [P.DataType.Configuration], toDrone), 200);
-  }));
-  on("Configuration", (m) => { hold = m.modeCrashHold < HOLD.EndOfType ? m.modeCrashHold : null; renderHold(); });
+  holdRow.addEventListener("change", () => {
+    if (holdSetting) return;
+    // 끌어 움직이는 동안은 보내지 않고 멈춘 뒤 0.3초에 한 번(조종기 · 드론 저장을 여러 번 하지 않게)
+    const v = Math.min(100, Math.max(0, parseInt(holdRow.get()) || 0));
+    if (hold === null && !(store.isController && store.droneSetting)) return; // 드론 값을 모르고 맡길 수도 없음(옛 드론 · 옛 조종기 · 연결 전)
+    clearTimeout(holdTimer);
+    holdTimer = setTimeout(() => {
+      send(P.DataType.Configuration, [holdMode(v), HOLD_FLAG | v], toDrone);
+      setTimeout(() => send(P.DataType.Request, [P.DataType.Configuration], toDrone), 200);
+    }, 300);
+  });
+  on("Configuration", (m) => { hold = holdOf(m); renderHold(); });
   on("droneSetting", renderHold);
+  onLang(renderHold);
 
   // ── 연결·탭 ──
   function ask() {

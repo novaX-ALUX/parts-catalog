@@ -127,7 +127,7 @@ export function initEsc(root) {
   $("#esc-yes").onclick = () => (api.web ? notify(221, 2500) : readEscConfigsAll(true)); // 웹판: ESC 바이패스는 아직 PC판만
   $("#esc-no").onclick = () => { // 상태 탭으로 · 막 끄기 · 연결 알림 끄기
     showPage("status");
-    setMotorMask(false);
+    setMotorMask(false, "esc");
     document.getElementById("devicePopup")?.classList.add("hidden");
   };
 
@@ -153,14 +153,14 @@ export function initEsc(root) {
     if (store.connected && store.isDrone) showNote(); else $("#esc-note").classList.add("hidden");
     cfg.hideCommon();
     upd.enable();
-    setMotorMask(true);
+    setMotorMask(true, "esc");
   }
   function close() {
     isOpen = false;
     co.stopAll(); upd.disable();
     root.querySelectorAll(".esc-pop").forEach((p) => p.classList.add("hidden"));
     $("#esc-note").classList.add("hidden");
-    setMotorMask(false);
+    setMotorMask(false, "esc");
     escModeEscape();
   }
   on("page", (name) => { if (name === "esc") open(); else if (isOpen) close(); });
