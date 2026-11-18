@@ -2,7 +2,7 @@
   "name": "D-Soccer Flight Web",
   "order": 5,
   "usedFor": "D-Soccer drones and controllers",
-  "summary": "The D-Soccer Flight app in the browser, nothing to install. Use Chrome, Edge or ego on a PC and connect the drone or controller by USB. Firmware, ESC and bootloader updates are still in D-Soccer Flight PC.",
+  "summary": "The D-Soccer Flight app in the browser, nothing to install. Use Chrome, Edge or ego on a PC and connect the drone or controller by USB. Drone and controller firmware updates work here too; bootloader and ESC updates are still in D-Soccer Flight PC.",
   "icon": "/images/tools/dsoccer-flight-icon.png",
   "launch": "/d-soccer_flight/"
 }

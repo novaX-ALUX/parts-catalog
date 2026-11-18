@@ -1,8 +1,10 @@
 // 브라우저판(웹) 속 — 데스크톱 일꾼(crates/link worker.rs)이 하던 포트 일을 Web Serial 로 한다.
 // 언제 무엇을 보내고 끊을지는 데스크톱과 같은 상태 기계(crates/web → pkg/dsf_web.wasm)가 정한다.
 // 할 일 목록(open · write · close · sleep · event)을 받은 순서대로 하고, open 결과를 알려 준 뒤 생긴 일은 남은 일 뒤에 잇는다(worker.rs flush 와 같음).
-// 펌웨어·부트로더·ESC 굽기는 아직 PC판에서만 — 부르면 WEB_ONLY 예외(화면은 api.web 을 보고 미리 안내).
-import init, { WebLink, appVersion } from "../pkg/dsf_web.js";
+// 앱 펌웨어 굽기: 순서·확인은 데스크톱과 같은 dsf_fw(wasm fwProbe · fwUpdate), 포트만 여기 fwIo 가 쥔다.
+// 부트로더·ESC 굽기는 아직 PC판에서만 — bl* 은 없음(화면이 부트로더 단계를 건너뜀) · esc* 는 WEB_ONLY 예외.
+import init, { WebLink, appVersion, fwCheck, fwProbe, fwUpdate } from "../pkg/dsf_web.js";
+import { fwIo } from "./web_fw_io.js";
 
 export const WEB_ONLY = "웹판에서는 아직 안 되는 기능 — PC판을 쓰세요";
 const ST_VID = 0x0483; // 드론·조종기 USB(STM32 가상 COM)
@@ -131,6 +133,41 @@ export async function webApi() {
   const webOnly = async () => { throw new Error(WEB_ONLY); };
   const PROFILE = "dsf-profile-";
 
+  // ── 앱 펌웨어 굽기(데스크톱 src-tauri/src/firmware.rs 와 같은 일 · 같은 결과 꼴) ──
+  const fwSubs = new Set();
+  let fwBusy = false, fwPort = null;
+  const fwError = (e) => { try { return JSON.parse(e); } catch { return { kind: "io", code: 14, text: errText(e) }; } };
+  /** 본 연결을 닫고 닫힐 때까지 기다림 — 연결돼 있던 포트 이름을 기억해 돌려줌(원본 CloseSerial) */
+  async function release() {
+    const s = JSON.parse(link.snapshot());
+    if (s.state === "connected" && s.port) fwPort = s.port;
+    if (s.state !== "disconnected") {
+      await run(link.disconnect());
+      const t0 = performance.now();
+      while (JSON.parse(link.snapshot()).state !== "disconnected" || port) {
+        if (performance.now() - t0 > 5000) throw { kind: "busy", code: 7, text: "본 연결이 5초 안에 닫히지 않음" };
+        await wait(50);
+      }
+    }
+    return fwPort;
+  }
+  /** 굽기 한 번 — 본 연결을 닫고 그 포트를 fwIo 로 열어 `job(io, 이름)` */
+  async function withFwPort(name, job) {
+    if (fwBusy) throw { kind: "busy", code: 14, text: "이미 굽는 중" };
+    fwBusy = true;
+    try {
+      const remembered = await release();
+      const use = name ?? remembered;
+      const p = use && byName.get(use);
+      if (!p) throw { kind: "noPort", code: 2, text: "연결된 포트가 없음 — 장치를 먼저 연결" };
+      const others = (await navigator.serial.getPorts()).filter((x) => x !== p); // 다른 장치 — 다시 켜진 뒤 우리 장치를 가려내는 데 씀
+      // 다시 켜진 장치는 브라우저가 새 포트로 준다 — 같은 이름에 다시 묶어 다음 굽기·연결도 그 이름으로
+      const io = fwIo(p, others, (np) => { names.set(np, use); byName.set(use, np); });
+      await io.start();
+      try { return JSON.parse(await job(io, use)); } catch (e) { throw fwError(e); } finally { await io.close(); }
+    } finally { fwBusy = false; }
+  }
+
   return {
     real: true,
     web: true,
@@ -155,8 +192,12 @@ export async function webApi() {
       }
       return buf;
     },
-    fwRelease: async () => null, fwCheck: webOnly, fwProbe: webOnly, fwUpdate: webOnly, onFw: async () => () => {},
-    blDriverReady: async () => true, blDriverInstall: webOnly, blUpdate: webOnly, blRetry: webOnly, onBl: async () => () => {},
+    fwRelease: async () => release(),
+    fwCheck: async (bytes) => { try { return JSON.parse(fwCheck(Uint8Array.from(bytes))); } catch (e) { throw fwError(e); } },
+    fwProbe: (name, bytes) => withFwPort(name, (io, use) => fwProbe(io, Uint8Array.from(bytes), use)),
+    fwUpdate: (name, bytes) => withFwPort(name, (io, use) => fwUpdate(io, Uint8Array.from(bytes), use, (j) => { const ev = JSON.parse(j); fwSubs.forEach((f) => f(ev)); })),
+    onFw: async (cb) => { fwSubs.add(cb); return () => fwSubs.delete(cb); },
+    // 부트로더(칩 안 DFU)는 아직 PC판만 — bl* 이 없으면 화면(firmware.js bootStep)이 그 단계를 건너뛴다
     escRead: webOnly, escConfig: webOnly, escFlash: webOnly, escLeave: async () => {}, onEsc: async () => () => {},
   };
 }

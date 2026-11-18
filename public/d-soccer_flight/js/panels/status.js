@@ -71,7 +71,7 @@ Yaw</div><div class="att-v">:        -
   onLang(renderInfo);
   renderInfo();
   [root.querySelector("#btnCal"), root.querySelector("#btnFwCheck")].forEach(buttonTransition); // 원본 ButtonTransition
-  root.querySelector("#btnFwCheck").onclick = () => api.web ? notify(221, 2500) : import("./firmware.js") // 웹판: 펌웨어 굽기는 아직 PC판만.then((m) => m.openFirmware?.()).catch(() => {});
+  root.querySelector("#btnFwCheck").onclick = () => import("./firmware.js").then((m) => m.openFirmware?.()).catch(() => {});
 
   // ── LED (컨트롤러와 연결했을 때만 — 드론만 연결이면 가림막 98·99) ──
   const team = [...root.querySelectorAll(".team div")], pos = [...root.querySelectorAll(".pos")];
