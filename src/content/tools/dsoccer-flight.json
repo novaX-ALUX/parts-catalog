@@ -10,6 +10,27 @@
   ],
   "releases": [
     {
+      "version": "2.9.0",
+      "date": "2026-11-18",
+      "changes": "Controller tab: stick deadzone in % for roll/pitch, yaw and throttle, with a graph per axis showing what goes to the drone after the deadzone, SPEED and the stick curves (the same DZ lines are on the controller's SETUP > FUNCTION menu). Drone settings with only the controller connected: PID values, PID reset to defaults and crash hold can be changed with only the controller on USB; the controller keeps them and sends them when it links with a drone on standby, then reads the drone back (the PID tab and CRASH HOLD show kept, sending or not taken). Built-in firmware is now controller v1.3.0 (also on the online list); the drone stays at v1.10.1. Update the controller. Controller v1.3.0: JOY RESET no longer wipes the stick curves, SET DEFAULT also clears kept drone settings, a failed settings save is retried instead of lost. Windows only: on a Mac use the 2.2.11 dmg below, which offers the same firmware online (no bootloader step).",
+      "notes": "https://github.com/novaX-ALUX/parts-catalog/releases/tag/dsoccer-flight-v2.9.0",
+      "files": [
+        {
+          "kind": "Windows installer",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/dsoccer-flight-v2.9.0/D-Soccer-Flight_2.9.0_x64-setup.exe",
+          "bytes": 9382836,
+          "sha256": "0813bb9ef5aa6b9cbbe892e535876dd0b97c6a1bd4b964bab08b206727595d5c"
+        },
+        {
+          "kind": "Windows portable (no install)",
+          "file": "https://github.com/novaX-ALUX/parts-catalog/releases/download/dsoccer-flight-v2.9.0/D-Soccer-Flight_2.9.0_portable.exe",
+          "bytes": 17209856,
+          "sha256": "5c3db909165917f81088dc30adf7fe09e9b2c1887bd6fb606b14ddb511c48425",
+          "notes": "Needs Microsoft Edge WebView2 (built into Windows 11)."
+        }
+      ]
+    },
+    {
       "version": "2.8.1",
       "date": "2026-11-18",
       "changes": "Built-in firmware is now drone v1.10.1 and controller v1.2.5 (also on the online list). Update the controller and the drone together. Drone: ESC setup mode is entered only from USB and only while the motors are stopped; gyro re-calibration, reset to defaults, PID defaults, trim reset and motor order changes are refused while flying. Controller: about 36 % faster main loop, the first screen speed (SPD) shows the drone's real speed, vibrator and buzzer queues no longer get stuck, a failed settings save is no longer counted as saved, button release is debounced, unplugging USB while charging turns the controller off. Status tab: the build version shows all three numbers; with a drone connected directly by USB the RF value is packets per second (/s). Windows only: on a Mac use the 2.2.11 dmg below, which offers the same firmware online (no bootloader step).",
