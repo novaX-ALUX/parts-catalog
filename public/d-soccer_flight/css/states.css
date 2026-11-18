@@ -1,0 +1,118 @@
+/* 버튼 상태 정본 — 마우스를 올림·누름·고름(Selected) 때 모양. 다른 CSS 파일에는 :hover/:active 를 두지 않는다.
+   ① 원본 Selectable ColorTint: '대상 그림'의 색에 곱한다(0.1초에 바뀜). 글자(자식 Text)는 그대로.
+      Unity 선형 색 공간이라 화면색 = sRGB(선형(바탕) × 선형(곱)) — 아래 색은 그 식으로 셈(tools/unity_tint.mjs, 손 계산 아님).
+      값 = 배포판 level1 m_Colors (target/rea/selectables.json). 대상 그림이 꺼졌거나 투명하면(탭 Background · 팀 Red/Blue · 막 단추) 규칙 없음.
+      우선순위(원본 그대로): 누름 > 고름 > 올림. 고름(.u-sel) = 마지막에 누른 것 — 다른 곳을 누를 때까지 남는다(widgets.uiSelect).
+   ② 원본이 직접 만든 반응 — ButtonTransition([data-bt]: 들어오면 올림색, 나가면 처음색, 누르면 누름색, 떼면 어디서든 올림색 · 바로 바뀜)
+      TabHighlight(탭) · PositionColorController(포지션 1.35배). 셋 다 widgets.js / status.js 가 붙인다. */
+:root { --fade: .1s; }
+
+/* 연결 단추(ConnectButton — 대상 = 자기 그림): 올림 × 0.5 · 고름 × 0.961 · 누름 × 0.784 */
+#connectBtn img { transition: filter var(--fade); }
+#connectBtn:hover img { filter: brightness(.5); }
+#connectBtn.u-sel img { filter: brightness(.961); }
+#connectBtn:active img { filter: brightness(.784); }
+
+/* 탭(TabHighlight): 고른 탭이 아니면 — 올리면 아이콘·이름 흰색 + 이름 굵게, 나가면 (1,1,1,0.4) · 바로 바뀜. Toggle 의 대상(Background)은 꺼져 있음 */
+.tab:not(.on):hover .ico { opacity: 1; } .tab:not(.on):hover .name { color: #fff; font-weight: 500; }
+
+/* 언어 고르기(LanguageDropdown — RoundBox_2 #1e1e1e) · 펼친 목록 항목(Item Background #1e1e1e) · 그래프 갱신 간격(Dropdown #1e1e1e) */
+#lang, .dl.lang .it::before { transition: background-color var(--fade); }
+#lang:hover, #lang.u-sel, .dl.lang .it:hover::before { background-color: #1c1c1c; }
+#lang:active, .dl.lang .it:active::before { background-color: #151515; }
+.g-rate:hover, .g-rate.u-sel { --c: #1c1c1c; } .g-rate:active { --c: #151515; }
+.dl.graph .vp::-webkit-scrollbar-thumb:hover { background-color: #2c2c2c; } .dl.graph .vp::-webkit-scrollbar-thumb:active { background-color: #222; } /* Handle #2e2e2e */
+
+/* 값 칸(InputField · 흰 RoundBox_2): 올림·고름(입력 중) × 0.961 · 누름 × 0.784 */
+.sval, #pid-note { transition: background-color var(--fade); }
+.sval:hover, .sval:focus, .sval.u-sel, #pid-note:hover, #pid-note:focus, #pid-note.u-sel { background-color: #f5f5f5; }
+.sval:active, #pid-note:active { background-color: #c8c8c8; }
+.esc-ppm .sval:hover, .esc-ppm .sval:focus, .esc-ppm .sval.u-sel, .esc-ppm .sval:active { background-color: transparent; }   /* BLHeli PPM 값(대상 그림 None) */
+
+/* − / + (Up · Down — 흰 그림): 올림 (0.514, 1, 0.882) = #83ffe1 · 고름 × 0.961 · 누름 × 0.7075 */
+.sbtn { transition: filter var(--fade); }
+.sbtn:hover { filter: url(#tint-mint); } .sbtn.u-sel { filter: brightness(.961); } .sbtn:active { filter: brightness(.7075); }
+
+/* 슬라이더 손잡이(Handle — 흰 동그라미): 올림 #83ffe1 · 고름 #f5f5f5 · 누름 #b4b4b4 (PID·ESC·모터 출력 같은 값) */
+.srange::-webkit-slider-thumb, .vs .vs-handle { transition: background-color var(--fade); }
+.srange:hover::-webkit-slider-thumb, .vs:hover .vs-handle { background-color: #83ffe1; }
+.srange.u-sel::-webkit-slider-thumb, .vs.u-sel .vs-handle { background-color: #f5f5f5; }
+.srange:active::-webkit-slider-thumb, .vs:active .vs-handle { background-color: #b4b4b4; }
+
+/* PID 프로파일(ProfileBtn #939598 · 고른 것 흰색): 올림 (0.588, 1, 1) · 누름 × 0.784 · 고름 = 1(바뀜 없음 — 그래서 고른 동안은 올려도 그대로) */
+.prof button { transition: background-color var(--fade); }
+.prof button:hover { background-color: #549598; } .prof button.sel:hover { background-color: #96ffff; }
+.prof button.u-sel { background-color: #939598; } .prof button.sel.u-sel { background-color: #fff; }
+.prof button:active { background-color: #727476; } .prof button.sel:active { background-color: #c8c8c8; }
+
+/* 둥근 테 단추 넷 — 모두 ButtonTransition: 테두리·글자 = 올림 민트 · 누름 #3692c1(원본 알파 0 은 화면에 안 먹음 — HP 원본 사진 hp-unityH1)
+   가속도계 교정 · 업데이트 확인은 ColorTint 없음. PID 정보 초기화 · 적용 및 저장은 ColorTint(테두리만 0.961 / 0.784)가 겹침 */
+#btnCal[data-bt=hl] { border-color: #00ffe6; color: #00ffe6; } #btnCal[data-bt=pr] { border-color: #3692c0; color: #3692c0; }
+#btnFwCheck[data-bt=hl] { border-color: #00ffe5; color: #00ffe5; } #btnFwCheck[data-bt=pr] { border-color: #3692c1; color: #3692c1; }
+:is(#pid-save, #pid-reset):is(:hover, .u-sel) { border-color: #3bb7f5; }
+:is(#pid-save, #pid-reset):active { border-color: #2e95c8; }
+:is(#pid-save, #pid-reset)[data-bt=hl] { border-color: #00ffe6; color: #00ffe6; }
+:is(#pid-save, #pid-reset)[data-bt=hl]:is(:hover, .u-sel) { border-color: #00f5dd; }
+:is(#pid-save, #pid-reset)[data-bt=hl]:active { border-color: #00c8b4; }
+:is(#pid-save, #pid-reset)[data-bt=pr] { border-color: #287197; color: #3692c1; }
+
+/* 모터 회전 · 방향 변경(RoundBox 테두리): ColorTint 테두리만 × 0.961 / 0.784. 방향 전체변경만 ButtonTransition(올림 흰색 · 누름 주황 — 테두리·글자·아이콘) */
+.mt-btn::before { transition: filter var(--fade); }
+.mt-btn:hover::before, .mt-btn.u-sel::before { filter: brightness(.961); } .mt-btn:active::before { filter: brightness(.784); }
+#mt-dir-4[data-bt] { --c: #fff; } #mt-dir-4[data-bt=pr] { --c: #ff8000; }
+/* 경고 체크(WarningON_OFF/Toggle → Background) */
+.mt-check i { transition: filter var(--fade); }
+.mt-check:hover i, .mt-check.u-sel i { filter: brightness(.961); } .mt-check:active i { filter: brightness(.784); }
+
+/* 포지션(자기 동그라미 색 × 0.961 / 0.784 — 색마다 status.js 가 --h · --p 로 셈) + PositionColorController: 올리면 1.35배(바로) · 고른 포지션은 계속 1.35배 + 빛 */
+.pos { transition: background-color var(--fade); }
+.pos:hover, .pos.u-sel { background-color: var(--h); } .pos:active { background-color: var(--p); }
+.pos:hover { transform: scale(1.35); }
+
+/* Z축 초기화(OffSet — InputFieldBackground × #505050 + Outline): 올림 (0.620, 0.941, 1) · 고름 × 0.961 · 누름 × 0.717 — tools/bake_unity_box.py 로 구운 4칸 */
+#st-3d .offset:hover::before { background-position-y: 33.333%; } #st-3d .offset.u-sel::before { background-position-y: 66.667%; } #st-3d .offset:active::before { background-position-y: 100%; } /* 구운 그림의 칸 — Outline 도 같이 곱해짐(HP 원본 사진 s10) */
+
+/* 펌웨어 창: 이름 칸(Dropdown → 대상 Item Checkmark ▼ 흰색) · 닫기 X — ColorTint 올림 #83ffe1 · 고름 #f5f5f5 · 누름 #b4b4b4 */
+.fwv-arrow, .fw-x { transition: background-color var(--fade); }
+.fwv-dd:hover .fwv-arrow, .fw-x:hover { background-color: #83ffe1; }
+.fwv-dd.u-sel .fwv-arrow, .fw-x.u-sel { background-color: #f5f5f5; }
+.fwv-dd:active .fwv-arrow, .fw-x:active { background-color: #b4b4b4; }
+/* 업데이트 · Yes · No — ButtonTransition(테 · 아이콘 · 글자 = 올림 #83ffe1 · 누름 #b4b4b4). 자기 그림은 투명이라 ColorTint 는 안 보임 */
+.fwv-up[data-bt=hl] .fwv-ring, .fwu-btn[data-bt=hl] { --c: #83ffe1; } .fwv-up[data-bt=hl] span, .fwu-btn[data-bt=hl] { color: #83ffe1; }
+.fwv-up[data-bt=hl] .fwv-upicon { filter: url(#tint-mint); }
+.fwv-up[data-bt=pr] .fwv-ring, .fwu-btn[data-bt=pr] { --c: #b4b4b4; } .fwv-up[data-bt=pr] span, .fwu-btn[data-bt=pr] { color: #b4b4b4; }
+.fwv-up[data-bt=pr] .fwv-upicon { filter: brightness(.7059); }
+
+/* ESC: 아래 단추들 · ESC 칸 업데이트 · 보내기/읽기 목록 · 안내 Yes/No · hex 창 (올림 · 고름 × 0.961 · 누름) */
+.esc-b { transition: background-color var(--fade); }
+#esc-hex:hover { background-color: #a3acb9; } #esc-hex.u-sel { background-color: #e8e8e8; } #esc-hex:active { background-color: #7a889b; }
+#esc-reset:hover { background-color: #b1b1b1; } #esc-reset.u-sel { background-color: #c4c4c4; } #esc-reset:active { background-color: #8e8e8e; }
+#esc-read:hover { background-color: #d2d2d2; } #esc-read.u-sel { background-color: #e8e8e8; } #esc-read:active { background-color: #a9a9a9; }
+#esc-updall:hover { background-color: #c0b39a; } #esc-updall.u-sel { background-color: #ebe3d2; } #esc-updall:active { background-color: #c0b9ab; }
+#esc-send:hover { background-color: #bdba9a; } #esc-send.u-sel { background-color: #e8ebd2; } #esc-send:active { background-color: #bec0ab; }
+.esc-upd:hover, .esc-upd.u-sel { background-color: #f5eddd; } .esc-upd:active { background-color: #c8c2b4; }
+#esc-pop-send .esc-b:hover { background-color: #c9cea2; } #esc-pop-send .esc-b.u-sel { background-color: #e8ebd2; } #esc-pop-send .esc-b:active { background-color: #9a9d7c; }
+#esc-pop-read .esc-b:hover { background-color: #d3d3d3; } #esc-pop-read .esc-b.u-sel { background-color: #e8e8e8; } #esc-pop-read .esc-b:active { background-color: #ababab; }
+#esc-yes:hover { background-color: #dbd4bf; } #esc-yes.u-sel { background-color: #f5edd6; } #esc-yes:active { background-color: #bcb6a4; }
+#esc-no:hover { background-color: #afafaf; } #esc-no.u-sel { background-color: #c4c4c4; } #esc-no:active { background-color: #959595; }
+.ehd-ok:hover { background-color: #dbd4be; } .ehd-ok.u-sel { background-color: #f5edd5; } .ehd-ok:active { background-color: #bcb6a3; }
+.ehd-pc:hover, .fwv-pc:hover { background-color: #afafaf; } .ehd-pc.u-sel, .fwv-pc.u-sel { background-color: #c4c4c4; } .ehd-pc:active, .fwv-pc:active { background-color: #969696; }
+.fwv-pc { transition: background-color var(--fade); }   /* 원본에 없는 'PC 에서 고르기' — 같은 꼴 원본 From PC 의 값 */
+.ehd-x { transition: background-color var(--fade); }
+.ehd-x:hover, .ehd-x.u-sel { background-color: #f5f5f5; } .ehd-x:active { background-color: #c8c8c8; }
+.esc-b:disabled { filter: none; }
+/* ESC 값 화면: 드롭다운(대상 = 자기 UISprite 칸, 글자·▼ 는 그대로) · 켜고 끄기(Toggle → Background, 체크는 그대로) · 목록 항목(Item Background #f5f5f5) · 스크롤 손잡이 */
+.dd + .dd-bg, .esc-tg::before { transition: filter var(--fade); }
+.dd:hover + .dd-bg, .dd.u-sel + .dd-bg, .esc-tg:hover::before, .esc-tg.u-sel::before { filter: brightness(.961); }
+.dd:active + .dd-bg, .esc-tg:active::before { filter: brightness(.784); }
+.dl.esc .it { transition: background-color var(--fade); }
+.dl.esc .it:hover { background-color: #ebebeb; } .dl.esc .it:active { background-color: #c0c0c0; }
+.dl.esc .vp::-webkit-scrollbar-thumb:hover { background-color: #ebebeb; } .dl.esc .vp::-webkit-scrollbar-thumb:active { background-color: #c0c0c0; }
+/* ESC Update Panel(개발용 시험 창, 원본에서 꺼져 있음) — 흰 그림 × 단추마다 값. hex 열기·모두 업데이트는 평소 색도 곱해져 있음 */
+.et-b { transition: background-color var(--fade); }
+#et-hex { background-color: #effff4; } #et-all { background-color: #fff0d0; }
+.et-b:hover:not(:disabled) { background-color: #d9d9d9; } #et-test:hover:not(:disabled) { background-color: #f5f5f5; }
+#et-hex:hover:not(:disabled) { background-color: #bacdc0; } #et-all:hover:not(:disabled) { background-color: #cdc1a7; }
+.et-b.u-sel:not(:disabled), #et-hex.u-sel:not(:disabled), #et-all.u-sel:not(:disabled) { background-color: #f5f5f5; }
+.et-b:active:not(:disabled) { background-color: #c8c8c8; }
+#et-hex:active:not(:disabled) { background-color: #8aa492; } #et-all:active:not(:disabled) { background-color: #a69b84; }

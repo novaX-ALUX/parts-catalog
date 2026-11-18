@@ -1,0 +1,324 @@
+No,Korean,English,Japanese,Chinese
+0,펌웨어,Firmware,ファームウェア,固件
+1,펌웨어 파일이 없습니다.,Firmware file is missing.,ファームウェアファイルがありません。,没有固件文件 。
+2,업데이트 할 장치를 연결하세요.,Please connect the device to be updated.,アップデートするデバイスを接続してください。,请连接要更新的设备。
+3,펌웨어 정보를 확인합니다.,Check the firmware information.,ファームウェア情報を確認します。,检查固件信息。
+4,펌웨어 업데이트 중 입니다.,Firmware update in progress.,ファームウェアの更新中です。,固件更新中。
+5,펌웨어 업데이트를 진행합니다.,Proceed with the firmware update.,ファームウェアのアップデートを行います。,进行固件更新。
+6,업데이트 준비 중입니다,Preparing for update.,アップデートの準備中です。,正在准备更新。
+7,다시 연결하시거나 다른 장치를 연결해 주세요.,Please reconnect or connect another device.,もう一度接続するか、別のデバイスを接続してください。,请重新连接或连接其他设备。
+8,업데이트 할 펌웨어가 이전 버전 보다 같거나 낮습니다.,Firmware version not newer.,バージョンが同じか古いです。,要更新的固件与上一个版本相同或更低。
+9,그래도 진행하시겠습니까?,Would you still like to continue?,それでも進行しますか？,你还想继续吗？
+10,업데이트를 시작하시겠습니까?,Do you want to start the update?,アップデートを実行しますか？,确定要开始更新吗？
+11,업데이트를 하시려면 다시 연결해주세요.,Please reconnect to update.,アップデートをするには、もう一度お繋ぎください。,请重新连接以更新。
+12,등록되지 않은 장치입니다.,This device is not registered.,登録されていないデバイスです。,此设备未注册。
+13,업데이트가 불가능한 장치입니다.,The device cannot be updated.,更新不可能なデバイスです。,无法更新的设备。
+14,펌웨어 업데이트를 실패하였습니다.,Firmware update failed.,ファームウェアの更新に失敗しました。,固件更新失败 。
+15,펌웨어 업데이트를 완료하였습니다.,Firmware update completed.,ファームウェアのアップデートを完了しました。,固件更新已完成。
+16,연결하기,Connect,接続する,连接
+17,연결됨,Connected,接続済み,已连接
+18,캘리브레이션,Calibration,キャリブレーション,校准
+19,가속도계 교정,Accelerometer calibration,加速度計校正,加速度计校准
+20,보드 또는 프레임을 수평의 표면 위에 두고 교정을 진행하십시오. ,Place the board or frame on a horizontal surface for calibration. ,ボードまたはフレームを水平な面に置いて校正を行ってください。,将板或框架置于水平表面上进行校准。
+21,교정이 진행되는 동안 드론을 절대 움직이지 마십시오.,Do not move the Drone at all during the correction process.,校正中は絶対にドローンを動かさないでください。,校准过程中不要移动无人机。
+22,설정을 처음상태로 되돌립니다.,Returns the settings to their initial state.,設定を初期状態に戻します。,将设置恢复到初始状态。
+23,드론 정보,Drone Information,ドローン情報,无人机信息
+24,비행모드,Flight mode,フライトモード,飞行模式
+25,배터리량,Amount of battery,バッテリー残量,电池电量
+26,배터리 전압,Battery voltage,バッテリー電圧,电池电压
+27,평균속도,Average speed,平均速度,平均速度
+28,RF 응답률,RF Respone,RF 応答率,RF应答率
+29,빌드 버전,Build Version,ビルドバージョン,构建版本
+30,빌드 날짜,Build Date,ビルド日付,构建日期
+31,그래프,Graph,グラフ,图形
+32,방향 전환 중...,Turning...,方向転換中...,转向中...
+33,"Z축 초기화, 오프셋","Z-axis initialization, offset",Z軸のリセット、オフセット,重置 Z 初始化、偏移
+34,PID 튜닝,PID Tuning,PIDチューニング,PID调谐
+35,PID 프리셋,PID Preset,PIDプリセット,PID预设
+36,PID 정보,PID Information,PID 情報,PID 信息
+37,프로파일,Profile,プロファイル,配置文件
+38,적용 및 저장,Apply and Save,適用と保存,应用与保存
+39,기본값으로 초기화,Default to Reset,基本値で初期化,重置为默认值
+40,PID 설정,PID Setting,PID 設定,PID 设置
+41,앵글,Angle,角度,角度
+42,Degree,Degree,Degree,Degree
+43,Degree/s,Degree/s,Degree/s,Degree/s
+44,모터,Motor,モーター,电机
+45,모터 방향,Motor direction,モーターの方向,电机方向
+46,모터 회전,Motor rotation,モーター回転,电机旋转
+47,방향 변경,Change direction,方向変更,改变方向
+48,모터 전체회전,Rotate the motor fully,モーターを完全に回転させる,电机全部旋转
+49,방향 전체변경,Change direction entirely,方向を完全に変える,全部改变方向
+50,경고 : 프로펠러가 제거 되었는지 확인하십시오!,WARNING: MAKE SURE THE PROPELLERS IS REMOVED!,警告：プロペラが取り外されているか確認してください！,警告 : 请检查螺旋桨是否被移除!
+51,안전 공지,Safety notice,安全通知,安全公告
+52,부상을 피하기 위해 모든 프로펠러를 제거하세요!,Remove all propellers to avoid injury!,けが防止のため、全プロペラを外してください！,卸下所有螺旋桨，以免受伤！
+53,모터를 선택하면 즉시,As soon as you select the motor,モーター選択後すぐに,选择电机后立即
+54,회전합니다!!,It spins!!,回転します!!,要转了!!
+55,나는 위험을 인지하고 있으며,I am aware of the risks.,危険承知ですが、,我意识到危险
+56,모든 프로펠러가 제거 되었습니다.,All propellers have been removed,全プロペラは取り外しました。,所有的螺旋桨都被拆除了。
+57,모터 출력,Motor output,モーター 出力,电机功率
+58,마스터,Master,マスター,主控
+59,모터 테스트 모드,Motor test mode,モーターテストモード,电机测试模式
+60,경고 심각한 부상 위험이 있습니다! 모든 프로펠러를 제거하십시오!,Warning There is a serious risk of injury! Remove all propellers!,警告、重大な負傷の危険があります！すべてのプロペラを取り外してください！,警告，有严重受伤的危险！ 拆除所有螺旋桨！
+61,슬라이드를 올릴 때 모터가 회전합니다.,The motor rotates when The slide is raised.,スライドを上げるとモーターが回転します。,滑块上升马达就会转动。
+62,모터 출력을 확인하는 기능으로 모터의 최대 최소값은 설정하지 않습니다.,A function to check motor output without setting maximum and minimum values for the motor.,モーター出力を確認する機能として、モーターの最大、最小値は設定しません。,确认电机输出的功能，不设定电机最大最小值。
+63,오직 모터 탭에서만 아무 키를 누르면 모터가 멈춥니다.,Press any key only on The motor tab to stop The motor.,モータータブでのみ、任意のキーを押すとモーターが停止します。,只有在马达标签上按任何键马达就会停止。
+64,USB 케이블을 제거하여도 모터가 멈추지 않습니다.,The motor does not stop even though The USB cable is removed.,USBケーブルを抜いてもモーターが停止しません。,即使拆下USB电缆电机也不会停止。
+65,프로펠러가 제거되었음을 확인합니다.,Verify that the propeller has been removed.,プロペラ取り外しを確認します。,确认螺旋桨已被移除。
+66,모터 제어 및 폭주 이륙 방지 비활성.,Motor control and runaway takeoff prevention deactivation,モーター制御・過熱離陸防止無効,电机控制及防止过热起飞非激活
+67,준비,Ready,準備,准备
+68,이륙,Take-off,離陸,起飞
+69,비행,Flight,飛行,飞行
+70,착륙,Landing,着陸,着陆
+71,장치를 먼저 연결해 주세요.,Please connect the device first.,先にデバイスを接続してください。,请先连接设备。
+72,연결 중,Connecting,接続中,连接中
+73,현재 FC에 저장된 PID 값 입니다.,The current PID values in FC.,現在FCに保存されているPID値です。,当前 FC 中保存的 PID 值 。
+74,펌웨어 파일이 맞지 않습니다.,firmware file is not correct.,ファームウェア ファイルが正しくありません。,固件文件不匹配 。
+75,기기 먼저 연결해주세요.,Please connect the device first.,機器を先に接続してください。,请先连接机器。
+76,컨트롤러가 연결되었습니다.,The controller is connected.,コントローラーが接続されました。,控制器是连接的。
+77,드론이 연결되었습니다.,The drone is connected.,ドローンが接続されました。,无人机是连接的。
+78,업데이트,Update,アップデート,更新
+79,다운로드,Download,ダウンロード,下载
+80,펌웨어 파일을 선택하세요.,Please select a firmware file.,ファームウェアを選択してください。,请选择固件文件。
+81,인터넷 연결을 확인해주세요!,Please check your internet connection!,インターネット接続を確認してください！,请检查您的网络连接！
+82,현재 부트로더 모드 상태입니다.,You are now in bootloader mode.,今はブートローダーモードの状態です。,您现在处于引导加载程序模式模式。
+83,펌웨어 업데이트를 마저 완료해주세요.,Plaese Complete firmware updates first.,ファームウェアのアップデートをすべて完了してください。,请先完成固件更新。
+84,새로운 업데이트가 있습니다.,There is a new update.,新しいアップデートがあります。,有新的更新。
+85,  바로가기,  Click Here,  ショートカット,快捷键
+86,비행 시간,Flight Time,飛行時間,飞行时间
+87,이륙 횟수,Take-off Count,離陸回数,起飞次数
+88,착륙 횟수,Landing Count,着陸回数,着陆次数
+89,충돌 횟수,Accident Count,衝突回数,冲突次数
+90,드론과 연결 시 사용 가능합니다.,Connect drone to use.,ドローン接続中に利用できます。,它可以在连接无人机时使用。
+91,모터 번호를 드래그 해서 원하는대로 순서를 변경할 수 있습니다.,You can change the order as desired by dragging the motor number.,モーター番号をドラッグすると、好きなように順序を変更できます。,您可以根据需要通过拖动电机号来更改顺序。
+92,모터 회전 버튼을 1초 이상 눌러야 작동됩니다.,The motor rotation button must be pressed for at least 1 second to operate.,モーターの回転ボタンを1秒間以上押す必要があります。,必须按下电机旋转按钮至少1秒钟才能操作。
+93,상태,State,状態,状态
+94,업데이트 확인,Update Check,更新確認,可写备注
+95,연결안됨,Disconnected,未接続,未连接
+96,기타,Miscs,その他,其他
+97.X,메모를 입력할 수 있습니다,You can enter a memo,メモを入力できます,可写信息
+98,컨트롤러와 연결 시,Can be used only,コントローラー接続中に,连接控制器时
+99,사용할 수 있습니다.,when connected to the controller.,使用することができます。,即可使用。
+100,우측 상단,Top Right,右上,右上角
+101,우측 하단,Bottom Right,右下,右下角
+102,좌측 하단,Bottom Left,左下,左下角
+103,좌측 상단,Top Left,左上,左上角
+104,교정이 완료되었습니다.,Calibration is complete.,校正が完了しました。,校准已完成。
+105,위치값이 초기화되었습니다.,Position has been reset.,位置が初期化されました。,位置已重置。
+106,데이터가 저장되었습니다.,Data has been saved.,データが保存されました。,数据已保存。
+107,데이터가 초기화되었습니다.,Data has been reset.,データが初期化されました。,数据已重置。
+108,연결이 끊겼습니다.,Connection lost.,接続が切断されました。,连接已断开。
+109,팀,Team,チーム,团队
+110,포지션,Position,ポジション,位置
+111,드론과 연결해 주세요.,Connect to the drone.,ドローンに接続してください。,请连接无人机。
+112,전송이 완료되었습니다.,The transmission is complete.,送信が完了しました。,传输已完成。
+113,ESC 설정 모드로 진입중입니다...,Entering ESC configuration mode...,ESC設定モードに入っています...,正在进入ESC设置模式...
+114,배터리가 연결되었습니까?,Is the battery connected?,バッテリーは接続されていますか？,电池连接了吗？
+115,데이터 수신에 실패하였습니다.,Failed to receive data.,データの受信に失敗しました。,数据接收失败。
+116,ESC에 데이터를 전송중입니다...,Sending data to ESC...,ESCにデータを送信中...,正在向ESC发送数据...
+117,알림,Notification,通知,通知
+118,ESC 설정 모드로 진입합니다.,Entering ESC configuration mode,ESC設定モードに入ります,正在进入ESC设定模式
+119,a,a,a,a
+120,설정 초기화,Reset Settings,設定を初期化,重置设置
+121,모터가 처음 돌 때 최소로 주는 전력입니다.,Minimum power for motor start.,モーター始動時の最小電力です。,电机启动时的最小功率。
+122,낮으면 헛돌고 높으면 튑니다.,Low causes slipping high causes jumping.,低すぎると空回り、高すぎると跳ねます。,数值低会打滑高会跳动
+123,실전에서는 1040~1100부터 시작해 조절하세요.,Start at 1040 to 1100 in actual use.,実用では1040～1100から調整してください。,实用时请从1040~1100开始调整。
+124,시동 직후 회전 안정화를 위한 임시 가속입니다.,Temporary boost after start.,始動直後の回転安定化のための一時加速です。,启动后用于稳定转速的临时加速。
+125,값 차이가 너무 작으면 시동에 실패하고,Too small causes start failure.,値が小さすぎると始動に失敗します。,值太小可能导致启动失败。
+126,너무 크면 과전류 위험이 있습니다.,Too large risks overcurrent.,大きすぎると過電流の危険があります。,太大有过电流风险。
+127,모터 회전 시기 조정입니다.,Adjust motor timing.,モーターのタイミング調整です。,电机转动时序调整。
+128,값이 클수록 출력↑ 효율↓,High value more power lower efficiency.,値が大きいほど出力↑効率↓,值越大输出越高效率越低。
+129,일반적인 범위는 5~9입니다. (1≈1.1°),Typical range is 5–9. (1≈1.1°),一般的な範囲は5～9です。 (1≈1.1°),一般范围为5~9。 (1≈1.1°)
+130,급가속 시 전류 과부하를 줄여줍니다.,Reduces surge during acceleration.,急加速時の過電流を抑えます。,减少急加速时的电流负载。
+131,값이 클수록 가속은 느려지지만 안정성↑.,Higher value = slower but stable.,値が大きいほど加速は遅くなるが安定性↑,值越大加速越慢但更稳定。
+132,30 전후로 시작해보세요.,Start around 30.,30前後で始めてください。,请从30左右开始尝试。
+133,고부하나 고속 시 자력 손실을 보정합니다.,Handles demag at high speed/load.,高負荷や高速時の磁力低下を補正します。,补偿高速或高负载时的消磁影响。
+134,노이즈가 많으면 high를 추천합니다.,Set to high when there is too much noise.,ノイズが多い場合はhighを推奨します。,噪声大时建议设为high。
+135,일반 비프음 크기입니다.,Standard beep volume.,標準のビープ音量です。,标准蜂鸣音音量。
+136,40~60이 무난합니다.,40–60 is common.,40～60が一般的です。,40~60为常用值。
+137,스로틀 0 후 비콘음 시작까지의 시간입니다.,Time before beacon starts after throttle 0.,スロットル0後のビーコン開始時間です。,油门为0后响铃前的延迟时间。
+138,보통 1분으로 설정합니다.,Usually set to 1 min.,通常は1分に設定します。,通常设为1分钟。
+139,과열 차단 온도입니다.,Overheat cutoff temperature.,過熱遮断温度です。,过热保护温度。
+140,100°C 근처가 일반적입니다.,Around 100°C is typical.,100°C前後が一般的です。,一般设为100°C附近。
+141,스로틀 0일 때 모터를 강제로 멈춥니다.,Force stop motor at 0 throttle.,スロットル0時にモーターを強制停止します。,油门为0时强制停止电机。
+142,작은 기체는 Off가 안전할 수 있습니다.,Off may be safer for small drones.,小型機体はオフが安全な場合があります。,小型机建议关闭该功能。
+143,모터 감속 시 제동 세기입니다.,Brake strength on deceleration.,減速時のブレーキ強度です。,减速时的刹车强度。
+144,빠른 스틱 반응엔 5~7,For fast stick response use 5–7.,スティック応答を重視するなら5～7。,快速响应建议设为5~7。
+145,효율을 중시할 땐 0이 적당합니다.,Use 0 for better efficiency.,効率重視なら0が適切です。,重视效率时建议设为0。
+146,모터 회전 방향입니다.,Motor rotation direction.,モーターの回転方向です。,电机旋转方向。
+147,역회전 프레임은 이 값만 바꾸면 됩니다.,Reverse-frame: just change this.,逆回転フレームはこの値だけ変更,反转机型只需改此值。
+148,ESC 보드의 LED 기능을 설정합니다.,Set ESC board LED function.,ESCボードのLED機能を設定します。,设置ESC板上的LED功能。
+149,모터를 처음 돌릴 때 가하는 전력입니다.,Power used to start motor.,モーター始動時にかける電力です。,电机启动时的初始功率。
+150,낮을 수록 부드럽게 시작합니다.,Lower means softer start.,値が低いほどスムーズに始動します。,值越低启动越平滑。
+151,분실 알림음 크기입니다.,Lost drone alarm volume.,紛失アラーム音量です。,丢失提醒音音量。
+152,야외 비행엔 80 이상을 추천합니다.,Use 80+ for outdoor.,屋外では80以上を推奨します。,户外飞行建议设为80以上。
+153,스로틀 0%로 인식할 최소 신호값입니다.,Min signal for 0% throttle.,スロットル0%と認識する最小信号値です。,识别为0%油门的最小信号值。
+154,스로틀 100%로 인식할 최대 신호값입니다.,Max signal for 100% throttle.,スロットル100%と認識する最大信号値です。,识别为100%油门的最大信号值。
+155,hex파일 열기,Open hex file,hexファイルを開く,打开hex文件
+156,현재 파일,Current file,現在のファイル,当前文件
+157,ESC 1에 펌웨어 업데이트,Update firmware to ESC 1,ESC 1にファームウェアを更新,更新固件到ESC 1
+158,ESC 2에 펌웨어 업데이트,Update firmware to ESC 2,ESC 2にファームウェアを更新,更新固件到ESC 2
+159,ESC 3에 펌웨어 업데이트,Update firmware to ESC 3,ESC 3にファームウェアを更新,更新固件到ESC 3
+160,ESC 4에 펌웨어 업데이트,Update firmware to ESC 4,ESC 4にファームウェアを更新,更新固件到ESC 4
+161,모든 ESC에 펌웨어 업데이트,Update firmware to all ESCs,すべてのESCにファームウェアを更新,将固件更新到所有ESC
+162,설정값 전송,Write settings,設定書込,写入设置
+163,모든 ESC,All ESCs,すべてのESC,所有ESC
+164,설정값 읽기,Read settings,設定読込,读取设置
+165,ESC 1에 데이터를 전송중입니다...,Sending data to ESC 1...,ESC 1にデータを送信中です...,正在向ESC 1发送数据...
+166,ESC 2에 데이터를 전송중입니다...,Sending data to ESC 2...,ESC 2にデータを送信中です...,正在向ESC 2发送数据...
+167,ESC 3에 데이터를 전송중입니다...,Sending data to ESC 3...,ESC 3にデータを送信中です...,正在向ESC 3发送数据...
+168,ESC 4에 데이터를 전송중입니다...,Sending data to ESC 4...,ESC 4にデータを送信中です...,正在向ESC 4发送数据...
+169,ESC 1에 데이터를 요청중입니다...,Requesting data from ESC 1...,ESC 1からデータを要求中です...,正在从ESC 1请求数据...
+170,ESC 2에 데이터를 요청중입니다...,Requesting data from ESC 2...,ESC 2からデータを要求中です...,正在从ESC 2请求数据...
+171,ESC 3에 데이터를 요청중입니다...,Requesting data from ESC 3...,ESC 3からデータを要求中です...,正在从ESC 3请求数据...
+172,ESC 4에 데이터를 요청중입니다...,Requesting data from ESC 4...,ESC 4からデータを要求中です...,正在从ESC 4请求数据...
+173,업데이트 중입니다...,Updating...,アップデート中です...,正在更新中...
+174,절대로 도중에 프로그램을 종료하지 마세요.,Never close the program during the process.,絶対に途中でプログラムを終了しないでください。,过程当中请勿关闭程序，切记！
+175,hex파일을 먼저 열어주세요.,Please open the hex file first.,hexファイルを先に開いてください。,请先打开hex文件。
+176,ESC 펌웨어가 모두 같아야 합니다.,ESCs must share same firmware.,ESCファームを統一,所有ESC的固件必须一致。
+177,업데이트에 실패하였습니다.,Update failed.,アップデートに失敗しました。,更新失败。
+178,ESC 모드를 해제 중입니다.,Exiting ESC mode.,ESCモードを解除中です。,正在退出ESC模式。
+179,배터리 전압을 확인하세요.,Check battery voltage.,バッテリー電圧を確認してください。,请检查电池电压。
+180,! 펌웨어를 다시 업데이트 해주세요.,! Please update this firmware again.,! ファームウェアを更新してください。,! 请重新更新固件。
+181,감속 시 모터 제동 강도입니다.,Brake strength on deceleration.,減速時のブレーキ強度です。,减速时的刹车强度。
+182,높을수록 정지는 빠르나 발열과 진동이 큽니다.,Higher = faster stop & more heat/vibration.,停止は速いが発熱・振動増。,值越大停止越快，但发热和震动越强。
+183,150-200 정도가 평균 수치입니다.,150–200 is the typical range.,150～200が平均的な数値です。,150～200是常见的数值范围。
+184,연결되었습니다,Connected to the device,デバイスに接続されました,已连接到设备
+185,hex파일을 선택하세요.,Please select the hex file.,hexファイルを選択してください。,请选择hex文件。
+186,확인,Confirm,確認,确认
+187,PC에서 선택,from PC,PCから選択,从电脑选择
+188,! 데이터가 수신되지 않았습니다.,! Data was not received.,! データが受信されませんでした。,! 未收到数据。
+189,인터넷 연결 후 재시작하세요,connect to the internet and restart.,ネット接続後に再起動,请连接互联网并重新启动。
+190,조종기,Controller,コントローラー,遥控器
+191,조종 곡선,Stick Curves,操縦カーブ,摇杆曲线
+192,적용,Apply,適用,应用
+193,"조종기를 USB로 연결하면
+조종기 설정을 바꿀 수 있습니다.","Connect the controller by USB
+to change controller settings.","コントローラーをUSBで接続すると
+設定を変更できます。","用USB连接遥控器后
+可更改遥控器设置。"
+194,드론 값을 읽지 못했습니다(드론 펌웨어 1.5.0 이상),Drone value not read (drone firmware 1.5.0 or later),ドローンの値を読めません(ファームウェア1.5.0以上),未读取到无人机的值(固件1.5.0以上)
+195,X : 끔 (지금까지와 같은 비행),X : Off (same flight as before),X : オフ(従来と同じ飛行),X : 关(与以前相同的飞行)
+196,1 : 충돌 뒤 자세 계산만 고침,1 : Attitude estimate fix only,1 : 衝突後の姿勢計算のみ補正,1 : 仅修正碰撞后的姿态计算
+197,2 : 자세 계산 + 충돌 복구 제어,2 : Estimate fix + crash recovery control,2 : 姿勢計算 + 衝突復帰制御,2 : 姿态计算 + 碰撞恢复控制
+198,"부트로더 업데이트 중 입니다.
+USB를 뽑거나 전원을 끄지 마세요.","Bootloader update in progress.
+Do not unplug USB or turn off the power.","ブートローダーを更新中です。
+USBを抜いたり電源を切らないでください。","引导程序更新中。
+请勿拔出USB或关闭电源。"
+199,펌웨어와 부트로더 업데이트를 완료하였습니다.,Firmware and bootloader update completed.,ファームウェアとブートローダーの更新を完了しました。,固件和引导程序更新已完成。
+200,"펌웨어 업데이트를 완료하였습니다.
+부트로더도 바꾸려면 USB 드라이버가 필요합니다.
+Yes를 누르면 설치합니다(처음 한 번 · 관리자 승인).","Firmware update completed.
+The bootloader update needs a USB driver.
+Press Yes to install it (once, admin approval).","ファームウェアの更新を完了しました。
+ブートローダーの更新にはUSBドライバーが必要です。
+Yesでインストールします(初回のみ・管理者の承認)。","固件更新已完成。
+更新引导程序需要USB驱动程序。
+按Yes安装(仅首次·需管理员确认)。"
+201,"부트로더 업데이트를 실패하였습니다.
+USB를 뽑거나 전원을 끄지 말고 Yes를 눌러 다시 하세요.","Bootloader update failed.
+Do not unplug USB or power off. Press Yes to try again.","ブートローダーの更新に失敗しました。
+USBを抜かず電源も切らずに、Yesで再試行してください。","引导程序更新失败。
+请勿拔出USB或关闭电源，按Yes重试。"
+202,"USB 드라이버를 설치하는 중 입니다.
+관리자 승인 창에서 예를 눌러 주세요.","Installing the USB driver.
+Press Yes in the administrator prompt.","USBドライバーをインストール中です。
+管理者の確認画面で「はい」を押してください。","正在安装USB驱动程序。
+请在管理员确认窗口中点击“是”。"
+203,추력 선형화,Thrust Linear,推力リニアライズ,推力线性化
+204,"Thrust Linear (추력 직선)
+롤·피치·요를 움직일 때 네 모터의 추력 합이 그대로 있도록, 이 드론 모터의 실측 회전수 곡선으로 추력을 직선으로 맞춥니다(%).
+100 = 실측 곡선 그대로(세게 움직여도 그 때문에 뜨지 않음) · 0 = 끔(세게 움직이면 조금 뜸). 기본 100.","Thrust Linear
+Keeps the total thrust of the four motors the same while rolling, pitching or yawing by straightening thrust with this drone's measured motor speed curve (%).
+100 = the measured curve as is (hard moves do not lift the drone because of it) · 0 = off (hard moves lift it a little). Default 100.","Thrust Linear（推力直線化）
+ロール・ピッチ・ヨーを動かしても4つのモーターの推力の合計が変わらないよう、この機体のモーター実測回転数カーブで推力を直線にします（%）。
+100 = 実測カーブそのまま（強く動かしてもそのせいで浮かない）· 0 = オフ（強く動かすと少し浮く）。既定 100。","Thrust Linear（推力线性化）
+横滚、俯仰、偏航时让四个电机的推力总和保持不变：用本机电机实测转速曲线把推力拉直（%）。
+100 = 完全按实测曲线（大动作也不会因此上升）· 0 = 关闭（大动作时会略微上升）。默认 100。"
+205,"DegreeP (각도 P)
+원하는 기울기와 실제 기울기의 차이를 얼마나 세게 되돌릴지 정합니다. 1도 어긋날 때마다 이 값만큼(°/s) 돌려 세웁니다.
+클수록 빨리 수평으로 돌아오고, 너무 크면 흔들거립니다. 기본 롤 12 · 피치 10.
+YAW 는 방향 잡기 세기입니다(1도 어긋날 때 이 값 °/s · 4 넘게는 펌웨어가 4로 자름 · 기본 2).","DegreeP (angle P)
+How hard the drone turns back toward the wanted tilt. For every degree of error it rotates back at this many °/s.
+Higher returns to level faster; too high makes it wobble. Default roll 12 · pitch 10.
+For YAW it is the heading-hold strength (this many °/s per degree · the firmware caps it at 4 · default 2).","DegreeP（角度 P）
+目標の傾きと実際の傾きの差をどれだけ強く戻すかを決めます。1度ずれるごとにこの値（°/s）で戻します。
+大きいほど早く水平に戻り、大きすぎると揺れます。既定 ロール 12 · ピッチ 10。
+YAW は方向保持の強さです（1度あたりこの値 °/s · 4を超えるとファームウェアが4に制限 · 既定 2）。","DegreeP（角度 P）
+决定以多大力度把实际倾角拉回到目标倾角。每偏差1度，以此数值（°/s）回正。
+越大回平越快，过大会摇晃。默认 横滚 12 · 俯仰 10。
+YAW 为航向保持强度（每偏差1度此数值 °/s · 超过4时固件按4限制 · 默认 2）。"
+206,"RateP (각속도 P)
+원하는 회전 속도와 실제 회전 속도의 차이에 곱해 모터 힘을 정합니다.
+클수록 빠르고 단단하게 반응하고, 너무 크면 빠르게 떨리고 모터가 뜨거워집니다. 기본 10.","RateP (rate P)
+Multiplies the gap between the wanted and the actual rotation speed to set the motor push.
+Higher reacts faster and firmer; too high causes fast shaking and hot motors. Default 10.","RateP（角速度 P）
+目標の回転速度と実際の回転速度の差に掛けてモーターの力を決めます。
+大きいほど速く硬く反応し、大きすぎると細かく震えモーターが熱くなります。既定 10。","RateP（角速度 P）
+用目标转速与实际转速之差乘以此值来决定电机出力。
+越大反应越快越硬，过大会快速抖动、电机发热。默认 10。"
+207,"RateD (각속도 D)
+회전이 빨라지거나 느려지는 빠르기에 브레이크를 걸어 지나치게 꺾이는 것(오버슛)을 막습니다.
+클수록 부드럽게 멈추지만, 너무 크면 잡음까지 키워 모터가 '지잉' 소리를 내며 뜨거워집니다. 기본 롤·피치 0.60 · 요 0.","RateD (rate D)
+Brakes how fast the rotation speeds up or slows down, so the drone does not overshoot.
+Higher stops more smoothly; too high also amplifies noise, making the motors buzz and run hot. Default roll/pitch 0.60 · yaw 0.","RateD（角速度 D）
+回転の加速・減速の速さにブレーキをかけ、行き過ぎ（オーバーシュート）を防ぎます。
+大きいほど滑らかに止まりますが、大きすぎるとノイズまで増やし、モーターが「ジー」と鳴って熱くなります。既定 ロール・ピッチ 0.60 · ヨー 0。","RateD（角速度 D）
+对转速变快或变慢的速度施加制动，防止转过头（超调）。
+越大停得越柔和，过大会放大噪声，电机发出""嗞嗞""声并发热。默认 横滚·俯仰 0.60 · 偏航 0。"
+208,"Degree (최대 기울기)
+조종기 막대를 끝까지 밀었을 때 드론이 기울어지는 각도(도)입니다. 클수록 빨리 움직입니다. 기본 58.","Degree (max tilt)
+The tilt angle (degrees) at full stick. Higher means faster movement. Default 58.","Degree（最大傾き）
+スティックを最後まで倒したときの機体の傾き（度）です。大きいほど速く動きます。既定 58。","Degree（最大倾角）
+摇杆推到底时无人机的倾斜角度（度）。越大移动越快。默认 58。"
+209,"Degree/s (요 회전 속도)
+요 막대를 끝까지 밀었을 때 제자리에서 도는 빠르기(°/s)입니다. 기본 360.","Degree/s (yaw rate)
+How fast the drone spins in place (°/s) at full yaw stick. Default 360.","Degree/s（ヨー回転速度）
+ヨースティックを最後まで倒したときのその場での回転速度（°/s）です。既定 360。","Degree/s（偏航转速）
+偏航摇杆推到底时原地旋转的速度（°/s）。默认 360。"
+210,"Dynamic Stability (낮은 스로틀 보강)
+스로틀이 낮을수록 RateP 를 더 세게 합니다. 스로틀 0 에서 이 값 × 10 % 세지고, 끝까지 올리면 그대로가 됩니다(예: 1 = 10 %). 0 = 끔. 기본 0.","Dynamic Stability (low-throttle boost)
+Makes RateP stronger at low throttle: this value × 10 % stronger at zero throttle, fading to none at full throttle (e.g. 1 = 10 %). 0 = off. Default 0.","Dynamic Stability（低スロットル補強）
+スロットルが低いほど RateP を強くします。スロットル 0 でこの値 × 10 % 強くなり、最大でそのままになります（例: 1 = 10 %）。0 = オフ。既定 0。","Dynamic Stability（低油门增强）
+油门越低，RateP 越强。油门为0时增强此值 × 10 %，油门到底时恢复原值（例：1 = 10 %）。0 = 关闭。默认 0。"
+211,"Throttle Assist (스로틀 보조)
+롤·피치·요 명령이 모터가 낼 수 있는 범위를 넘을 때, 스로틀을 얼마나 올려(또는 내려) 맞출지 정합니다(%).
+0 = 끔: 스로틀은 막대 그대로, 넘는 만큼 명령을 줄입니다(세게 움직여도 뜨지 않음 · 큰 동작은 약해짐).
+100 = 자세를 끝까지 지키려고 스로틀을 올립니다(반응은 세지만 세게 움직이면 뜸). 기본 0.","Throttle Assist
+When the roll, pitch and yaw commands need more than the motors can give, sets how much (%) the throttle may move to make room.
+0 = off: the throttle stays where the stick is and the commands are scaled down (no climb on hard moves · big moves get weaker).
+100 = the throttle rises to keep the attitude (stronger response, but hard moves lift the drone). Default 0.","Throttle Assist（スロットル補助）
+ロール・ピッチ・ヨーの指令がモーターの出せる範囲を超えるとき、スロットルをどれだけ動かして合わせるかを決めます（%）。
+0 = オフ：スロットルはスティックのまま、超える分だけ指令を小さくします（強く動かしても浮かない · 大きな動きは弱くなる）。
+100 = 姿勢を守るためにスロットルを上げます（反応は強いが、強く動かすと浮く）。既定 0。","Throttle Assist（油门辅助）
+当横滚、俯仰、偏航指令超出电机可输出范围时，决定油门可移动多少（%）来腾出空间。
+0 = 关闭：油门保持摇杆位置，超出部分按比例缩小指令（大动作也不会上升 · 大动作会变弱）。
+100 = 为保持姿态而抬升油门（反应强，但大动作时会上升）。默认 0。"
+212,데드존 · 막대 → 드론,Deadzone · stick → drone,デッドゾーン · スティック → ドローン,死区 · 摇杆 → 无人机
+213,"데드존(%): 막대를 조금 밀어도 반응하지 않는 칸입니다.
+DZ RnP · DZ YAW: 가운데 ± 이만큼 = 0, 끝 이만큼 = 최대.
+DZ THR: 바닥 이만큼 = 0, 꼭대기 이만큼 = 최대.
+그래프는 데드존 · SPEED · 조종 곡선을 거쳐 드론에 가는 값입니다(가로 = 막대 위치).
+'적용'을 누르면 조종기에 들어갑니다. 조종기 SETUP > FUNCTION 의 DZ 세 줄과 같은 값입니다.","Deadzone (%): the part of the stick travel that does nothing.
+DZ RnP · DZ YAW: ± this much around the center = 0, this much at the ends = full.
+DZ THR: this much at the bottom = 0, this much at the top = full.
+The graphs show what goes to the drone after the deadzone, SPEED and the curve (across = stick position).
+Press Apply to write it to the controller. Same values as the three DZ lines in the controller SETUP > FUNCTION menu.","デッドゾーン（%）：スティックを少し動かしても反応しない範囲です。
+DZ RnP · DZ YAW：中央 ± この幅 = 0、端のこの幅 = 最大。
+DZ THR：下端のこの幅 = 0、上端のこの幅 = 最大。
+グラフはデッドゾーン · SPEED · 操縦カーブを通ってドローンに送られる値です（横 = スティック位置）。
+「適用」を押すとコントローラーに書き込みます。コントローラー SETUP > FUNCTION の DZ 3 行と同じ値です。","死区（%）：摇杆稍微推动也不反应的范围。
+DZ RnP · DZ YAW：中心 ± 此范围 = 0，两端此范围 = 最大。
+DZ THR：底部此范围 = 0，顶部此范围 = 最大。
+图表为经过死区、SPEED、操控曲线后发送给无人机的值（横轴 = 摇杆位置）。
+按“应用”写入遥控器。与遥控器 SETUP > FUNCTION 的三行 DZ 相同。"
+214,데드존은 조종기 펌웨어 1.3.0 이상에서 바꿀 수 있습니다(그래프는 기본값),Deadzone needs controller firmware 1.3.0 or later (graphs show the defaults),デッドゾーンはコントローラーファームウェア 1.3.0 以上で変更できます（グラフは既定値）,死区需要遥控器固件 1.3.0 或以上（图表为默认值）
+215,조종기에 맡김 — 드론과 연결되면 보냅니다,Kept in the controller — sent when the drone connects,コントローラーに保存 — ドローンと接続したら送ります,已保存在遥控器 — 连接无人机后发送
+216,조종기에 맡김 — 드론이 대기(착륙)하면 보냅니다,Kept in the controller — sent when the drone is on standby (landed),コントローラーに保存 — ドローンが待機（着陸）したら送ります,已保存在遥控器 — 无人机待机（着陆）后发送
+217,드론에 보내는 중…,Sending to the drone…,ドローンに送信中…,正在发送到无人机…
+218,드론이 값을 받지 않았습니다,The drone did not take the values,ドローンが値を受け付けませんでした,无人机未接受这些值
+219,드론과 연결되면 기본값으로 바꿉니다,Will reset to defaults when the drone connects,ドローンと接続したら既定値に戻します,连接无人机后恢复默认值
+220,드론과 연결 안 됨 — 마지막으로 받은 값,Drone not connected — last values received,ドローン未接続 — 最後に受け取った値,未连接无人机 — 最后收到的值
+221,웹판에서는 아직 안 되는 기능입니다 — PC판을 써 주세요,Not available in the web version yet — please use the PC version,ウェブ版ではまだ使えません — PC版をお使いください,网页版暂不支持此功能 — 请使用电脑版
+222,이 브라우저는 USB 연결을 못 합니다 — 크롬·엣지·이고 브라우저에서 열어 주세요,This browser cannot use USB — please open it in Chrome / Edge / ego,このブラウザはUSB接続できません — Chrome・Edge・egoで開いてください,此浏览器无法连接USB — 请用Chrome、Edge或ego打开

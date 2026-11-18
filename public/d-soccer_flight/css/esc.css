@@ -1,0 +1,130 @@
+/* ESC 탭 — 원본 ESC_Content (칸은 #view 기준, 칸 안은 칸 기준 = 무대 좌표 −(250,130) / −(1085,130+…)) */
+#esc-common { left: 20px; top: 0; width: 815px; height: 845px; }
+#esc-common > h3 { text-align: left; padding-left: 41px; }
+#esc-common > .rule { left: 40px; right: auto; width: 735px; top: 50.5px; } /* 원본 Line L40 T50.5 735×1 */
+.esc-cp, .esc-in { position: absolute; inset: 0; }
+
+/* 공통 단추(원본 Button: 네모, 누르면 어둡게) */
+.esc-b { position: absolute; border: 0; padding: 0; font: 16px NK, sans-serif; color: #323232; cursor: pointer; }
+.esc-b:disabled { opacity: .5; cursor: default; filter: none; }
+.esc-b.blink { background: #ffb3b3 !important; }  /* hex 를 먼저 열라는 깜빡임 (원본 1, 0.7, 0.7) */
+
+/* 글·도움(?)·구역 제목 */
+/* 자리·크기·정렬은 esc_config.js 가 원본(esc_layout.js)대로 넣음 — 여기는 모양만 */
+.esc-lab, .esc-sec, .esc-unit-us { position: absolute; display: flex; white-space: nowrap; }
+.help { position: absolute; display: flex; align-items: center; justify-content: center; border-radius: 50%;
+  background: #828282; color: #000; font: 500 12.8px NK, sans-serif; cursor: help; } /* 원본 Help: circle 0.51 회색 22×0.8 · "?" NotoSansKR-Medium 16×0.8 */
+.esc-sec { font-weight: 500; } /* 원본 Title (1): NotoSansJP-Medium 20 */
+.esc-sec, .esc-unit-us { font-family: NJ, NK, "Malgun Gothic", sans-serif; }
+.esc-unit-us { font-weight: 500; }
+.esc-line { position: absolute; background: var(--line); }
+/* 원본 Help Bubble(Left)·(Right): 색 (0.804, 0.851, 0.847) · 상자 boxR · 글 NotoSansKR-Medium 16 검정 가운데 · 줄바꿈 없음 · 그림자 없음 */
+#escBubble { width: 0; height: 0; z-index: 70; pointer-events: none; }
+#escBubble .cone { position: absolute; background: #cdd9d8; -webkit-mask: url(../assets/img/cone_100X50.png) no-repeat center / 100% 100%; mask: url(../assets/img/cone_100X50.png) no-repeat center / 100% 100%; }
+#escBubble .box { position: absolute; display: flex; align-items: center; justify-content: center; background: #cdd9d8; border-radius: var(--radius); }
+#escBubble span { font-size: 16px; font-weight: 500; color: #000; white-space: pre; text-align: center; line-height: 1.448; }
+#escBubble.left .cone { left: 0; top: -16px; width: 40px; height: 32px; }
+#escBubble.left .box { left: 19.9px; top: -45px; width: 360px; height: 90px; }
+#escBubble.right .cone { left: 0; top: -13px; width: 20px; height: 26px; transform-origin: 0 50%; transform: rotate(90deg); }
+#escBubble.right .box { left: -313.1px; top: 11.6px; width: 360px; height: 60px; }
+
+/* 드롭다운(원본 Dropdown — 흰 칸, 회색 글) */
+/* 원본 Dropdown (Legacy): UISprite 흰 칸 · Label NotoSansKR-Medium · 화살표 DropdownArrow 16 (자리·크기는 esc_config.js) */
+/* 칸(UISprite)은 바로 뒤 .dd-bg 가 그림 — select 에 칸을 그리면 칸의 속(fill)이 ▼ 화살표(배경 그림)를 덮고, 올림 색이 글자까지 어둡게 함 */
+.dd { position: absolute; z-index: 1; box-sizing: border-box; padding: 0; font: 500 16px NK, sans-serif; color: #323232; border: 0;
+  -webkit-appearance: none; appearance: none; cursor: pointer; outline: none; background: url(../assets/img/ui/DropdownArrow.png) no-repeat; }
+.dd-bg { position: absolute; pointer-events: none; border-image: url(../assets/img/ui/UISprite.png) 10 fill / 4px stretch; }
+
+/* 켜고 끄기(원본 Toggle — Background UISprite 흰 칸 36 · 켜면 Checkmark 24) */
+.esc-tg { position: absolute; box-sizing: border-box; cursor: pointer; }
+.esc-tg::before { content: ""; position: absolute; inset: 0; border-image: url(../assets/img/ui/UISprite.png) 10 fill / 4px stretch; } /* Background — 올림 색은 이 칸만(states.css) */
+.esc-ck { position: absolute; display: none; background: url(../assets/img/ui/Checkmark.png) no-repeat center / contain; }
+.esc-tg.on .esc-ck { display: block; }
+/* 펼친 목록 — 원본 Dropdown (Legacy)/Template(Unity 기본): UISprite 칸 · 항목 32 · 고른 항목 Checkmark · 넘치면 오른쪽 16 스크롤 막대 */
+.dl.esc { border: 0; border-image: url(../assets/img/ui/UISprite.png) 10 fill / 4px stretch; }
+.dl.esc .it { height: 32px; background: #f5f5f5; }
+.dl.esc .it i { left: 0; top: 8px; width: 16px; height: 16px; background: url(../assets/img/ui/Checkmark.png) no-repeat center / contain; }
+.dl.esc .it span { left: 16px; right: 8px; top: 4px; height: 24px; font: 500 16px NK, sans-serif; color: #323232; }
+.dl.esc .vp::-webkit-scrollbar { width: 16px; }
+.dl.esc .vp::-webkit-scrollbar-track { background: #d6d6d6; border-radius: 4px; box-shadow: inset 0 0 0 .4px #323232; } /* 원본 Scrollbar: Background 그림 */
+.dl.esc .vp::-webkit-scrollbar-thumb { background: #f5f5f5; border-radius: 4px; box-shadow: inset 0 0 0 .4px #323232; min-height: 40px; } /* 손잡이: UISprite */
+
+/* 값 칸(sliderRow): 원본 글자 16px */
+#page-esc .sval { font-size: 16px; }
+
+/* ESC 1~4 칸 */
+.esc-unit { left: 855px; width: 815px; height: 200px; }
+.esc-title { position: absolute; left: 25px; top: 0; height: 40px; line-height: 40px; font-size: 20px; font-weight: 500; white-space: nowrap; } /* 원본 Title: NotoSansJP-Medium 20 */
+.esc-unit > .rule { top: 44.5px; left: 22.5px; right: auto; width: 770px; } /* 원본 ESC1/Line L22.5 T44.5 770×1 */
+.esc-upd { left: 37.3px; top: 145.5px; width: 480px; height: 40px; background: #fff7e6; color: #000; } /* 원본 Button (Legacy) */
+.esc-bar { position: absolute; left: 530px; top: 145px; width: 270px; height: 42px; padding: 2px; background: #1b1b1b; }
+.esc-bar i { display: block; height: 38px; width: 0; background: #9eb900; }
+.esc-stat { position: absolute; left: 530px; top: 151px; width: 270px; height: 30px; line-height: 30px; text-align: center; font-size: 16px; white-space: nowrap; }
+/* PPM 칸: 슬라이더 아래 투명 값 칸(원본 SliderManager_ESC — 흰 글자 가운데) + µs */
+.esc-ppm .sval { background: transparent; color: #fff; text-align: center; font-size: 16px; }
+
+/* 아래 단추 줄 */
+#esc-bar { left: 20px; top: 859px; width: 1650px; height: 70px; }
+#esc-hex { left: 24px; top: 15px; width: 130px; height: 40px; background: #f2f2f2; white-space: nowrap; }
+#esc-hexname { position: absolute; left: 163px; top: 20px; width: 200px; height: 30px; line-height: 30px; font-size: 14px; white-space: nowrap; overflow: hidden; }
+#esc-reset { left: 731px; top: 15px; width: 130px; height: 40px; background: #ccc; }
+#esc-updall { left: 872px; top: 15px; width: 480px; height: 40px; background: #f5ecdb; }
+#esc-send { left: 1363px; top: 15px; width: 130px; height: 40px; background: #f2f5db; }
+#esc-read { left: 1504px; top: 15px; width: 130px; height: 40px; background: #f2f2f2; }
+.esc-pop { position: absolute; top: -282px; width: 160px; height: 300px; z-index: 5; }
+#esc-pop-send { left: 1348px; }
+#esc-pop-read { left: 1489px; }
+.esc-pop-box { position: absolute; left: 0; top: 0; width: 160px; height: 260px; background: #696969; border-radius: var(--radius); box-shadow: 0 6px 18px rgba(0, 0, 0, .24); }
+.esc-pop-box .esc-b { left: 20px; width: 120px; height: 35px; font-size: 14px; }
+.esc-pop-box .esc-b:nth-child(1) { top: 20px; } .esc-pop-box .esc-b:nth-child(2) { top: 60px; }
+.esc-pop-box .esc-b:nth-child(3) { top: 100px; } .esc-pop-box .esc-b:nth-child(4) { top: 140px; }
+.esc-pop-box .esc-b.all { top: 180px; height: 60px; }
+#esc-pop-send .esc-b { background: #f2f5db; }
+#esc-pop-read .esc-b { background: #f2f2f2; }
+.esc-pop-cone { position: absolute; left: 68px; top: 260px; border: 12px solid transparent; border-top-color: #696969; border-bottom: 0; }
+.esc-pop-detect { position: absolute; left: 30px; top: 250px; width: 100px; height: 50px; }
+
+/* 들어올 때 알림 */
+#esc-note { position: absolute; left: 19.9px; top: -0.4px; width: 1650.7px; height: 930.8px; background: rgba(0, 0, 0, .64); border-radius: var(--radius); z-index: 20; } /* 원본 ESC Notification #000/0.8235 */
+/* 원본 Message L713.8 T421.6 480×240 · Outline #000/0.5 (10,10) 은 꺼져 있음(원본 캡처 u07: 상자 바로 바깥도 바탕과 같은 밝기) */
+.esc-note-box { position: absolute; left: 463.9px; top: 292px; width: 480px; height: 240px; background: var(--msg); border-radius: var(--radius); animation: escBox .428s .929s cubic-bezier(.333, 0, .667, 1) both; }
+/* 원본 ESCNotification_OnEnable: 바탕 0.643→1.114초에 0→0.8235 · 안내 상자 0.929→1.357초에 나타남 */
+#esc-note { animation: escBg 1.114s linear both; }
+@keyframes escBg { 0%, 57.7% { background-color: rgba(0, 0, 0, 0); animation-timing-function: cubic-bezier(.333, 0, .667, 1); } 100% { background-color: rgba(0, 0, 0, .64); } }
+@keyframes escBox { from { opacity: 0; } to { opacity: 1; } }
+/* 원본 Content1(20 Light, 가운데 73) · Content2(22 Medium #ff696a + 검은 Outline 1, 가운데 107.2) — 화면 파일엔 빈 줄이 붙어 있지만 실행 때
+   언어표 글자(118·114, 빈 줄 없음)로 바뀌어 보이는 줄이 칸 가운데에 섬(원본 캡처 u07: 잉크 가운데 495.0 · 529.8) */
+.esc-note-1 { position: absolute; left: 0; right: 0; top: 58.5px; height: 29px; line-height: 29px; text-align: center; font-size: 20px; }
+.esc-note-2 { position: absolute; left: 0; right: 0; top: 91.25px; height: 31.9px; line-height: 31.9px; text-align: center; font-size: 22px; font-weight: 500; color: #ff696a;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, .31), -1px 1px 0 rgba(0, 0, 0, .31), 1px -1px 0 rgba(0, 0, 0, .31), -1px -1px 0 rgba(0, 0, 0, .31); }
+#esc-yes, #esc-no { top: 171.3px; width: 150px; height: 35px; border-radius: 4.75px; font-size: 18px; font-weight: 500; color: #000; } /* boxR 배율 2 · NotoSansKR-Medium 18 */
+#esc-yes { left: 84.6px; background: #fff7df; }
+#esc-no { left: 245.4px; background: #ccc; }
+
+/* hex 열기 창 · 업데이트 중 가림막 · 시험 창(원본 Canvas/Top · Overlay Canvas) */
+#escUpBlock { inset: 0; background: rgba(0, 60, 3, .25); z-index: 58; display: flex; align-items: center; justify-content: center;
+  font-size: 28px; color: #ffd62e; text-align: center; white-space: pre-line; line-height: 1.4;
+  text-shadow: 1.5px 1.5px 0 rgba(0, 0, 0, .35), 1.5px -1.5px 0 rgba(0, 0, 0, .35), -1.5px 1.5px 0 rgba(0, 0, 0, .35), -1.5px -1.5px 0 rgba(0, 0, 0, .35); } /* 원본 ESC Info Text Outline #000/0.5 (1.5,−1.5) — 대각선 네 벌 */
+#escHexDlg { inset: 0; background: rgba(0, 0, 0, .46); z-index: 46; }
+.ehd-box { position: absolute; left: 695px; top: 411px; width: 520px; height: 260px; background: var(--msg); border-radius: var(--radius);
+  box-shadow: 10px 10px 0 rgba(0, 0, 0, .35), 10px -10px 0 rgba(0, 0, 0, .35), -10px 10px 0 rgba(0, 0, 0, .35), -10px -10px 0 rgba(0, 0, 0, .35); }
+/* 원본 Background Outline #000/0.5 (10,10) 켜짐: 같은 상자를 대각선 네 방향 ±10 으로 뒤에 깔기 — 원본은 선형 섞기라 sRGB 로는 한 벌 0.35 가 가장 가까움 */
+.ehd-title { position: absolute; left: 0; right: 0; top: 39px; text-align: center; font-size: 22px; }
+.ehd-list, .ehd-list-bg { left: 80px; top: 108.6px; width: 360px; height: 32px; }
+.ehd-list { padding-left: 8px; background-position: 340px 8px; background-size: 16px 16px; } /* 원본 Dropdown 360×32(450×40 × 0.8) · Label +8 · Arrow (340, 8) 16 */
+.ehd-ok { left: 200px; top: 178px; width: 120px; height: 35px; border-radius: var(--radius); background: #fff7de; color: #000; font-size: 18px; }
+.ehd-pc { left: 415px; top: 210px; width: 90px; height: 35px; border-radius: var(--radius); background: #ccc; color: #000; font-size: 14px; }
+.ehd-x, .ehd-wifi { position: absolute; background: #fff; -webkit-mask: no-repeat center / contain; }
+.ehd-x { left: 485px; top: 15px; width: 20px; height: 20px; cursor: pointer; -webkit-mask-image: url(../assets/img/X_icon.png); }
+.ehd-wifi { left: 123px; top: 174px; width: 40px; height: 40px; -webkit-mask-image: url(../assets/img/no-wifi.png); }
+#escTest { inset: 0; background: rgba(0, 0, 0, .59); z-index: 44; }
+.et-box { position: absolute; left: 335px; top: 227px; width: 1250px; height: 625px; background: var(--msg); border-radius: var(--radius); }
+.et-b { position: absolute; left: 91px; width: 220px; height: 50px; border: 0; background: #fff; font: 20px NK, sans-serif; color: #323232; cursor: pointer; }
+.et-b:disabled { opacity: .5; cursor: default; }
+.et-prev { position: absolute; left: 384px; top: 105px; width: 800px; height: 450px; background: #fff; border-radius: var(--radius); overflow: hidden; }
+.et-prev pre { margin: 0; padding: 15px 10px; font: 14px/1.5 Consolas, monospace; color: #000; text-align: center; white-space: pre; }
+.et-k, .et-v { position: absolute; height: 40px; line-height: 40px; font-size: 20px; color: #000; white-space: nowrap; }
+.et-k { left: 703px; width: 150px; } .et-v { left: 848px; width: 300px; }
+.et-x { left: 1205px; top: 15px; width: 30px; height: 30px; }
+#escTestOpen { position: absolute; left: 704px; top: 601px; width: 90px; height: 60px; border: 0; background: #f2f2f2; color: #323232; font: 14px NK, sans-serif; white-space: pre-line; cursor: pointer; }
+#escTestOpen2 { left: 33px; top: 853px; width: 185px; height: 45px; border: 0; border-radius: 22px; background: var(--bg); color: #fff; font: 20px NK, sans-serif; z-index: 42; cursor: pointer; }

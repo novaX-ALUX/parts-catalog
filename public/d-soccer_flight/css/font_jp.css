@@ -1,0 +1,22 @@
+/* 원본이 NotoSansJP 를 쓰는 글자 칸(배포판 level1 Text.m_Font — tools/check_vs_shipped.mjs '글꼴' 검사가 찾음).
+   NJ = 원본 NotoSansJP 에서 언어표 일본어·중국어 한자만 뽑은 것(tools/jp_font.py). 한글·가나·영문·숫자는 NJ 에 없어 NK 로 그려짐
+   — 원본 JP 글꼴에도 한글이 없어 KR 로 대체되고, 가나·영문·숫자는 두 글꼴 모양·폭이 똑같다. 그래서 바뀌는 것은 일본어·중국어 화면의 한자뿐 */
+@font-face { font-family: NJ; src: url("../assets/fonts/NotoSansJP-Light.woff") format("woff"); font-weight: 300; }
+@font-face { font-family: NJ; src: url("../assets/fonts/NotoSansJP-Medium.woff") format("woff"); font-weight: 500; }
+
+/* 탭 이름(Setting/PID Tuning/Motors/ESC Text) */
+.tab .name,
+/* 상태: 칸 제목 · 가속도계 교정 · Z축 초기화 · 3D 자세 글 · 그래프 갱신 간격 */
+#st-info h3, #st-led h3, #st-graph h3, #st-cal h3, #btnCal, #btnOffset, #st-3d .att-k, #st-3d .att-v, .g-rate-v, .g-rate-ms,
+/* PID: 칸 제목 · 축·항목 이름 · 프로파일·저장·초기화 단추 */
+#pid-now h3, #pid-set h3, #pid-angle h3, #pid-misc h3, #pid-now .pn-axis, #pid-now .pn-k, #pid-set .axis, #pid-angle .mk, #pid-misc .mk,
+#pid-set button, #pid-reset, #pid-save,
+/* 모터: 칸 제목 · 경고 글 · 단추 글 · 모터 번호 · 출력 칸 글 */
+#mt-rot h3, #mt-out h3, .mt-warn-text, .mt-check-text, [id^="mt-dir-"] span, [id^="mt-rot-"] span, [id^="mt-num-"] span,
+.mo-mlabel, .mo-name, .mo-val, .mo-boxval, .mo-kv,
+/* ESC: 공통 설정 제목 · ESC 칸 제목 */
+#esc-common h3, .esc-title,
+/* 펌웨어 굽기 물어보기 Yes/No */
+.fwu-btn {
+  font-family: NJ, NK, "Malgun Gothic", sans-serif;
+}

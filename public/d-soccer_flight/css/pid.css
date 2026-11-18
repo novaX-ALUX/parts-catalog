@@ -1,0 +1,65 @@
+/* PID 튜닝 탭 — 원본 PID Tuning_Content. 자리·크기·색은 배포판에서 뽑은 design/shipped_ui.json(tools/ship_show.mjs) — #view 기준 = 무대 −(230,130) */
+#pid-now { left: 20.9px; top: 0; width: 350.2px; height: 842.3px; }       /* PIDCurrent L250.9 T130 */
+#pid-set { left: 389.7px; top: -1px; width: 1273.6px; height: 584.9px; }  /* ProfileSetting L619.7 T129 */
+#pid-angle { left: 389.7px; top: 603.4px; width: 627.7px; height: 238.5px; } /* Angle L619.7 T733.4 */
+#pid-misc { left: 1036.1px; top: 603.6px; width: 627.2px; height: 238.2px; } /* DynamicS L1266.1 T733.6 */
+
+/* 칸 제목·밑줄 — 원본 Title·Line 칸 그대로 */
+#pid-now > h3 { position: absolute; left: 96px; top: 10.4px; width: 160px; height: 30px; line-height: 30px; }
+#pid-set > h3 { position: absolute; left: 486.8px; top: 0.6px; width: 300px; }
+#pid-angle > h3 { position: absolute; left: 275.8px; top: 4.9px; width: 76px; height: 41px; line-height: 41px; }
+#pid-misc > h3 { position: absolute; left: 201.2px; top: 4.9px; width: 224.9px; height: 41px; line-height: 41px; }
+#pid-now > .rule { left: 21px; right: auto; width: 310px; top: 53.7px; }
+#pid-set > .rule { left: 18.8px; right: auto; width: 1236.1px; top: 54.7px; }
+#pid-angle > .rule { left: 38.8px; right: auto; width: 550px; top: 53.7px; }
+#pid-misc > .rule { left: 38.6px; right: auto; width: 550px; top: 53.7px; }
+
+/* PID 정보(현재 FC 값) — 원본 PIDCurrent/ValueBox: 글자 칸마다 원본 좌표(가운데 정렬) */
+.pn-msg { position: absolute; left: 15.1px; top: 92.1px; width: 331.8px; height: 70px; font-size: 20px; display: flex; align-items: center; justify-content: center; text-align: center; } /* CurMessage NotoSansKR-Light 20 맞춤 */
+.pn-pend { position: absolute; left: 15.1px; top: 150px; width: 331.8px; height: 30px; font-size: 15px; display: flex; align-items: center; justify-content: center; text-align: center; color: var(--accent); } /* 조종기 1.3.0: 조종기가 맡아 둔 PID 상태 */
+.pn-t { position: absolute; display: flex; align-items: center; justify-content: center; white-space: nowrap; }
+.pn-axis { width: 160px; height: 30px; font-size: 20px; }          /* ROLL·PITCH·YAW NotoSansJP-Light 20 */
+.pn-lab { width: 100px; height: 50px; font-size: 20px; }           /* DegreeP·RateP·RateD NotoSansKR-Light 20 */
+.pn-val { width: 160px; height: 30px; font-size: 16px; font-variant-numeric: tabular-nums; } /* ValueText NotoSansKR-Light 16 */
+.pn-k { width: 200px; height: 30px; font-size: 17px; }             /* Degree … NotoSansJP-Light 17 */
+#pid-reset { left: 86px; top: 770.3px; width: 180px; height: 40px; font-size: 16px; font-weight: 500; border-width: 1px; border-radius: 5.9px; } /* Reset RoundBox 배율 4 · NotoSansJP-Medium 16 */
+
+/* 프로파일 1~4 — 원본 ProfileBtn: 139 간격 140×40(1 겹침), 1·4 만 바깥 모서리 둥긂(11), 단추마다 반투명 흰 Outline 1px · 고른 것 흰 바탕·검은 굵은 글자 */
+.prof button { position: absolute; top: 80px; width: 140px; height: 40px; white-space: nowrap; border: 0; background: #939598; color: #fff; font: 300 20px NK, sans-serif; cursor: pointer; box-shadow: 0 0 0 1px rgba(255, 255, 255, .83); }
+/* 원본 Outline 흰색 0.5 (1,−1): 대각선 네 벌이 테두리에서 두 벌씩 겹쳐 선형 75% → 어두운 바탕 위 226 · 회색 위 234 (HP 원본 사진) — sRGB 섞기로는 0.83 이 둘 다 가장 가까움 */
+.prof button:nth-child(1) { left: 25.5px; border-radius: 11px 0 0 11px; } .prof button:nth-child(2) { left: 164.5px; }
+.prof button:nth-child(3) { left: 303.5px; } .prof button:nth-child(4) { left: 442.5px; border-radius: 0 11px 11px 0; }
+.prof button.sel { background: #fff; color: #000; font-weight: 500; }   /* FontStyle.Bold = Light 가짜 굵게 */
+#pid-save { left: 1111.6px; top: 80.9px; width: 140px; height: 40px; font-size: 16px; border-width: 1px; border-radius: 5.9px; } /* SaveBtn RoundBox 배율 4 · NotoSansJP-Light 16 */
+#pid-note { position: absolute; left: 20px; top: 145.3px; width: 1233.6px; height: 152.8px; border: 0; border-radius: 15.7px; padding: 7px 15px; resize: none; font: 20px NK, sans-serif; color: #323232; background: #fff; outline: none; } /* InputField(TMP) RoundBox_2 배율 1.5 · Text Area 안 여백 15·7 */
+#pid-note::placeholder { color: #9a9a9a; }
+.ph { position: absolute; width: 320px; top: 313.4px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 20px; } /* RPYText Text1~3 320×30 */
+.axis { position: absolute; left: -20.4px; width: 160px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 16px; } /* ROLL·PITCH·YAW NotoSansJP-Light 16 */
+.vsep { position: absolute; top: 377.8px; width: 1px; height: 150px; background: var(--line); }
+
+/* 값 한 줄(원본 Value · Down · Slider · Up) — 값 상자 왼쪽 위 기준: − +64.3 · 슬라이더 +108.7(170) · + +298, 셋 다 위 +5 · 20×20
+   :where 로 우선순위를 낮춰 ESC 칸(.esc-ppm …)의 덮어쓰기가 이기게 */
+:where(.srow) { position: absolute; width: 318px; height: 30px; }
+:where(.srow) > .sval { position: absolute; left: 0; top: 0; }
+:where(.srow) > .sbtn { position: absolute; top: 5px; width: 20px; height: 20px; }
+:where(.srow) > .sbtn.minus { left: 64.3px; } :where(.srow) > .sbtn.minus.big { left: 61.8px; top: 2.5px; width: 25px; height: 25px; } /* 원본 Roll DegreeP 의 − 만 25×25 */
+:where(.srow) > .sbtn.plus { left: 298px; }
+:where(.srow) > .srange { position: absolute; left: 98.7px; top: 5px; margin: 0; }   /* 원본보다 양쪽 10 넓게 — 손잡이 가운데가 트랙 0~170 전체를 움직임(Handle Slide Area 여백 0) */
+/* 원본 Value: 50×30 흰 상자(위 3줄 RoundBox_2 배율 3 → 반지름 7.8 · 아래 boxR → 9.5) · 글자 NotoSansJP-Medium 16 → 자동 맞춤(40×20 칸)으로 13 */
+.sval { border: 0; outline: none; background: #fff; color: #000; text-align: center; font: 500 13px NK, sans-serif; padding: 0; }
+.sval.bubble { width: 50px; height: 30px; border-radius: 7.8px; }
+.sval.pill { width: 50px; height: 30px; border-radius: 9.5px; }
+.sval:focus { box-shadow: 0 0 0 3px var(--accent); }
+.sval::placeholder { color: #000; opacity: 1; }   /* 원본 Placeholder 글자도 검은색 */
+/* 원본 Up/Down: 흰 '+' '−' 그림(+.png · -.png) 20×20 */
+.sbtn { border: 0; padding: 0; cursor: pointer; background: center / contain no-repeat; font-size: 0; }
+.sbtn.minus { background-image: url(../assets/img/-.png); } .sbtn.plus { background-image: url(../assets/img/+.png); }
+/* 원본 Slider 170×20: 트랙 1.5(흰 0.4) · 채움 4.5(흰, 손잡이 가운데 +5 까지) · 손잡이 20 흰 원 + 연회색 Outline 0.5 */
+.srange { -webkit-appearance: none; appearance: none; width: 190px; height: 20px; background: transparent; cursor: pointer; --t: 0; }
+.srange::-webkit-slider-runnable-track { height: 4.5px;
+  background: linear-gradient(#fff, #fff) no-repeat 5px 0 / calc(10px + var(--t) * (100% - 20px)) 100%, linear-gradient(rgba(255, 255, 255, .59), rgba(255, 255, 255, .59)) no-repeat 10px 50% / calc(100% - 20px) 1.5px; }
+.srange::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #fff; margin-top: -7.75px; box-shadow: 0 0 0 .5px #e4e4e2; }
+.mk { position: absolute; width: 190px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 18px; } /* Degree · Degree/s … NotoSansJP-Light 18 */
+
+/* 언어별 조정(원본 LanguageUIChange): 일본어 프로파일 글자 16 */
+:root[data-lang="Japanese"] .prof button { font-size: 16px; }

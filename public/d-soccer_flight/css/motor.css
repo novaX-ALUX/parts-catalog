@@ -1,0 +1,97 @@
+/* 모터 탭 — 원본 Motors_Content (칸 위치는 #view 기준, 칸 안 위치는 칸 기준 = 무대 좌표 −(250,130) / −(1085,130)) */
+#mt-rot { left: 20px; top: 0; width: 815px; height: 930px; }
+#mt-out { left: 855px; top: 0; width: 815px; height: 930px; }
+.mt-content { position: absolute; inset: 0; }
+
+/* 흰 그림을 색으로 칠하기(원본 Image.color 곱하기) */
+.mt-spin-img, .mt-follow, .mt-arrow, .mt-btn .ico { -webkit-mask-repeat: no-repeat; -webkit-mask-position: center; -webkit-mask-size: contain; }
+
+/* ── 모터 회전 칸 ── */
+.mt-drone { position: absolute; left: 307px; top: 216px; width: 200px; height: 200px; pointer-events: none; }
+.mt-spin { position: absolute; width: 120px; height: 120px; }
+.mt-spin-img { position: absolute; inset: 0; background: var(--c, #b0afaf); -webkit-mask-image: var(--img); }
+.mt-arrow { position: absolute; width: 20px; height: 40px; background: #fff; -webkit-mask-image: url(../assets/img/motor/arrow_button.png); display: none; pointer-events: none; }
+.mt-spin.hover .mt-arrow { display: block; }
+.mt-num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: 700 40px NK, sans-serif; cursor: grab; touch-action: none; }
+.mt-num span { position: relative; }
+.mt-num.drag { z-index: 5; cursor: grabbing; }
+.mt-follow { position: absolute; inset: 0; background: #fff; -webkit-mask-image: var(--img); display: none; }
+.mt-num.drag .mt-follow { display: block; }
+.mt-num.drag span { color: #1d1d1d; }
+
+/* 원본 Motor Rot · Direction 150×50: RoundBox 테두리(배율 3.5 → --k .286) · 아이콘 L12.5 T12.5 25×25 · 글자 칸 L40 T5 100×40 NotoSansJP-Medium 20 굵게(맞춤) */
+.mt-btn { position: absolute; width: 150px; height: 50px; --c: #3ebfff; --k: .286; color: var(--c); font: 700 20px NK, sans-serif; cursor: pointer; touch-action: none; }
+.mt-btn span { position: absolute; left: 40px; top: 5px; width: 100px; height: 40px; display: flex; align-items: center; justify-content: center; white-space: nowrap; overflow: hidden; } /* 긴 글자(영어)는 줄여 맞춤(data-fit · 원본 Best Fit) */
+.mt-btn .ico { position: absolute; left: 12.5px; top: 12.5px; width: 25px; height: 25px; background: var(--c); }
+.mt-btn .ico.play { -webkit-mask-image: url(../assets/img/motor/Motor_play.png); }
+.mt-btn .ico.rev { -webkit-mask-image: url(../assets/img/motor/Motor_reverse.png); }
+.mt-btn.wide { width: 195px; }
+.mt-btn.wide.mt-rotbtn span { left: 45.5px; width: 140px; } .mt-btn.wide.mt-dirbtn span { left: 50px; width: 130px; } /* MotorAll 글자 칸 */
+#mt-rot-4::before { background: #42cffe; }   /* 원본 MotorAll/Motor Rot 테두리만 #42cffe(글자·아이콘은 #3ebfff) */
+.mt-dirbtn { --c: #fff; }
+.mt-dirbtn.turned { --c: #ff8000; }   /* 방향을 바꾼 버튼(원본 주황) */
+
+/* 가림막 — 경고를 체크하기 전(원본 Prevent Click_*) · 방향 전환 중 */
+.mt-prevent { position: absolute; inset: 0; background: rgba(0, 0, 0, .61); border-radius: var(--radius); }
+#mt-prevent-out { background: rgba(0, 0, 0, .61); }
+#mt-changing span { position: absolute; left: 0; right: 0; top: 335px; text-align: center; font-size: 36px; }
+
+/* 경고 칸 + 체크 */
+.mt-warn { position: absolute; left: 20px; width: 775px; background: var(--msg); border-radius: var(--radius); }
+.mt-warn-text { position: absolute; left: 25px; width: 725px; font-size: 18px; line-height: 1.88; } /* 원본 줄 간격 1.3 × 글꼴 줄 높이 1.448 */
+.mt-warn-line { position: absolute; left: 22px; width: 730px; height: 1px; background: var(--line); }
+.mt-check-text { position: absolute; width: 675px; font-size: 18px; font-weight: 500; line-height: 1.448; display: flex; align-items: center; } /* 원본 TextWarning2·Text 3: NotoSansJP-Medium 18 · 줄 간격 1 */
+.mt-check-text.flash { animation: mtFlash .32s linear; }
+@keyframes mtFlash { 50% { color: #ff0000; } }
+.mt-check { position: absolute; width: 60px; height: 35px; cursor: pointer; }
+.mt-check i { position: absolute; left: 15px; top: 3px; width: 30px; height: 30px; border: 2px solid #fff; border-radius: 3px; }
+.mt-check.on i { background: #3ebfff; border-color: #3ebfff; }
+.mt-check.on i::after { content: ""; position: absolute; left: 8px; top: 2px; width: 8px; height: 15px; border: solid #fff; border-width: 0 3px 3px 0; transform: rotate(45deg); }
+#mt-warn-rot { top: 690px; height: 220px; }
+#mt-warn-rot .mt-warn-text { top: 7px; height: 139px; display: flex; align-items: center; }
+#mt-warn-rot .mt-warn-line { top: 149px; display: none; } /* 원본 화면 그림(u06·v08·v09) 어디에도 이 선이 보이지 않음 — 실행 중 그려지지 않음 */
+#mt-warn-rot .mt-check-text { left: 163px; top: 153px; height: 60px; }
+#mt-warn-rot .mt-check { left: 97px; top: 167px; }
+#mt-warn-out { top: 634px; height: 275px; }
+#mt-warn-out .mt-warn-text { top: 8px; height: 195px; font-size: 16px; line-height: 2.03; } /* 원본 18 · 줄 간격 1.4 → 자동 맞춤(189px 에 6줄)으로 16 */
+#mt-warn-out .mt-warn-line { top: 204px; }
+#mt-warn-out .mt-check-text { left: 149px; top: 197px; height: 80px; }
+#mt-warn-out .mt-check { left: 85px; top: 222.9px; }
+
+/* ── 모터 출력 칸 ── */
+.mo-col { position: absolute; top: 0; width: 160px; height: 620px; }
+.mo-box { position: absolute; left: 5px; top: 101px; width: 150px; height: 220px; background: #939498; border-radius: 14px; overflow: hidden; }
+.mo-fill { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: #fff; }
+.mo-boxval { position: absolute; left: 0; right: 0; top: 90px; height: 30px; line-height: 30px; text-align: center; font-size: 20px; color: #000; }
+.mo-val, .mo-kv, .mo-name { position: absolute; height: 30px; line-height: 30px; text-align: center; font-size: 20px; white-space: nowrap; }
+.mo-val { left: 55px; top: 506px; width: 50px; }
+.mo-kv { left: 23px; top: 548px; width: 115px; }
+.mo-name { left: 23px; top: 581px; width: 115px; }
+.mo-master { position: absolute; left: 714px; top: 345px; width: 50px; height: 190px; }
+.mo-mlabel { position: absolute; left: -25px; width: 100px; top: 160px; height: 30px; line-height: 30px; text-align: center; font-size: 20px; }
+
+/* 세로 슬라이더(0 = 아래). --p = 0~1 */
+.vs { position: absolute; left: 55px; top: 346px; width: 50px; height: 150px; cursor: pointer; touch-action: none; }
+.mo-master .vs { left: 0; top: 0; }
+/* 원본 Slider 50×150: 트랙 1.5(흰 0.4 + 검은 0.5 Outline 1) · 채움 4.5(아래 끝 ~ 손잡이 가운데 +10) · 손잡이 24×25 흰 원(그림자 없음, 올리면 #83ffe1 · 누르면 #b4b4b4) */
+.vs-track { position: absolute; left: 24.3px; top: 0; width: 1.5px; height: 150px; background: rgba(255, 255, 255, .59); box-shadow: 0 0 0 1px rgba(0, 0, 0, .31); }
+.vs-fill { position: absolute; left: 22.8px; width: 4.5px; bottom: 0; height: calc(var(--p) * 130px + 20px); background: #fff; }
+.vs-handle { position: absolute; left: 13px; width: 24px; height: 25px; top: calc(127.5px - var(--p) * 130px); background: #fff; border-radius: 50%; }
+.vs.big .vs-handle { left: 7px; width: 36px; height: 37.5px; top: calc(121.25px - var(--p) * 130px); } /* MasterSlider 손잡이 1.5배 */
+
+/* 조종기 연결 때 막(원본 Mask - Motor: 옅은 막 + 1.7초 동안 어두워졌다 밝아지는 알림) */
+#motorMask { left: 242px; top: 129px; width: 1677px; height: 950px; background: rgba(0, 0, 0, .05); z-index: 35; }
+#motorMask .mm-pop { position: absolute; left: -242px; top: -129px; width: 1920px; height: 1080px; animation: mmFade 1.7s linear forwards; }
+@keyframes mmFade { 0% { background: rgba(0, 0, 0, 0); } 47% { background: rgba(0, 0, 0, .61); } 94%, 100% { background: rgba(0, 0, 0, 0); } }
+#motorMask .mm-msg { position: absolute; left: 720px; top: 491px; width: 480px; height: 120px; background: var(--msg); border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 500; text-align: center; white-space: pre; } /* 원본 Medium 26 · 글자 칸 360 줄바꿈 없음 */
+
+/* 칸 밑줄 — 원본 Line L22.5 T53.7 770×1 */
+#mt-rot > .rule, #mt-out > .rule { left: 22.5px; right: auto; width: 770px; top: 53.7px; }
+
+/* 언어별 조정(원본 LanguageUIChange): 경고 체크 묶음 가로 자리 — 기본 WarningCheckRot x −113.05 · WarningCheckOutput x −126.45 */
+:root[data-lang="Japanese"] #mt-warn-rot :is(.mt-check, .mt-check-text) { translate: 53.05px 0; }
+:root[data-lang="Chinese"] #mt-warn-rot :is(.mt-check, .mt-check-text) { translate: 88.05px 0; }
+:root[data-lang="English"] #mt-warn-out :is(.mt-check, .mt-check-text) { translate: -21.55px 0; }
+:root[data-lang="Japanese"] #mt-warn-out :is(.mt-check, .mt-check-text) { translate: 59.45px 0; }
+:root[data-lang="Chinese"] #mt-warn-out :is(.mt-check, .mt-check-text) { translate: 117.45px 0; }

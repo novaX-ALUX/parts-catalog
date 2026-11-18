@@ -18,3 +18,6 @@ tools/manual/__pycache__/
 
 # 로컬 미리보기 (preview 스킬)
 미리보기/
+
+# 웹판 D-Soccer Flight(public/d-soccer_flight · 만드는 곳 d_soccer_flight_tauri/tools/web_build.mjs) 안 three.js — PC 전체 설정의 build/ 무시에 걸리지 않게
+!public/d-soccer_flight/vendor/three/build/

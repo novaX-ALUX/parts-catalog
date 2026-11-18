@@ -40,10 +40,18 @@ test('tool list: every side-tab icon and screenshot is a file in public/', () =>
   }
 });
 
-test('tool list: releases newest first, a program without one is Coming soon', () => {
+test('tool list: releases newest first, a program without one is Coming soon or a web app', () => {
   for (const { f, t } of tools) {
     const dates = (t.releases ?? []).map((r) => r.date);
     assert.deepEqual(dates, [...dates].sort().reverse(), f);
-    if (!dates.length) assert.equal(t.comingSoon, true, `${f} has no release and is not Coming soon`);
+    if (!dates.length && !t.launch) assert.equal(t.comingSoon, true, `${f} has no release and is not Coming soon`);
+  }
+});
+
+// A web app tab (launch) opens a folder of this site: it must be there with its page.
+test('tool list: a web app tab opens a folder in public/ with index.html', () => {
+  for (const { f, t } of tools.filter(({ t }) => t.launch)) {
+    assert.match(t.launch, /^\/[a-z0-9_-]+\/$/, f);
+    assert.ok(existsSync(new URL('../public' + t.launch + 'index.html', import.meta.url)), `${f} ${t.launch}index.html`);
   }
 });

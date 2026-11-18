@@ -1,0 +1,114 @@
+/* D-Soccer Flight — 원본 Unity 화면(Main.unity)의 색·배치를 그대로 옮김.
+   원본처럼 1920×1080 무대를 창 크기에 맞춰 비율 그대로 늘리고 줄인다(WindowSize.cs 16:9). */
+/* 글꼴: 원본 Unity 화면이 쓰는 본고딕(Noto Sans KR, 7.Font/KR) — 굵기 300 Light(대부분 글자) · 400 Regular · 500 Medium(제목) · 700 Bold
+   원본 파일에서 화면에 쓰는 글자(한글 전체·영문·LanguageTable.csv 글자)만 뽑아 woff 로 만듦(fontTools subset) */
+@font-face { font-family: NK; src: url("../assets/fonts/NotoSansKR-Thin.woff") format("woff"); font-weight: 100; } /* 원본 PortNameText 만 — 영문·숫자 부분집합 */
+@font-face { font-family: NK; src: url("../assets/fonts/NotoSansKR-Light.woff") format("woff"); font-weight: 300; }
+@font-face { font-family: NK; src: url("../assets/fonts/NotoSansKR-Regular.woff") format("woff"); font-weight: 400; }
+@font-face { font-family: NK; src: url("../assets/fonts/NotoSansKR-Medium.woff") format("woff"); font-weight: 500; }
+@font-face { font-family: NK; src: url("../assets/fonts/NotoSansKR-Bold.woff") format("woff"); font-weight: 700 800; }
+
+:root {
+  --bg: #1d1d1d;        /* Background */
+  --panel: #373737;     /* 칸(boxR) */
+  --msg: #58595b;       /* 알림 상자 — 배포판 Popup 색 (0.3451, 0.349, 0.3569) */
+  --line: rgba(255, 255, 255, .68);      /* 원본 흰색 알파 .5 — Unity 는 선형 색공간에서 섞어 더 밝게 보임(같은 밝기가 되는 웹 값) */
+  --accent: #3dbeff;    /* 둥근 테 버튼(가속도계 교정·업데이트 확인) */
+  --tab-on: #20ccf5;    /* 탭 선택 */
+  --cyan: #0ad0fe;
+  --text-dim: rgba(255, 255, 255, .68);  /* 원본 .5 */
+  --icon-dim: rgba(255, 255, 255, .59);  /* 원본 .4 */
+  --radius: 9px;        /* boxR_100x100 테두리 9px */
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; user-select: none; }
+body { font-family: NK, "Malgun Gothic", sans-serif; font-weight: 300; color: #fff; }
+
+#stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; background: var(--bg); }
+.abs { position: absolute; }
+.hidden { display: none !important; }
+
+/* 칸 */
+.box { position: absolute; background: var(--panel); border-radius: var(--radius); }
+.box > h3 { margin: 0; height: 50px; line-height: 50px; font-size: 20px; font-weight: 500; text-align: center; } /* 원본 제목: NotoSansJP-Medium 20 */
+.box > .rule { position: absolute; left: 20px; right: 20px; top: 54px; height: 1px; background: var(--line); }
+
+/* 위 막대 */
+#title { left: 16px; top: 32px; width: 551px; height: 75px; }
+#version { left: 416px; top: 68px; width: 181px; height: 30px; font-size: 20px; color: #dcf0ff; display: flex; align-items: center; justify-content: flex-end; } /* 원본 MiddleRight */
+#version .ver-patch { position: absolute; left: 100%; top: 0; height: 100%; display: flex; align-items: center; white-space: nowrap; } /* 끝자리 — 칸 오른쪽 끝("v2.2" 끝) 바로 뒤 */
+#portName { left: 1549.9px; top: 44.9px; width: 240px; height: 70.4px; font-size: 22px; font-weight: 100; display: flex; align-items: flex-end; justify-content: flex-end; padding-bottom: 6px; }
+#connectBtn { left: 1818px; top: 17px; width: 70px; height: 70px; cursor: pointer; border-radius: 50%; }
+#connectBtn img { width: 70px; height: 70px; }
+#connectText { left: 1793px; top: 88px; width: 120px; height: 28px; font-size: 20px; font-weight: 500; text-align: center; } /* 원본 ConenctText NotoSansKR-Medium 20 */
+#fida { left: 16px; top: 968px; width: 225px; height: 80px; }
+
+/* 왼쪽 탭 */
+#tabs { left: 26px; top: 130.6px; width: 200px; height: 830px; } /* 원본 Tab L26 T130.6 */
+.tab { position: absolute; left: 1px; width: 200px; height: 60px; cursor: pointer; }
+.tab .ico { position: absolute; left: 12.8px; top: 16.5px; width: 27px; height: 27px; opacity: .59; } /* 원본 .4(선형 섞기) */
+.tab .name { position: absolute; left: 25px; right: 0; top: 0; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 20px; white-space: nowrap; /* 가운데 112.5 그대로 · 긴 글자는 data-fit 으로 줄임 */ color: var(--text-dim); }
+.tab.on .ico { opacity: 1; } .tab.on .name { color: #fff; font-weight: 500; } /* 원본 FontStyle.Bold = Light 가짜 굵게 */
+#tabBar { left: 208px; top: 147px; width: 18px; height: 60px; background: #fff; } /* 움직임은 shell.js moveTabBar(원본 SmoothDamp) */
+
+/* 언어 고르기 */
+#lang { left: 33px; top: 907px; z-index: 41; width: 185px; height: 45px; background: #1e1e1e; border-radius: 6px; cursor: pointer; } /* 원본 RoundBox_2 · 배율 3 → 모서리 6 */
+#lang .label { position: absolute; left: 20px; top: 0.7px; width: 145px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 20px; } /* Label L20 T0.7 145×40 NotoSansKR-Light 20 */
+#lang .arrow { position: absolute; left: 150px; top: 13px; width: 20px; height: 20px; }
+/* 원본 LanguageDropdown/Template: #000/0.502(선형 → .31) RoundBox_2 배율 4 · 아래 칸이 모자라 위로 열림 · 항목 168×40(위아래 여백 5)
+   Item Background = RoundBox 테두리 #1e1e1e 배율 5 · 고른 줄 ▶(Motor_play) L26.5 T10 20×20 · 이름 L67 NotoSansKR-Light 16 왼쪽
+   위로 열 때 Unity 가 Template(아래 2px 띄움)을 뒤집어 단추 위 2px 에 겹침 → 아래 45−2 = 43 */
+.dl.lang { background: rgba(0, 0, 0, .31); border-radius: 5.9px; }
+.dl.lang .it { height: 40px; isolation: isolate; } /* 스크롤이 필요 없으면 막대 자리를 접고 꽉 채움 — 원본 ScrollRect AutoHideAndExpandViewport */
+.dl.lang .it::before { content: ""; position: absolute; inset: 0; z-index: -1; background: #1e1e1e; pointer-events: none;
+  -webkit-mask-box-image: url(../assets/img/RoundBox.png) 22 20 21 20 / 4.4px 4px 4.2px 4px; } /* RoundBox 테두리 배율 5 (.s9.s-rb, --k .2) */
+.dl.lang .it i { left: 26.5px; top: 10px; width: 20px; height: 20px; background: #fff; -webkit-mask: url(../assets/img/motor/Motor_play.png) no-repeat center / contain; }
+.dl.lang .it span { left: 67px; top: 0; width: 116.3px; height: 40px; font-size: 16px; }
+
+/* 펼친 목록 공용 틀(widgets.dropList — 원본 Dropdown Template) · 모양은 .dl.<종류> 가 정함 */
+.dl { z-index: 75; box-sizing: border-box; }
+.dl .vp { position: absolute; inset: 0; overflow-x: hidden; overflow-y: auto; }
+.dl .it { position: absolute; left: 0; right: 0; cursor: pointer; } /* 넘칠 때 스크롤 막대가 제 폭만큼 자리를 차지해 항목이 저절로 좁아짐(원본 Viewport −막대) */
+.dl .it i { position: absolute; visibility: hidden; }
+.dl .it.on i { visibility: visible; }
+.dl .it span { position: absolute; display: flex; align-items: center; white-space: nowrap; overflow: hidden; }
+.dl .pad { width: 1px; }
+
+/* 탭 내용 자리 */
+#view { left: 230px; top: 130px; width: 1690px; height: 950px; }
+.page { position: absolute; inset: 0; }
+
+/* 알림·가림막 (원본 Notification · Mask - Connect · Blocking All) */
+/* 원본 Notification: 500×100 #1e1e1e · 글자 NotoSansKR-Medium 26 줄바꿈 없음 · Notification_OnEnable 1초(0.25초 나타남 → 0.5초 → 0.25초 사라짐) 뒤 꺼짐 */
+#notice { left: 710px; top: 502px; width: 500px; height: 100px; background: #1e1e1e; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 500; text-align: center; white-space: pre; animation: ntc 1s linear both; z-index: 50; }
+#notice::before { content: ""; position: absolute; left: -750px; top: -600px; width: 2000px; height: 1200px; } /* 원본 Button (Legacy) 2000×1200: 떠 있는 동안 어디를 눌러도 알림만 닫힘 */
+@keyframes ntc { 0% { opacity: 0; animation-timing-function: cubic-bezier(.333, 0, .667, 1); } 25%, 75% { opacity: 1; animation-timing-function: cubic-bezier(.333, 0, .667, 1); } 100% { opacity: 0; } }
+#connectMask { left: 0; top: 129.6px; width: 1920px; height: 950.4px; z-index: 40; display: none; } /* 원본 Mask - Connect 0~0.88 */
+#connectMask.armed { display: block; }
+#connectMask.show { background: rgba(0, 0, 0, .61); }
+#connectMsg { left: 720px; top: 362.2px; width: 480px; height: 120px; background: var(--msg); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 500; white-space: pre; } /* 원본 Message · 글자 Medium 26 */
+#blocking { inset: 0; background: rgba(0, 0, 0, .5); z-index: 60; display: flex; align-items: center; justify-content: center; font-size: 28px; text-align: center; line-height: 1.4; }
+/* 원본 Connected Controller Popup/popup: 400×100 #1e1e1e · 글자 칸 580×282(창보다 넓음) Medium 26 맞춤 · ConnectedPopup_OnEnable 2초(0.5초 나타남 → 1초 → 0.5초 사라짐) */
+#devicePopup { left: 760px; top: 502px; width: 400px; height: 100px; background: #1e1e1e; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; z-index: 45; animation: dpop 2s linear both; }
+#devicePopup span { flex: 0 0 580px; text-align: center; font-size: 26px; font-weight: 500; white-space: pre-line; }
+#devicePopup::before { content: ""; position: absolute; left: -760px; top: -502px; width: 1920px; height: 1080px; } /* 원본 exit_btn(화면 전체): 누르면 닫힘 */
+@keyframes dpop { 0% { opacity: 0; animation-timing-function: cubic-bezier(.333, 0, .667, 1); } 25%, 75% { opacity: 1; animation-timing-function: cubic-bezier(.333, 0, .667, 1); } 100% { opacity: 0; } }
+
+/* 원본 Unity 'Sliced' 그림을 그대로 그리기 — 원본 스프라이트를 9조각 가면(-webkit-mask-box-image)으로 쓰고 바탕색 = Image 색.
+   요소에 .s9 + 그림 하나(.s-rb 테두리 · .s-rb2 채움 · .s-box 작은 모서리), --c = 색, --k = (요소 배율 ÷ 그림 m_PixelsPerUnitMultiplier).
+   조각 수(위 오른 아래 왼)는 배포판 스프라이트 m_Border(왼 아래 오른 위)를 바꿔 적은 것 — design/shipped_ui.json. 가면이 글자를 가리지 않게 ::before 에 그림. */
+.s9 { isolation: isolate; }
+.s9::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--c, #fff); pointer-events: none; }
+.s-rb::before { -webkit-mask-box-image: url(../assets/img/RoundBox.png) 22 20 21 20 / calc(22px * var(--k, 1)) calc(20px * var(--k, 1)) calc(21px * var(--k, 1)) calc(20px * var(--k, 1)); }
+/* 채움 그림은 9조각으로 그리면 조각 이음선이 비쳐서, 원본 그림에서 잰 모서리 반지름(RoundBox_2 23.5 · boxR 9.5 — 원에 맞춤)으로 둥글림 */
+.s-rb2::before { border-radius: calc(23.5px * var(--k, 1)); }
+.s-box::before { border-radius: calc(9.5px * var(--k, 1)); }
+
+/* 공통 버튼: 원본 RoundBox 하늘색 테두리 */
+.btn-line { position: absolute; border: 3px solid var(--accent); border-radius: 22px; color: var(--accent); background: transparent; font: inherit; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.btn-line:disabled { opacity: .35; pointer-events: none; }
+
+/* 언어별 조정 — 원본 LanguageUIChange.UIChange(배포판 코드에서 REA 로 푼 값). 한국어 = 기본 */
+:root[data-lang="English"] #connectText { font-size: 16px; }
+:root[data-lang="Japanese"] .tab[data-page="pid"] .name { font-size: 17px; }

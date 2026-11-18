@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<script>window.DSF_WEB = true;</script>
+<meta charset="utf-8">
+<title>D-Soccer Flight</title>
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/build/three.module.js", "three/addons/": "./vendor/three/examples/jsm/" } }
+</script>
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/status.css">
+<link rel="stylesheet" href="css/pid.css">
+<link rel="stylesheet" href="css/motor.css">
+<link rel="stylesheet" href="css/esc.css">
+<link rel="stylesheet" href="css/controller.css">
+<link rel="stylesheet" href="css/font_jp.css">
+<link rel="stylesheet" href="css/states.css">
+</head>
+<body>
+<!-- 원본 ColorTint 색 곱하기(sRGB): −/+ 그림 올림 (0.5137, 1, 0.8824) — css/states.css -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="tint-mint" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.5137 0 0 0 0  0 1 0 0 0  0 0 0.8824 0 0  0 0 0 1 0"/></filter></svg>
+<div id="stage">
+  <!-- 위 막대 -->
+  <img id="title" class="abs" src="assets/img/DSoccerTitle_logo.png" alt="D-SOCCER Flight">
+  <div id="version" class="abs">v2.0</div>
+  <div id="portName" class="abs">Port : None</div>
+  <div id="connectBtn" class="abs" role="button"><img id="connectImg" src="assets/img/Connection_Default.png" alt=""></div>
+  <div id="connectText" class="abs" data-i18n="16">연결하기</div>
+
+  <!-- 왼쪽 탭 (원본 Tab · GridLayout 칸 200×60 · 위 여백 15 · 간격 20) -->
+  <div id="tabs" class="box">
+    <div class="tab on" data-page="status" style="top:15px"><img class="ico" src="assets/img/icon_1.png" alt=""><div class="name" data-i18n="93" data-fit>상 태</div></div>
+    <div class="tab" data-page="pid" style="top:95px"><img class="ico" src="assets/img/icon_2.png" alt=""><div class="name" data-i18n="34" data-fit>PID 튜닝</div></div>
+    <div class="tab" data-page="motor" style="top:175px"><img class="ico" src="assets/img/icon_3.png" alt=""><div class="name" data-i18n="44" data-fit>모 터</div></div>
+    <div class="tab" data-page="esc" style="top:255px"><img class="ico" src="assets/img/Firmware_icon.png" alt=""><div class="name">ESC</div></div>
+    <div class="tab" data-page="controller" style="top:335px"><img class="ico" src="assets/img/Connect_icon.png" alt=""><div class="name" data-i18n="190" data-fit>조종기</div></div>
+  </div>
+  <div id="tabBar" class="abs"></div>
+  <img id="fida" class="abs" src="assets/img/FIDA.png" alt="FIDA">
+
+  <!-- 탭 내용 -->
+  <div id="view" class="abs">
+    <section class="page" id="page-status"></section>
+    <section class="page hidden" id="page-pid"></section>
+    <section class="page hidden" id="page-motor"></section>
+    <section class="page hidden" id="page-esc"></section>
+    <section class="page hidden" id="page-controller"></section>
+  </div>
+
+  <!-- 가림막·알림 -->
+  <div id="connectMask" class="abs"><div id="connectMsg" class="abs hidden" data-i18n="71">장치를 먼저 연결해 주세요</div></div>
+  <!-- 언어 고르기는 가림막 위(원본 순서: Mask - Connect 다음) -->
+  <div id="lang" class="abs"><div class="label" id="langLabel">한국어</div><img class="arrow" src="assets/img/UIArrowDown2.png" alt=""></div>
+  <div id="devicePopup" class="abs hidden"></div>
+  <div id="notice" class="abs hidden"></div>
+  <div id="blocking" class="abs hidden"></div>
+</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

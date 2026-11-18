@@ -1,5 +1,5 @@
 {
-  "name": "D-Soccer Flight",
+  "name": "D-Soccer Flight PC",
   "order": 10,
   "usedFor": "D-Soccer drones and controllers",
   "summary": "Setup, check and firmware update tool for D-Soccer drones (Windows / Mac, works offline).",

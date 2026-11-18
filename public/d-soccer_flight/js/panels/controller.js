@@ -1,0 +1,183 @@
+// 조종기 탭 — 조종기 SETUP 메뉴(FUNCTION · RnP/YAW/THR CALIB · DZ · RESET)와 드론의 충돌 자세 유지를 앱에서 같은 값으로 읽고 씀
+// 원본 Unity 에는 없는 탭. 이름·값 글자는 조종기 화면과 같게(FHSS:A · BUZZER:O · DZ RnP …), 틀은 다른 탭의 칸·단추·슬라이더를 그대로 씀
+// 꾸러미: DataType.Configuration — 조종기 22바이트(펌웨어 Protocol::ConfigurationController) · 드론 2바이트(Protocol::Configuration)
+//         DataType.Deadzone — 조종기 3바이트(조종기 1.3.0 부터) · 옛 조종기는 답하지 않음 → 데드존 칸을 막고 그래프는 기본값
+// 드론 설정(충돌 자세)은 조종기만 꽂혀 있어도 바꿀 수 있음 — 조종기 1.3.0 이 맡아 두었다가 드론과 연결되면 보냄(drone_setting.js)
+import { store, on } from "../store.js";
+import { t, applyStatic } from "../i18n.js";
+import { send, P } from "../proto.js";
+import { notify } from "../shell.js";
+import { sliderRow, buttonTransition } from "../widgets.js";
+import { drawCurve } from "./stick_curve.js";
+import { startDroneSetting, stepText, Step } from "../drone_setting.js";
+
+const OPT = P.raw.ConfigurationOption, HOLD = P.raw.CrashHold;
+// [조종기 화면 이름, 값 글자들, 꾸러미에서 읽기, 꾸러미에 쓰기]
+const bit = (mask, onFirst) => [(c) => (((c.option & mask) !== 0) === onFirst ? 0 : 1), (c, i) => { c.option = (i === 0) === onFirst ? c.option | mask : c.option & ~mask; }];
+const FUNC = [
+  ["FHSS", ["A", "X"], ...bit(OPT.FhssAOff, false)],
+  ["BACK LIGHT", ["O", "X"], ...bit(OPT.Backlight, true)],
+  ["BUZZER", ["O", "X"], ...bit(OPT.Buzzer, true)],
+  ["VIBRATOR", ["O", "X"], ...bit(OPT.Vibrator, true)],
+  ["PAIR ALARM", ["O", "X"], ...bit(OPT.PairAlarm, true)],
+  ["STICK MODE", ["1", "2"], ...bit(OPT.JoystickMode1, true)],
+  ["SPEED", ["1(40%)", "2(70%)", "3(100%)"], (c) => c.controlSpeed - 1, (c, i) => { c.controlSpeed = i + 1; }],
+];
+const CURVES = [["RnP CALIB", "rnp"], ["YAW CALIB", "yaw"], ["THR CALIB", "thr"]];
+const KEYS = ["option", "controlSpeed", "position", "team", ...CURVES.flatMap(([, k]) => [1, 2, 3, 4, 5, 6].map((n) => k + n))];
+// 데드존 세 줄 — 조종기 메뉴 이름 · 꾸러미 칸 · 최대 % · 기본(옛 조종기 그래프) · 그래프 색(PID 탭 축 색)
+const DZ = [
+  { name: "DZ RnP", key: "rollPitch", curve: "rnp", max: 30, def: 9, color: "#ed1c24" },
+  { name: "DZ YAW", key: "yaw", curve: "yaw", max: 30, def: 9, color: "#3ebfff" },
+  { name: "DZ THR", key: "throttle", curve: "thr", max: 20, def: 7, color: "#54dc91" },
+];
+
+const seg = (id, items) => `<div class="seg" id="${id}">${items.map((s, i) => `<button data-i="${i}">${s}</button>`).join("")}</div>`;
+
+export function initController(root) {
+  root.innerHTML = `
+    <div id="ct-func" class="box"><h3>FUNCTION</h3><div class="rule"></div>
+      ${FUNC.map(([name, vals], i) => `<div class="ct-k ct-ctl" style="top:${86 + i * 68}px">${name}</div><div class="ct-ctl" style="position:absolute;left:230px;top:${86 + i * 68}px">${seg("ct-f" + i, vals)}</div>`).join("")}
+      <div class="ct-k" style="top:${86 + 7 * 68}px">CRASH HOLD</div><div style="position:absolute;left:230px;top:${86 + 7 * 68}px">${seg("ct-hold", ["X", "1", "2"])}</div>
+      <div class="ct-note" id="ct-hold-note"></div>
+      <div class="ct-note ct-pend" id="ct-hold-pend"></div>
+    </div>
+    <div id="ct-curve" class="box"><h3 data-i18n="191">조종 곡선</h3><div class="rule"></div>
+      ${CURVES.map(([name], r) => `<div class="ct-c" style="top:${92 + r * 150}px">${name}</div>`).join("")}
+      <button class="btn-line" id="ct-apply" data-i18n="192"></button>
+    </div>
+    <div id="ct-reset" class="box"><h3>RESET</h3><div class="rule"></div>
+      <button class="btn-line" id="ct-imu">IMU RESET</button><button class="btn-line" id="ct-joy">JOY RESET</button><button class="btn-line" id="ct-def">SET DEFAULT</button>
+    </div>
+    <div id="ct-dz" class="box"><h3><span data-i18n="212"></span> <span class="ct-help" id="ct-dz-help">ⓘ</span></h3><div class="rule"></div>
+      ${DZ.map((d, i) => `<canvas class="ct-graph" id="ct-g${i}" width="440" height="250" style="left:${24 + i * 236}px"></canvas><div class="ct-dzk" style="left:${24 + i * 236}px">${d.name}</div>`).join("")}
+      <div class="ct-dzold" id="ct-dz-old" data-i18n="214"></div>
+    </div>
+    <div id="ct-block" class="box hidden"><span data-i18n="193"></span></div>`;
+  applyStatic(root);
+  const $ = (s) => root.querySelector(s);
+  const toCtl = P.DeviceType.Controller, toDrone = P.DeviceType.Drone;
+  startDroneSetting();
+
+  // ── 조종 곡선 슬라이더(곡선마다 STEP1~6 · 0~100) ──
+  const rows = {};
+  CURVES.forEach(([, k], r) => [1, 2, 3, 4, 5, 6].forEach((n) => {
+    const el = sliderRow({ min: 0, max: 100, step: 1, decimals: 0, w: 138 });
+    el.classList.add("ct-row");
+    el.style.left = 196 + ((n - 1) % 3) * 306 + "px";
+    el.style.top = 92 + r * 150 + (n <= 3 ? 0 : 52) + "px";
+    $("#ct-curve").appendChild(el);
+    rows[k + n] = el;
+    el.addEventListener("change", () => drawAll());
+  }));
+  // 줄마다 값 칸 왼쪽에 S1~S6(조종기 곡선 화면의 점 이름)
+  CURVES.forEach(([, k], r) => [1, 2, 3, 4, 5, 6].forEach((n) => {
+    const lab = document.createElement("div");
+    lab.className = "ct-s"; lab.textContent = "S" + n;
+    lab.style.left = 160 + ((n - 1) % 3) * 306 + "px";
+    lab.style.top = 92 + r * 150 + (n <= 3 ? 0 : 52) + "px";
+    $("#ct-curve").appendChild(lab);
+  }));
+
+  // ── 데드존 슬라이더(그래프 밑) ──
+  const dzRows = DZ.map((d, i) => {
+    const el = sliderRow({ min: 0, max: d.max, step: 1, decimals: 0, w: 90 });
+    el.classList.add("ct-dzrow");
+    el.style.left = 26 + i * 236 + "px";
+    el.style.top = "198px";
+    $("#ct-dz").appendChild(el);
+    el.addEventListener("change", () => drawAll());
+    return el;
+  });
+  $("#ct-dz-help").title = t(213);
+
+  // ── 조종기 설정: 읽기 → 화면 · 화면 → 쓰기(바꾼 칸만 고친 22바이트 전체) ──
+  let cfg = null;  // 조종기가 마지막으로 알려 준 값
+  let dz = null;   // 조종기 데드존(옛 조종기 = null)
+  const bytes = (c) => KEYS.map((k) => c[k] & 0xff);
+  const mark = (id, i) => root.querySelectorAll(`#${id} button`).forEach((b, k) => b.classList.toggle("sel", k === i));
+  const curveNow = (k) => [1, 2, 3, 4, 5, 6].map((n) => parseInt(rows[k + n].get()) || 0);
+  function drawAll() {
+    const speed = cfg ? cfg.controlSpeed : 3;
+    DZ.forEach((d, i) => drawCurve($("#ct-g" + i), { kind: d.curve, dz: dz ? +dzRows[i].get() || 0 : d.def, speed, curve: curveNow(d.curve), color: d.color }));
+  }
+  const render = () => {
+    FUNC.forEach(([, , get], i) => mark("ct-f" + i, cfg ? get(cfg) : -1));
+    if (cfg) CURVES.forEach(([, k]) => [1, 2, 3, 4, 5, 6].forEach((n) => rows[k + n].set(cfg[k + n])));
+    drawAll();
+  };
+  // 데드존 칸 막기 · 안내만(값은 그대로) — 조종기 설정 답이 올 때마다 부름. 값까지 바꾸면 '적용' 전에 고친 데드존이 지워짐
+  const markDz = () => {
+    dzRows.forEach((el) => el.classList.toggle("ct-off", !dz));
+    $("#ct-dz-old").classList.toggle("hidden", !!dz || !cfg);   // 옛 조종기(설정은 읽었는데 데드존 답 없음)일 때만 안내
+    drawAll();
+  };
+  // 조종기가 알려 준 데드존을 칸에 넣음 — 데드존 답이 왔을 때 · 연결이 끊겼을 때만
+  const renderDz = () => {
+    DZ.forEach((d, i) => dzRows[i].set(dz ? dz[d.key] : d.def));   // 옛 조종기는 기본값을 막은 채 보여 줌
+    markDz();
+  };
+  const write = (c) => send(P.DataType.Configuration, bytes(c), toCtl); // 조종기는 적용한 뒤의 값을 돌려줌 → on("ConfigurationController")
+  FUNC.forEach(([, , , set], i) => root.querySelectorAll(`#ct-f${i} button`).forEach((b) => (b.onclick = () => {
+    if (!cfg) return;
+    const c = { ...cfg }; set(c, +b.dataset.i); write(c);
+  })));
+  $("#ct-apply").onclick = () => {
+    if (!cfg) return;
+    const c = { ...cfg };
+    CURVES.forEach(([, k]) => [1, 2, 3, 4, 5, 6].forEach((n) => (c[k + n] = parseInt(rows[k + n].get()) || 0)));
+    // 조종기 메뉴와 같은 조건: 뒤로 갈수록 커지거나 같아야 함 — 아니면 조종기가 거부(값이 그대로 돌아옴)
+    // 데드존은 누른 순간의 값을 잡아 둠 — 조종기 설정 답(0.15초 안)이 화면을 다시 그린 뒤에 읽으면 옛 값이 나감(2.9.0 HP 실기에서 잡음)
+    const dzNew = DZ.map((d, i) => Math.min(d.max, Math.max(0, parseInt(dzRows[i].get()) || 0)));
+    write(c);
+    if (dz) setTimeout(() => send(P.DataType.Deadzone, dzNew, toCtl), 150);
+    notify(106);
+  };
+  on("ConfigurationController", (m) => { cfg = m; render(); markDz(); });
+  on("Deadzone", (m) => { dz = m; renderDz(); });
+
+  // ── RESET 세 가지(조종기 메뉴와 같은 함수를 부르는 명령) ──
+  const cmd = (type, note) => { send(P.DataType.Command, [type, 0], toCtl); setTimeout(ask, 300); notify(note); };
+  $("#ct-imu").onclick = () => cmd(P.CommandType.ClearBias, 104);
+  $("#ct-joy").onclick = () => cmd(P.CommandType.ClearJoystick, 107);
+  $("#ct-def").onclick = () => cmd(P.CommandType.SetDefault, 107);
+  [$("#ct-apply"), $("#ct-imu"), $("#ct-joy"), $("#ct-def")].forEach(buttonTransition);
+
+  // ── 충돌 자세 유지(드론 값 — 조종기를 거쳐도, 드론에 바로 꽂아도 같은 꾸러미) ──
+  // 조종기 1.3.0 은 드론과 연결이 안 돼 있어도 받아 맡아 둠 → 드론 값을 몰라도 고를 수 있음
+  let hold = null;
+  const renderHold = () => {
+    mark("ct-hold", hold ?? -1);
+    $("#ct-hold-note").dataset.i18n = hold === null ? "194" : ["195", "196", "197"][hold] ?? "194";
+    const s = store.isController ? store.droneSetting : null;
+    const n = s ? stepText(s.crashHold, s.link) : null;
+    const pend = $("#ct-hold-pend");
+    pend.textContent = n !== null && s.crashHold !== Step.Done ? t(n) : "";
+    applyStatic($("#ct-func"));
+  };
+  root.querySelectorAll("#ct-hold button").forEach((b) => (b.onclick = () => {
+    if (hold === null && !store.droneSetting) return; // 드론 값을 모르고 맡길 수도 없음(옛 드론 · 옛 조종기 · 연결 전)
+    send(P.DataType.Configuration, [+b.dataset.i, 0], toDrone);
+    setTimeout(() => send(P.DataType.Request, [P.DataType.Configuration], toDrone), 200);
+  }));
+  on("Configuration", (m) => { hold = m.modeCrashHold < HOLD.EndOfType ? m.modeCrashHold : null; renderHold(); });
+  on("droneSetting", renderHold);
+
+  // ── 연결·탭 ──
+  function ask() {
+    if (!store.connected) return;
+    if (store.isController) {
+      send(P.DataType.Request, [P.DataType.Configuration], toCtl);
+      setTimeout(() => send(P.DataType.Request, [P.DataType.Deadzone], toCtl), 150); // 조종기는 USB 답을 하나씩 — 바로 이어 물으면 두 번째 답이 버려질 수 있음
+    }
+    send(P.DataType.Request, [P.DataType.Configuration], toDrone);
+  }
+  const block = $("#ct-block");
+  on("link", ({ now }) => {
+    if (now.state !== "connected") { cfg = null; dz = null; hold = null; render(); renderDz(); renderHold(); }
+    const droneOnly = store.connected && store.isDrone;
+    block.classList.toggle("hidden", !droneOnly); root.classList.toggle("ct-drone-only", droneOnly); // 드론만 꽂았으면 조종기 칸을 가림(상태 탭 LED 와 같은 규칙)
+  });
+  on("page", (p) => { if (p === "controller") ask(); });
+  render(); renderDz(); renderHold();
+}

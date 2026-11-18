@@ -177,6 +177,9 @@ const tools = defineCollection({
     icon: z.string().regex(/^\/images\/[^?#%]+\.png$/),
     shots: z.array(z.object({ src: z.string().regex(/^\/images\/[^?#%]+\.png$/), caption: z.string() })).default([]),
     comingSoon: z.boolean().optional().default(false),
+    // a web app on this site (path under public/, e.g. "/d-soccer_flight/"): its side tab opens the app
+    // in a new browser tab instead of a download panel (the director, 2026-11-18 #o5a6780ff)
+    launch: z.string().regex(/^\/[a-z0-9_\-]+\/$/).optional(),
     // newest first; each one is a GitHub release whose page carries the change notes
     releases: z.array(z.object({
       version: z.string(),

@@ -1,0 +1,26 @@
+{
+ "schema": "dsoccer-bootloader/1",
+ "about": "Built into the app: the newest bootloader per device from the parts-catalog list.",
+ "bootloader": [
+  {
+   "device": "drone",
+   "name": "DSoccer_Drone_v1.7.0_261116_Boot",
+   "file": "DSoccer_Drone_v1.7.0_261116_Boot.bin",
+   "model": "0x000D1003",
+   "version": "1.7.0",
+   "date": "2026-11-16",
+   "size": 24444,
+   "sha256": "cf2c5befdf8ebc226663fa5ba697f650e83c27b458aefe68599c9907931316db"
+  },
+  {
+   "device": "controller",
+   "name": "DSoccer_Controller_v1.2.0_261116_Boot",
+   "file": "DSoccer_Controller_v1.2.0_261116_Boot.bin",
+   "model": "0x000D2002",
+   "version": "1.2.0",
+   "date": "2026-11-16",
+   "size": 22692,
+   "sha256": "452ce7e7cdefe1be4ac220d2b808d5199e51a533bab00ca870134f5328556380"
+  }
+ ]
+}

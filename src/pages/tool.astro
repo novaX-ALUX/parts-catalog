@@ -11,6 +11,7 @@ import { getCollection } from 'astro:content';
 // releases stay on GitHub and in the JSON. The URL hash (#<id>) keeps the pick.
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const tools = (await getCollection('tools')).sort((a, b) => a.data.order - b.data.order);
+const panelTools = tools.filter((t) => !t.data.launch); // a web app (launch) is a link in the rail, no panel
 const mb = (bytes: number) => `${(bytes / 1048576).toFixed(1)} MB`;
 const rowsOf = (t: (typeof tools)[number]) => {
   const seen = new Set<string>();
@@ -28,8 +29,13 @@ const rowsOf = (t: (typeof tools)[number]) => {
 
       <div class="picker">
         <nav class="catnav toolnav" aria-label="Programs">
-          {tools.map((t, i) => (
-            <button type="button" class={i === 0 ? 'on' : ''} data-tool={t.id}>
+          {tools.map((t) => t.data.launch ? (
+            <a class="launch" href={`${base}${t.data.launch}`} target="_blank" rel="noopener" title={t.data.summary}>
+              <img src={`${base}${t.data.icon}`} alt="" width="40" height="40" />
+              <span class="tn"><b>{t.data.name}</b><small>Open in browser ↗</small></span>
+            </a>
+          ) : (
+            <button type="button" class={t.id === panelTools[0]?.id ? 'on' : ''} data-tool={t.id}>
               <img src={`${base}${t.data.icon}`} alt="" width="40" height="40" />
               <span class="tn"><b>{t.data.name}</b><small>{t.data.comingSoon && !t.data.releases.length ? 'Coming soon' : t.data.releases[0]?.version}</small></span>
             </button>
@@ -37,7 +43,7 @@ const rowsOf = (t: (typeof tools)[number]) => {
         </nav>
 
         <div class="pickmain">
-          {tools.map((t, i) => {
+          {panelTools.map((t, i) => {
             const latest = t.data.releases[0];
             return (
               <div class="toolpanel" id={t.id} data-panel={t.id} hidden={i !== 0}>
@@ -68,6 +74,10 @@ const rowsOf = (t: (typeof tools)[number]) => {
   .tool-page { max-width: 1172px; } /* same width as the Update page: content + the 196 px rail */
   .tool-page [hidden] { display: none !important; }
   .toolnav button { justify-content: flex-start; align-items: center; gap: 12px; padding: 12px 13px; }
+  /* a web app link looks like the side tabs (global .catnav button) */
+  .toolnav a.launch { display: flex; justify-content: flex-start; align-items: center; gap: 12px; padding: 12px 13px; text-decoration: none;
+    border-bottom: 1px solid #f1f1f1; background: #fff; font-size: 13.5px; font-weight: 700; color: var(--ink); }
+  @media (max-width: 760px) { .toolnav a.launch { border-bottom: 0; border-right: 1px solid #f1f1f1; } }
   .toolnav img { width: 40px; height: 40px; object-fit: contain; border-radius: 9px; background: var(--paper); flex: none; }
   .toolnav .tn { display: flex; flex-direction: column; gap: 2px; color: inherit; }
   .toolnav .tn small { font-size: 11.5px; font-weight: 600; color: var(--ink-4); }
