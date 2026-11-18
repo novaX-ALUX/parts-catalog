@@ -323,10 +323,10 @@ DZ THR：底部此范围 = 0，顶部此范围 = 最大。
 221,웹판에서는 아직 안 되는 기능입니다 — PC판을 써 주세요,Not available in the web version yet — please use the PC version,ウェブ版ではまだ使えません — PC版をお使いください,网页版暂不支持此功能 — 请使用电脑版
 222,이 브라우저는 USB 연결을 못 합니다 — 크롬·엣지·이고 브라우저에서 열어 주세요,This browser cannot use USB — please open it in Chrome / Edge / ego,このブラウザはUSB接続できません — Chrome・Edge・egoで開いてください,此浏览器无法连接USB — 请用Chrome、Edge或ego打开
 223,"그래프 = 조종기 SETUP 의 CALIB 화면과 같음 · 가로 = 막대(가운데 → 끝 · 스로틀은 바닥 → 꼭대기) · 세로 = 드론에 가는 값
-회색 = 데드존(FUNCTION 의 DZ) · 주황 = 끝(최대) · 그래프의 점이나 값 칸을 눌러 고르고 - + 로 바꿈 · SPEED 는 아래 그래프에","Same graph as the controller's SETUP CALIB screen · across = stick (center → end, throttle bottom → top) · up = value sent to the drone
-Gray = deadzone (DZ in FUNCTION) · orange = end (max) · pick a point on the graph or its box and change it with - + · SPEED is in the graphs below","コントローラー SETUP の CALIB 画面と同じグラフ · 横 = スティック(中央 → 端 · スロットルは下 → 上) · 縦 = ドローンへ送る値
-灰色 = デッドゾーン(FUNCTION の DZ) · オレンジ = 端(最大) · グラフの点か値の欄を押して選び - + で変更 · SPEED は下のグラフ","与遥控器 SETUP 的 CALIB 画面相同的图 · 横 = 摇杆(中间 → 末端 · 油门为下 → 上) · 纵 = 发送给无人机的值
-灰色 = 死区(FUNCTION 的 DZ) · 橙色 = 末端(最大) · 点击图上的点或数值栏选择，用 - + 修改 · SPEED 见下方图"
+회색 = 데드존(이름 밑 DZ % · 조종기 FUNCTION 의 DZ) · 주황 = 끝(최대) · 그래프의 점이나 값 칸을 눌러 고르고 - + 로 바꿈","Same graph as the controller's SETUP CALIB screen · across = stick (center → end, throttle bottom → top) · up = value sent to the drone
+Gray = deadzone (DZ % under the name · DZ in the controller's FUNCTION) · orange = end (max) · pick a point on the graph or its box and change it with - +","コントローラー SETUP の CALIB 画面と同じグラフ · 横 = スティック(中央 → 端 · スロットルは下 → 上) · 縦 = ドローンへ送る値
+灰色 = デッドゾーン(名前の下の DZ % · コントローラー FUNCTION の DZ) · オレンジ = 端(最大) · グラフの点か値の欄を押して選び - + で変更","与遥控器 SETUP 的 CALIB 画面相同的图 · 横 = 摇杆(中间 → 末端 · 油门为下 → 上) · 纵 = 发送给无人机的值
+灰色 = 死区(名称下方的 DZ % · 遥控器 FUNCTION 的 DZ) · 橙色 = 末端(最大) · 点击图上的点或数值栏选择，用 - + 修改"
 224,"충돌 자세 유지 세기(0 ~ 100)
 0 = 끔 · 지금까지와 같은 비행
 1 ~ 50 = 자세를 놓치지 않게: 부딪혀 크게 돌아도 위아래를 잃지 않음(전의 1 = 50)

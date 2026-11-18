@@ -8,7 +8,7 @@ import { t, applyStatic, onLang } from "../i18n.js";
 import { send, P } from "../proto.js";
 import { notify } from "../shell.js";
 import { sliderRow, buttonTransition } from "../widgets.js";
-import { drawCurve, drawCalib, calibPick } from "./stick_curve.js";
+import { drawCalib, calibPick } from "./stick_curve.js";
 import { startDroneSetting, stepText, Step } from "../drone_setting.js";
 
 const OPT = P.raw.ConfigurationOption;
@@ -51,15 +51,13 @@ export function initController(root) {
     </div>
     <div id="ct-curve" class="box"><h3 data-i18n="191">조종 곡선</h3><div class="rule"></div>
       ${CURVES.map(([name], r) => `<div class="ct-c ct-c2" style="top:${ROW(r)}px">${name}</div><canvas class="ct-cal" id="ct-cal${r}" width="520" height="300" style="top:${ROW(r)}px"></canvas>`).join("")}
+      ${DZ.map((d, r) => `<div class="ct-dzk" style="top:${ROW(r) + 40}px">DZ %${r === 0 ? ' <span class="ct-help" id="ct-dz-help">ⓘ</span>' : ""}</div>`).join("")}
       <div class="ct-legend" data-i18n="223"></div>
+      <div class="ct-dzold" id="ct-dz-old" data-i18n="214"></div>
       <button class="btn-line" id="ct-apply" data-i18n="192"></button>
     </div>
     <div id="ct-reset" class="box"><h3>RESET</h3><div class="rule"></div>
       <button class="btn-line" id="ct-imu">IMU RESET</button><button class="btn-line" id="ct-joy">JOY RESET</button><button class="btn-line" id="ct-def">SET DEFAULT</button>
-    </div>
-    <div id="ct-dz" class="box"><h3><span data-i18n="212"></span> <span class="ct-help" id="ct-dz-help">ⓘ</span></h3><div class="rule"></div>
-      ${DZ.map((d, i) => `<canvas class="ct-graph" id="ct-g${i}" width="440" height="250" style="left:${24 + i * 236}px"></canvas><div class="ct-dzk" style="left:${24 + i * 236}px">${d.name}</div>`).join("")}
-      <div class="ct-dzold" id="ct-dz-old" data-i18n="214"></div>
     </div>
     <div id="ct-block" class="box hidden"><span data-i18n="193"></span></div>`;
   applyStatic(root);
@@ -86,13 +84,13 @@ export function initController(root) {
     labs[k + n] = lab;
   }));
 
-  // ── 데드존 슬라이더(그래프 밑) ──
+  // ── 데드존 값: 곡선 줄마다 이름 밑(그래프에 회색 띠로 보임 — 따로 그래프 칸을 두지 않음 · 이사님 #ob6f2f758) ──
   const dzRows = DZ.map((d, i) => {
-    const el = sliderRow({ min: 0, max: d.max, step: 1, decimals: 0, w: 90 });
-    el.classList.add("ct-dzrow");
-    el.style.left = 26 + i * 236 + "px";
-    el.style.top = "198px";
-    $("#ct-dz").appendChild(el);
+    const el = sliderRow({ min: 0, max: d.max, step: 1, decimals: 0 });
+    el.classList.add("ct-row2", "ct-dzrow");
+    el.style.left = "24px";
+    el.style.top = ROW(i) + 66 + "px";
+    $("#ct-curve").appendChild(el);
     el.addEventListener("change", () => drawAll());
     return el;
   });
@@ -106,9 +104,7 @@ export function initController(root) {
   const curveNow = (k) => [1, 2, 3, 4, 5, 6].map((n) => parseInt(rows[k + n].get()) || 0);
   const dzNow = (i) => (dz ? +dzRows[i].get() || 0 : DZ[i].def);
   function drawAll() {
-    const speed = cfg ? cfg.controlSpeed : 3;
     DZ.forEach((d, i) => {
-      drawCurve($("#ct-g" + i), { kind: d.curve, dz: dzNow(i), speed, curve: curveNow(d.curve), color: d.color });
       drawCalib($("#ct-cal" + i), { kind: d.curve, dz: dzNow(i), curve: curveNow(d.curve), sel: sel[i], color: d.color });
       [1, 2, 3, 4, 5, 6].forEach((n) => labs[d.curve + n].classList.toggle("on", n - 1 === sel[i]));
     });

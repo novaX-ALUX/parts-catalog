@@ -1,4 +1,4 @@
-// 막대 → 드론에 가는 값(조종기 1.3.0 Joystick 과 같은 계산) + 작은 그래프 — 조종기 탭의 '데드존' 칸이 씀
+// 막대 → 드론에 가는 값(조종기 1.3.0 Joystick 과 같은 계산) + 조종기 CALIB 화면 꼴 곡선 그림 — 조종기 탭 '조종 곡선' 칸이 씀
 // 계산 정본은 조종기 펌웨어 Source/Device/Joystick.Joystick.cpp(scaleReturnAxis · scaleThrottleAxis) · Joystick.cpp(convertControl)
 // 그래프는 미리보기 — 막대 끝값을 기본(가운데 2048 · 끝 600 · 3400)으로 보고 %로 그림
 
@@ -88,39 +88,4 @@ export function calibPick(canvas, cssX, kind, dz) {
   const x = (cssX / r.width) * W;
   const xs = calibStickX(kind, dz).map((v) => L + (v / 100) * (R - L));
   return xs.reduce((b, v, i) => (Math.abs(v - x) < Math.abs(xs[b] - x) ? i : b), 0);
-}
-
-/** 작은 그래프 하나 — kind: "rnp" | "yaw" | "thr" · dz % · speed 1~3 · curve S1~S6 */
-export function drawCurve(canvas, { kind, dz, speed, curve, color }) {
-  const g = canvas.getContext("2d");
-  const W = canvas.width, H = canvas.height, pad = 6 * (W / 220);
-  const thr = kind === "thr";
-  const x0 = thr ? 0 : -100, x1 = 100, y0 = thr ? 0 : -100, y1 = 100;
-  const X = (x) => pad + ((x - x0) / (x1 - x0)) * (W - 2 * pad);
-  const Y = (y) => H - pad - ((y - y0) / (y1 - y0)) * (H - 2 * pad);
-  g.clearRect(0, 0, W, H);
-  // 데드존(회색) · 끝(주황) 띠
-  g.fillStyle = "rgba(255,255,255,.13)";
-  if (thr) g.fillRect(X(0), Y(y1), X(dz) - X(0), Y(y0) - Y(y1));
-  else g.fillRect(X(-dz), Y(y1), X(dz) - X(-dz), Y(y0) - Y(y1));
-  g.fillStyle = "rgba(255,160,60,.22)";
-  g.fillRect(X(100 - dz), Y(y1), X(100) - X(100 - dz), Y(y0) - Y(y1));
-  if (!thr) g.fillRect(X(-100), Y(y1), X(-100 + dz) - X(-100), Y(y0) - Y(y1));
-  // 축
-  g.strokeStyle = "rgba(255,255,255,.35)";
-  g.lineWidth = 1;
-  g.beginPath();
-  if (!thr) { g.moveTo(X(0), Y(y0)); g.lineTo(X(0), Y(y1)); g.moveTo(X(x0), Y(0)); g.lineTo(X(x1), Y(0)); }
-  g.rect(X(x0), Y(y1), X(x1) - X(x0), Y(y0) - Y(y1));
-  g.stroke();
-  // 곡선
-  g.strokeStyle = color;
-  g.lineWidth = 2.5 * (W / 220);
-  g.beginPath();
-  for (let i = 0; i <= 400; i++) {
-    const p = x0 + ((x1 - x0) * i) / 400;
-    const v = thr ? outThrottle(p, dz, curve) : outReturn(p, dz, speed, curve);
-    if (i) g.lineTo(X(p), Y(v)); else g.moveTo(X(p), Y(v));
-  }
-  g.stroke();
 }
