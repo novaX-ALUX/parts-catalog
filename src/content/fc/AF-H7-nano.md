@@ -39,7 +39,7 @@ firmware:
 specs:
   - { key: MCU, value: "STM32H743VIH6, 480 MHz (1MB RAM, 2MB Flash)" }
   - { key: IMU, value: "2× ICM-42688-P" }
-  - { key: Barometer, value: "DPS-368" }
+  - { key: Barometer, value: "DPS310 (Infineon)" }
   - { key: Operating Voltage, value: "6 – 36 V DC (2–8S LiPo)" }
   - { key: Output Voltage, value: "BEC 5V @ 2.5A" }
   - { key: USB Input, value: "USB-C (Firmware & Power)" }
@@ -54,7 +54,7 @@ specs:
   - { key: Operating Temp, value: "-20 ~ +85 ℃" }
   - { key: Supported F/W, value: "novaX ArduPilot (released); Betaflight board configuration available" }
 description: |
-  AF-H7 nano is a compact STM32H743 flight controller with two ICM-42688-P IMUs. The current novaX ArduPilot definition enables ten motor/servo PWM channels, one WS2812 LED channel and seven hardware UARTs. Use the AF-H7_nano board definition and its matching released images; another H743 board's firmware is not interchangeable. The catalog barometer label is DPS368; the schematic symbol is DPS310 and the firmware uses the compatible SPL06/DPS310 driver, so confirm the fitted component against the board revision.
+  AF-H7 nano is a compact STM32H743 flight controller with two ICM-42688-P IMUs. The current novaX ArduPilot definition enables ten motor/servo PWM channels, one WS2812 LED channel and seven hardware UARTs. Use the AF-H7_nano board definition and its matching released images; another H743 board's firmware is not interchangeable. The barometer is an Infineon DPS310.
 pinoutNotes: |
   Pinout follows novaX AF-H7_nano, not a generic H7 target. PWM1–10 are motor/servo outputs; PWM11 is the WS2812 LED line. The GPS connector is USART3 (SERIAL3, PD8/PD9), the ELRS/RC connector is USART6 (SERIAL6, PC6/PC7), and UART7/8 are spare pads. UART4 is assigned to DJI O3 MSP.
 

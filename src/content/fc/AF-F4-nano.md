@@ -21,7 +21,7 @@ manuals:
 specs:
   - { key: MCU, value: "STM32F405" }
   - { key: IMU, value: "ICM-42688-P" }
-  - { key: Barometer, value: "SPL06-001 (Goertek) — NDAA build: Infineon DPS368 on the same pads, with firmware that enables the DPS310 driver" }
+  - { key: Barometer, value: "DPS368 (Infineon)" }
   - { key: Operating Voltage, value: "9 – 25 V DC" }
   - { key: Output Voltage, value: "3.3V/1A · 5V/3A · 10V/3A" }
   - { key: USB Input, value: "USB Type-C (Firmware & Power)" }
@@ -36,7 +36,7 @@ specs:
   - { key: Operating Temp, value: "-20 ~ +70 ℃" }
   - { key: Supported F/W, value: "novaX ArduPilot (released); Betaflight board configuration available" }
 description: |
-  AF-F4 nano is a compact STM32F405 flight controller with an ICM-42688-P IMU. The novaX hardware definition configures an SPL06 barometer, eight motor/servo PWM outputs, one LED output and six hardware UARTs plus USB. Use the matching AF-F4_nano ArduPilot release. Betaflight board configuration is available in the FC repository; a verified PX4 release is not provided here.
+  AF-F4 nano is a compact STM32F405 flight controller with an ICM-42688-P IMU. The novaX hardware definition configures the onboard barometer, eight motor/servo PWM outputs, one LED output and six hardware UARTs plus USB. Use the matching AF-F4_nano ArduPilot release. Betaflight board configuration is available in the FC repository; a verified PX4 release is not provided here.
 firmware:
   - kind: "ArduPilot (.apj package)"
     file: /firmware/AF-F4_nano-v1.2.3.apj

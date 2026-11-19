@@ -9,7 +9,7 @@ manuals:
   - { label: "한국어", file: /manuals/esc_AE-6S-60A_manual_ko.pdf }
   - { label: English, file: /manuals/esc_AE-6S-60A_manual_en.pdf }
 specs:
-  - { key: MCU, value: "AT32F415KBU7 (128 KB Flash) — NDAA build: ST STM32F051K8U6 with TI DRV8300 gate drivers (as in AE-8S 60A V2), in design" }
+  - { key: MCU, value: "STM32F051K8U6 (ST, 64 KB Flash)" }
   - { key: Mounting Hole, value: "45 × 52 mm / Φ 4 mm" }
   - { key: Weight, value: "18.5 g" }
   - { key: Voltage Range, value: "4 – 6S LiPo (16.8 – 25.2 V)" }

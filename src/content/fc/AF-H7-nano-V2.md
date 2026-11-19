@@ -12,7 +12,7 @@ specs:
   - { key: IMU, value: "2× ICM-42688-P" }
   - { key: Barometer, value: "DPS368" }
   - { key: Compass, value: "IST8310 (onboard)" }
-  - { key: OSD, value: "AT7456E analog OSD — camera in, VTX out" }
+  - { key: OSD, value: "Analog OSD — camera in, VTX out" }
   - { key: Operating Voltage, value: "2–8S LiPo (up to 33.6 V) · both regulators rated 60 V, 36 V TVS on the battery input" }
   - { key: Output Voltage, value: "5 V / 1.5 A with 6.5 V or more at the FC battery input · 12 V / 1.2 A with 13.5 V or more at the FC battery input (VTX, DJI O3) — below that the output follows the battery · 5 V port rail for GPS, receiver and CAN that also runs from USB alone (unplug those devices, or use a USB-C supply of 1.5 A or more)" }
   - { key: ESC Port, value: "10-pin JST-SH: VBAT · VBAT · GND · GND · M1–M4 · CUR · TEL — straight 1:1 cable to the novaX AE-8S-60A 4-in-1 V2 ESC" }

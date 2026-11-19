@@ -11,7 +11,7 @@ specs:
   - { key: Control, value: "Sensorless FOC (InstaSPIN-FAST)" }
   - { key: Voltage Range, value: "6S LiPo (max 25.2 V)" }
   - { key: Constant Current, value: "60 A" }
-  - { key: Power Stage, value: "JSM6288T half-bridge modules" }
+  - { key: Power Stage, value: "TI DRV8300 3-phase gate driver · onsemi NVMFS5C612NL MOSFETs" }
   - { key: Interface, value: "DroneCAN (CAN 2.0 · 1 Mbit)" }
   - { key: Position Sensor, value: "MT6701 magnetic encoder (prop parking)" }
   - { key: Telemetry, value: "DroneCAN ESC status + flight recorder (on-board flash)" }

@@ -10,7 +10,7 @@ manuals:
   - { label: English, file: /manuals/esc_AE-8S-60A_manual_en.pdf }
 specs:
   - key: MCU
-    value: AT32F415KBU7 (128 KB Flash) — NDAA build (V2) uses ST STM32F051K8U6 with TI DRV8300 gate drivers and its own AM32 F051 firmware
+    value: STM32F051K8U6 (ST, 64 KB Flash)
   - key: Mounting Hole
     value: 56 × 57 mm / Φ 4 mm
   - key: Weight

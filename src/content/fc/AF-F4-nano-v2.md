@@ -22,7 +22,7 @@ specs:
   - { key: IMU, value: "ICM-42688-P" }
   - { key: Barometer, value: "DPS368" }
   - { key: GNSS, value: "MAX-M10S — via external GPS module (not onboard)" }
-  - { key: Compass, value: "QMC5883P — on external GPS module (not onboard)" }
+  - { key: Compass, value: "BMM350 (Bosch) — on the external AP-M10 GPS module (not onboard)" }
   - { key: GPS Port, value: "6-pin connector (UART TX/RX + I2C SCL/SDA)" }
   - { key: Operating Voltage, value: "9 – 25 V DC" }
   - { key: Output Voltage, value: "3.3V/1A · 5V/3A · 10V/3A" }
@@ -36,7 +36,7 @@ specs:
   - { key: Weight, value: "9.3 g" }
   - { key: Supported F/W, value: "ArduPilot" }
 description: |
-  AF-F4 nano v2 is a compact F4-class flight controller built around the STM32F405, with an ICM-42688-P IMU and a DPS368 barometer onboard. GNSS and compass are external: the 6-pin GPS port carries USART1 and I2C1 for a module with MAX-M10S and QMC5883P. Without an external positioning or heading source those measurements are unavailable. The current novaX ArduPilot definition enables five PWM outputs, three hardware UARTs plus USB, and microSD logging. Board ID 6204 allows compatible APJ uploaders to check the target; raw DFU and SWD flashing do not provide that protection. Use only the matching AF-F4_nano_v2 image.
+  AF-F4 nano v2 is a compact F4-class flight controller built around the STM32F405, with an ICM-42688-P IMU and a DPS368 barometer onboard. GNSS and compass are external: the 6-pin GPS port carries USART1 and I2C1 for a GPS module with a u-blox M10 receiver and a Bosch BMM350 compass (such as AP-M10). Without an external positioning or heading source those measurements are unavailable. The current novaX ArduPilot definition enables five PWM outputs, three hardware UARTs plus USB, and microSD logging. Board ID 6204 allows compatible APJ uploaders to check the target; raw DFU and SWD flashing do not provide that protection. Use only the matching AF-F4_nano_v2 image.
 pinoutImages:
   - /images/products/fc_F4_nano_v2_pinout.png
 firmware:
