@@ -224,6 +224,53 @@ export function appVersion() {
 }
 
 /**
+ * @param {any} io
+ * @param {Uint8Array | number[]} config
+ * @returns {Promise<string>}
+ */
+export function escConfig(io, config) {
+    const ptr0 = passArray8ToWasm0(config, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.escConfig(io, ptr0, len0);
+    return ret;
+}
+
+/**
+ * 진행은 `on_progress(JSON 글자 {esc, done, total})` — 데스크톱 "esc" 알림과 같은 꼴
+ * @param {any} io
+ * @param {number} esc
+ * @param {string} hex
+ * @param {Function} on_progress
+ * @returns {Promise<string>}
+ */
+export function escFlash(io, esc, hex, on_progress) {
+    const val2 = +esc;
+    const ptr0 = passStringToWasm0(hex, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.escFlash(io, val2, ptr0, len0, on_progress);
+    return ret;
+}
+
+/**
+ * @param {any} io
+ * @returns {Promise<void>}
+ */
+export function escLeave(io) {
+    const ret = wasm.escLeave(io);
+    return ret;
+}
+
+/**
+ * @param {any} io
+ * @param {number} esc
+ * @returns {Promise<string>}
+ */
+export function escRead(io, esc) {
+    const ret = wasm.escRead(io, esc);
+    return ret;
+}
+
+/**
  * 고른 파일 확인 — 성공 FwFile · 실패 FwError(둘 다 JSON 글자)
  * @param {Uint8Array | number[]} bytes
  * @returns {string}
@@ -335,7 +382,7 @@ function __wbg_get_imports() {
             const ret = arg0.call(arg1, arg2);
             return ret;
         }, arguments); },
-        __wbg_close_b9de268465331eba: function(arg0) {
+        __wbg_close_e48b740db068b7d5: function(arg0) {
             arg0.close();
         },
         __wbg_length_186163212ffe79c3: function(arg0) {
@@ -364,7 +411,7 @@ function __wbg_get_imports() {
                 state0.a = 0;
             }
         },
-        __wbg_now_3e9d70583fe92fb3: function(arg0) {
+        __wbg_now_2739fef7aa675ce1: function(arg0) {
             const ret = arg0.now();
             return ret;
         },
@@ -386,11 +433,11 @@ function __wbg_get_imports() {
         __wbg_queueMicrotask_4a1a4d8dd332373b: function(arg0) {
             queueMicrotask(arg0);
         },
-        __wbg_read_1ef750f50db15fac: function(arg0, arg1, arg2) {
+        __wbg_read_95ddafdf1fbc5531: function(arg0, arg1, arg2) {
             const ret = arg0.read(arg1 >>> 0, arg2);
             return ret;
         },
-        __wbg_reopen_5061481ddde6027d: function(arg0) {
+        __wbg_reopen_84c9b4074c0131c8: function(arg0) {
             const ret = arg0.reopen();
             return ret;
         },
@@ -398,7 +445,7 @@ function __wbg_get_imports() {
             const ret = Promise.resolve(arg0);
             return ret;
         },
-        __wbg_sleep_0ddce6bcf7a3a5f9: function(arg0, arg1) {
+        __wbg_sleep_e5b7063aad5da6b5: function(arg0, arg1) {
             const ret = arg0.sleep(arg1);
             return ret;
         },
@@ -430,14 +477,14 @@ function __wbg_get_imports() {
             const ret = arg0.then(arg1);
             return ret;
         },
-        __wbg_write_0e00df1491bee73e: function(arg0, arg1, arg2) {
+        __wbg_write_7cab9873a23efd65: function(arg0, arg1, arg2) {
             var v0 = getArrayU8FromWasm0(arg1, arg2).slice();
             wasm.__wbindgen_free(arg1, arg2 * 1, 1);
             const ret = arg0.write(v0);
             return ret;
         },
         __wbindgen_generic_0000000000000001: function(arg0, arg1) {
-            // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [Externref], shim_idx: 42, ret: Result(Unit), inner_ret: Some(Result(Unit)) }, mutable: true }) -> Externref`.
+            // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [Externref], shim_idx: 82, ret: Result(Unit), inner_ret: Some(Result(Unit)) }, mutable: true }) -> Externref`.
             const ret = makeMutClosure(arg0, arg1, wasm_bindgen__convert__closures_____invoke__h9d70b5376fe4d351);
             return ret;
         },

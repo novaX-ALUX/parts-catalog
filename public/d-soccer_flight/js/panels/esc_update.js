@@ -70,7 +70,7 @@ export function initEscUpdate({ page, cfg, readOne, readAll, hexOpenBtn, fileNam
   // ── 인터넷 펌웨어 목록 (ESCFirmwareFileManager · 받기는 netlist.js) ──
   let fileList = [], fileName = "", fileURL = "";
   const list = $("#escHexDlg .ehd-list");
-  // 웹판은 안 받음 — SharePoint 는 브라우저 받기를 막고(쿠키·다른 사이트), ESC 굽기도 아직 PC판만(api.js WEB)
+  // 웹판은 목록을 안 받음 — SharePoint 는 브라우저 받기를 막는다(쿠키·다른 사이트). 웹판 굽기는 'PC 에서 열기'로 고른 hex 로
   if (!api.web) fetchList(LIST_URL.esc).then((l) => { fileList = l; fileListSetting(); })
     .catch((e) => console.info("[esc] " + e.message));
   function fileListSetting() { list.innerHTML = fileList.map((f, i) => `<option value="${i}">${f.name}</option>`).join(""); selectFirmware(); }

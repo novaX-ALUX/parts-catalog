@@ -124,7 +124,7 @@ export function initEsc(root) {
     clearTimeout(noteTimer);
     noteTimer = setTimeout(() => noteBtns.forEach((b) => (b.disabled = false)), 2250);
   }
-  $("#esc-yes").onclick = () => (api.web ? notify(221, 2500) : readEscConfigsAll(true)); // 웹판: ESC 바이패스는 아직 PC판만
+  $("#esc-yes").onclick = () => readEscConfigsAll(true);
   $("#esc-no").onclick = () => { // 상태 탭으로 · 막 끄기 · 연결 알림 끄기
     showPage("status");
     setMotorMask(false, "esc");

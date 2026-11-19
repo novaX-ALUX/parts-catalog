@@ -2,14 +2,13 @@
 // 언제 무엇을 보내고 끊을지는 데스크톱과 같은 상태 기계(crates/web → pkg/dsf_web.wasm)가 정한다.
 // 할 일 목록(open · write · close · sleep · event)을 받은 순서대로 하고, open 결과를 알려 준 뒤 생긴 일은 남은 일 뒤에 잇는다(worker.rs flush 와 같음).
 // 앱 펌웨어 굽기: 순서·확인은 데스크톱과 같은 dsf_fw(wasm fwProbe · fwUpdate), 포트만 여기 fwIo 가 쥔다.
-// 부트로더·ESC 굽기는 아직 PC판에서만 — bl* 은 없음(화면이 부트로더 단계를 건너뜀) · esc* 는 WEB_ONLY 예외.
-import init, { WebLink, appVersion, fwCheck, fwProbe, fwUpdate } from "../pkg/dsf_web.js";
-import { fwIo } from "./web_fw_io.js";
+// ESC 읽기·설정·굽기: 순서·확인은 데스크톱과 같은 dsf_fw::esc::app(wasm esc*), 포트는 본 연결이 연 것을 withEscPort 가 잠깐 빌려 준다.
+// 부트로더(칩 안 DFU)는 아직 PC판에서만 — bl* 은 없음(화면이 부트로더 단계를 건너뜀).
+import init, { WebLink, appVersion, fwCheck, fwProbe, fwUpdate, escRead, escConfig, escFlash, escLeave } from "../pkg/dsf_web.js";
+import { fwIo, inbox, wait } from "./web_fw_io.js";
 
-export const WEB_ONLY = "웹판에서는 아직 안 되는 기능 — PC판을 쓰세요";
 const ST_VID = 0x0483; // 드론·조종기 USB(STM32 가상 COM)
 const POLL_OPEN = 5, POLL_IDLE = 100; // worker.rs 와 같은 간격(ms)
-const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const errText = (e) => String(e?.message ?? e);
 
 export async function webApi() {
@@ -21,6 +20,7 @@ export async function webApi() {
   let seq = 0, port = null, writer = null, reader = null, opening = false, askAgain = false;
   const queue = [];
   let running = false;
+  let escSink = null; // ESC 일 하는 동안 받은 바이트는 상태 기계 대신 여기로(withEscPort)
 
   const nameOf = (p) => {
     if (!names.has(p)) { const n = "USB" + ++seq; names.set(p, n); byName.set(n, p); }
@@ -33,12 +33,14 @@ export async function webApi() {
 
   /** 상태 기계가 준 할 일(JSON 글자)을 뒤에 잇고, 아무도 안 돌고 있으면 차례로 한다 */
   async function run(json) {
-    const steps = JSON.parse(json);
-    if (!steps.length) return;
-    queue.push(...steps);
-    if (running) return;
+    queue.push(...JSON.parse(json));
+    return pump();
+  }
+  /** 쌓인 할 일을 차례로 — ESC 일 하는 동안은 쉰다(데스크톱도 포트를 빌려준 동안 일꾼이 멈춤) */
+  async function pump() {
+    if (running || escSink || !queue.length) return;
     running = true;
-    try { while (queue.length) await step(queue.shift()); }
+    try { while (queue.length && !escSink) await step(queue.shift()); }
     finally { running = false; }
   }
 
@@ -82,7 +84,7 @@ export async function webApi() {
         for (;;) {
           const { value, done } = await reader.read();
           if (done) break;
-          if (value?.length) run(link.bytes(value));
+          if (value?.length) { if (escSink) escSink(value); else run(link.bytes(value)); }
         }
       } catch (e) {
         if (port === p) run(link.ioError(errText(e))); // 선 뽑힘 등 → 상태 기계가 끊기·알림
@@ -110,7 +112,7 @@ export async function webApi() {
     ["let t=null;onmessage=(e)=>{clearInterval(t);t=setInterval(()=>postMessage(0),e.data)}"], { type: "text/javascript" })));
   let pollMs = 0;
   function setPoll(ms) { if (ms !== pollMs) { pollMs = ms; clock.postMessage(ms); } }
-  clock.onmessage = () => { if (!opening) run(link.tick()); };
+  clock.onmessage = () => { if (!opening && !escSink) run(link.tick()); };
   setPoll(POLL_IDLE);
 
   // 드론·조종기 포트 — 허락받은 것 + (처음이거나 지난번에 못 찾았으면) 포트 고르기 창
@@ -130,7 +132,27 @@ export async function webApi() {
   });
   addEventListener("pagehide", () => run(link.shutdown()));
 
-  const webOnly = async () => { throw new Error(WEB_ONLY); };
+  // ── ESC(데스크톱 src-tauri/src/esc.rs with_wire 자리) — 열린 드론 포트를 빌려 job(io) · 그동안 본 연결 읽기·보내기·시간은 멈춤 ──
+  const escSubs = new Set();
+  async function withEscPort(job) {
+    if (escSink) throw "ESC 일이 이미 도는 중";
+    const p = port;
+    if (!p || !writer) throw "드론이 연결돼 있지 않음";
+    const box = inbox();
+    escSink = box.push;
+    while (running) await wait(5); // 상태 기계가 하던 일(보내기)을 마치게
+    const alive = () => port === p && !!writer;
+    const io = {
+      write: async (bytes) => { if (!alive()) throw "포트가 닫혀 있음"; await writer.write(bytes); },
+      read: (max, ms) => box.read(max, ms, alive, () => !alive()),
+      now: () => performance.now(),
+      sleep: (ms) => wait(ms),
+      close() {},
+      reopen: async () => {},
+    };
+    try { return await job(io); }
+    finally { escSink = null; pump(); }
+  }
   const PROFILE = "dsf-profile-";
 
   // ── 앱 펌웨어 굽기(데스크톱 src-tauri/src/firmware.rs 와 같은 일 · 같은 결과 꼴) ──
@@ -198,6 +220,10 @@ export async function webApi() {
     fwUpdate: (name, bytes) => withFwPort(name, (io, use) => fwUpdate(io, Uint8Array.from(bytes), use, (j) => { const ev = JSON.parse(j); fwSubs.forEach((f) => f(ev)); })),
     onFw: async (cb) => { fwSubs.add(cb); return () => fwSubs.delete(cb); },
     // 부트로더(칩 안 DFU)는 아직 PC판만 — bl* 이 없으면 화면(firmware.js bootStep)이 그 단계를 건너뛴다
-    escRead: webOnly, escConfig: webOnly, escFlash: webOnly, escLeave: async () => {}, onEsc: async () => () => {},
+    escRead: (esc) => withEscPort(async (io) => JSON.parse(await escRead(io, esc))),
+    escConfig: (config) => withEscPort(async (io) => JSON.parse(await escConfig(io, Uint8Array.from(config)))),
+    escFlash: (esc, hex) => withEscPort(async (io) => JSON.parse(await escFlash(io, esc, hex, (j) => { const ev = JSON.parse(j); escSubs.forEach((f) => f(ev)); }))),
+    escLeave: () => withEscPort((io) => escLeave(io)),
+    onEsc: async (cb) => { escSubs.add(cb); return () => escSubs.delete(cb); },
   };
 }
