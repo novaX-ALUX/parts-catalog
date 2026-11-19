@@ -1,6 +1,6 @@
 ---
 name: AE-6S 60A BC
-ndaa: true
+ndaa: false
 tagline: 32-bit ESC for X-Blade 10/15 · 6S LiPo
 image: /images/products/esc_32-6S-60A-BC.png
 pictureKey: esc_32-6S-60A-BC
@@ -10,7 +10,7 @@ manuals:
   - { label: "한국어", file: /manuals/esc_AE-6S-60A-BC_manual_ko.pdf }
   - { label: English, file: /manuals/esc_AE-6S-60A-BC_manual_en.pdf }
 specs:
-  - { key: MCU, value: "AT32F415KBU7 (128 KB Flash) — NDAA build: non-Chinese MCU and gate driver, in design" }
+  - { key: MCU, value: "AT32F415KBU7 (128 KB Flash)" }
   - { key: Mounting Hole, value: "45 × 52 mm / Φ 4 mm" }
   - { key: Weight, value: "18.5 g" }
   - { key: Voltage Range, value: "4 – 6S LiPo (16.8 – 25.2 V)" }
