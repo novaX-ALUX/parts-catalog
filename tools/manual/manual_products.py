@@ -15,7 +15,7 @@ def spec(d, key):
 KO_VALUE = {
     "AE-6S-60A-FOC-TI": {
         "Sensorless FOC (InstaSPIN-FAST)": "센서리스 FOC (InstaSPIN-FAST)", "6S LiPo (max 25.2 V)": "6S LiPo (최대 25.2 V)",
-        "JSM6288T half-bridge modules": "JSM6288T 하프브리지 모듈", "MT6701 magnetic encoder (prop parking)": "MT6701 자기 엔코더 (프로펠러 정위치 정지)",
+        "TI DRV8300 3-phase gate driver · onsemi NVMFS5C612NL MOSFETs": "TI DRV8300 3상 게이트 드라이버 · onsemi NVMFS5C612NL MOSFET", "MT6701 magnetic encoder (prop parking)": "MT6701 자기 엔코더 (프로펠러 정위치 정지)",
         "DroneCAN ESC status + flight recorder (on-board flash)": "DroneCAN ESC 상태 + 비행 기록 (보드 내장 플래시)",
         "CMPSS hardware overcurrent, trip-zone safe-off, stall supervision": "CMPSS 하드웨어 과전류 보호 · 트립존 안전 차단 · 멈춤 감시"},
     "AC-C2M104L": {"M12 S mount": "M12 S 마운트"},
@@ -23,13 +23,13 @@ KO_VALUE = {
     "AC-THE02F": {"Typ. 30 Hz": "일반 30 Hz"},
     "AF-F4-nano-v2": {
         "MAX-M10S — via external GPS module (not onboard)": "MAX-M10S — 외장 GPS 모듈 (보드에 없음)",
-        "QMC5883P — on external GPS module (not onboard)": "QMC5883P — 외장 GPS 모듈 (보드에 없음)",
+        "BMM350 (Bosch) — on the external AP-M10 GPS module (not onboard)": "BMM350 (Bosch) — 외장 AP-M10 GPS 모듈 (보드에 없음)",
         "6-pin connector (UART TX/RX + I2C SCL/SDA)": "6핀 커넥터 (UART TX/RX + I2C SCL/SDA)",
         "5 channels in current novaX ArduPilot configuration": "5채널 (현재 novaX ArduPilot 설정)",
         "3 hardware UARTs + USB in current novaX ArduPilot configuration": "하드웨어 UART 3개 + USB (현재 novaX ArduPilot 설정)",
         "microSD card": "microSD 카드"},
     "AF-F4-nano": {
-        "SPL06 (current novaX hardware definition)": "SPL06 (현재 novaX 하드웨어 정의)", "USB Type-C (Firmware & Power)": "USB Type-C (펌웨어 · 전원)",
+        "USB Type-C (Firmware & Power)": "USB Type-C (펌웨어 · 전원)",
         "8 motor/servo channels + 1 LED channel": "모터/서보 8채널 + LED 1채널",
         "6 hardware UARTs + USB configured; verify connector pinout": "하드웨어 UART 6개 + USB (커넥터 핀맵 확인 필요)",
         "novaX ArduPilot (released); Betaflight board configuration available": "novaX ArduPilot (배포) · Betaflight 보드 설정 제공"},
@@ -96,8 +96,8 @@ OVERVIEW = {
                   "en": "Thermal imaging module based on a VOx detector, available in SoC (USB output) and FPGA (CVBS output) variants."},
     "AF-F4-nano-v2": {"ko": "STM32F405 · ICM-42688-P · DPS368 을 올린 소형 F4 비행 컨트롤러입니다. GNSS 와 나침반은 외장이며 6핀 GPS 포트(USART1 + I2C1)로 연결합니다.",
                       "en": "Compact F4 flight controller with STM32F405, ICM-42688-P and DPS368. GNSS and compass are external, connected through the 6-pin GPS port (USART1 + I2C1)."},
-    "AF-F4-nano": {"ko": "STM32F405 · ICM-42688-P 소형 비행 컨트롤러입니다. novaX 하드웨어 정의로 SPL06 기압계, 모터/서보 8채널, LED 1채널, UART 6개 + USB 를 씁니다.",
-                   "en": "Compact STM32F405 flight controller with an ICM-42688-P IMU. The novaX hardware definition configures an SPL06 barometer, 8 motor/servo outputs, 1 LED output and 6 UARTs plus USB."},
+    "AF-F4-nano": {"ko": "STM32F405 · ICM-42688-P 소형 비행 컨트롤러입니다. novaX 하드웨어 정의로 보드 기압계, 모터/서보 8채널, LED 1채널, UART 6개 + USB 를 씁니다.",
+                   "en": "Compact STM32F405 flight controller with an ICM-42688-P IMU. The novaX hardware definition configures the onboard barometer, 8 motor/servo outputs, 1 LED output and 6 UARTs plus USB."},
     "AF-H7-nano": {"ko": "STM32H743 · ICM-42688-P 2개를 올린 소형 비행 컨트롤러입니다. 모터/서보 10채널, WS2812 LED 1채널, UART 7개를 쓰며 2–8S 입력을 받습니다.",
                    "en": "Compact STM32H743 flight controller with two ICM-42688-P IMUs. Provides 10 motor/servo outputs, 1 WS2812 LED output and 7 UARTs with 2–8S input."},
     "AF-H7E": {"ko": "Pixhawk FMUv6x 구조의 모듈형 STM32H753 비행 컨트롤러입니다. IMU 3종 · RM3100 나침반 · ICP-20100 기압계 2개, FMU 8 + IOMCU 8 출력, CAN 2 · 이더넷을 갖췄습니다.",
