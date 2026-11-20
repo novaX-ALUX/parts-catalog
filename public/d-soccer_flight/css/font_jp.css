@@ -6,8 +6,8 @@
 
 /* 탭 이름(Setting/PID Tuning/Motors/ESC Text) */
 .tab .name,
-/* 상태: 칸 제목 · 가속도계 교정 · Z축 초기화 · 3D 자세 글 · 그래프 갱신 간격 */
-#st-info h3, #st-led h3, #st-graph h3, #st-cal h3, #btnCal, #btnOffset, #st-3d .att-k, #st-3d .att-v, .g-rate-v, .g-rate-ms,
+/* 상태: 칸 제목 · Z축 초기화 · 3D 자세 글 · 그래프 갱신 간격(LED · 가속도계 교정은 2.13.0 에 조종기 탭으로) */
+#st-info h3, #st-graph h3, #btnOffset, #st-3d .att-k, #st-3d .att-v, .g-rate-v, .g-rate-ms,
 /* PID: 칸 제목 · 축·항목 이름 · 프로파일·저장·초기화 단추 */
 #pid-now h3, #pid-set h3, #pid-angle h3, #pid-misc h3, #pid-now .pn-axis, #pid-now .pn-k, #pid-set .axis, #pid-angle .mk, #pid-misc .mk,
 #pid-set button, #pid-reset, #pid-save,

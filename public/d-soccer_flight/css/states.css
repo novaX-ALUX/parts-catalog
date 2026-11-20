@@ -47,7 +47,7 @@
 
 /* 둥근 테 단추 넷 — 모두 ButtonTransition: 테두리·글자 = 올림 민트 · 누름 #3692c1(원본 알파 0 은 화면에 안 먹음 — HP 원본 사진 hp-unityH1)
    가속도계 교정 · 업데이트 확인은 ColorTint 없음. PID 정보 초기화 · 적용 및 저장은 ColorTint(테두리만 0.961 / 0.784)가 겹침 */
-#btnCal[data-bt=hl] { border-color: #00ffe6; color: #00ffe6; } #btnCal[data-bt=pr] { border-color: #3692c0; color: #3692c0; }
+:is(#ct-imu, #ct-joy, #ct-def)[data-bt=hl] { border-color: #00ffe6; color: #00ffe6; } :is(#ct-imu, #ct-joy, #ct-def)[data-bt=pr] { border-color: #3692c0; color: #3692c0; }   /* 원본 가속도계 교정 단추(2.13.0 에 조종기 탭 보정·초기화로) */
 #btnFwCheck[data-bt=hl] { border-color: #00ffe5; color: #00ffe5; } #btnFwCheck[data-bt=pr] { border-color: #3692c1; color: #3692c1; }
 :is(#pid-save, #pid-reset):is(:hover, .u-sel) { border-color: #3bb7f5; }
 :is(#pid-save, #pid-reset):active { border-color: #2e95c8; }

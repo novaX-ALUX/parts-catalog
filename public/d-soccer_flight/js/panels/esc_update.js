@@ -68,16 +68,20 @@ export function initEscUpdate({ page, cfg, readOne, readAll, hexOpenBtn, fileNam
   };
 
   // ── 인터넷 펌웨어 목록 (ESCFirmwareFileManager · 받기는 netlist.js) ──
-  let fileList = [], fileName = "", fileURL = "";
+  let fileList = [], fileName = "", fileURL = "", fileSha = "";
   const list = $("#escHexDlg .ehd-list");
-  // 웹판은 목록을 안 받음 — SharePoint 는 브라우저 받기를 막는다(쿠키·다른 사이트). 웹판 굽기는 'PC 에서 열기'로 고른 hex 로
-  if (!api.web) fetchList(LIST_URL.esc).then((l) => { fileList = l; fileListSetting(); })
+  // 목록은 깃카탈로그 esc/index.json — 웹·PC 같음(2.13.0 · 전에는 SharePoint 라 웹판은 목록이 비어 'PC 에서 열기'만 됐음)
+  fetchList(LIST_URL.esc).then((l) => { fileList = l; fileListSetting(); })
     .catch((e) => console.info("[esc] " + e.message));
-  function fileListSetting() { list.innerHTML = fileList.map((f, i) => `<option value="${i}">${f.name}</option>`).join(""); selectFirmware(); }
+  function fileListSetting() {
+    list.innerHTML = fileList.map((f, i) => `<option value="${i}">${f.name}</option>`).join("");
+    list.selectedIndex = Math.max(0, fileList.findIndex((f) => f.default)); // 카탈로그가 정한 기본(48 kHz)을 골라 둠
+    selectFirmware();
+  }
   function selectFirmware() { // SelectFirmware — 창이 열려 있을 때만
     if ($("#escHexDlg").classList.contains("hidden") || !fileList.length) return;
     const f = fileList[+list.value] ?? fileList[0];
-    fileName = f.name; fileURL = f.url;
+    fileName = f.name; fileURL = f.url; fileSha = f.sha256;
   }
   list.onchange = selectFirmware;
   // 펼친 목록: 원본 hex Open Panel/Background/Dropdown/Template(Unity 기본 — ESC 드롭다운과 같은 모양) — 창(OS) 목록 대신
@@ -89,7 +93,7 @@ export function initEscUpdate({ page, cfg, readOne, readAll, hexOpenBtn, fileNam
     if (!navigator.onLine || !fileList.length) { notify(189); return; } // 인터넷 연결 후 재시작하세요(목록을 못 받은 때도)
     if (!fileURL) selectFirmware();
     $("#escHexDlg").classList.add("hidden");
-    fetchBytes(fileURL).then((b) => loadHex(fileName, b)).catch((e) => console.error("HEX 다운로드 실패: " + e.message));
+    fetchBytes(fileURL, fileSha).then((b) => loadHex(fileName, b)).catch((e) => console.error("HEX 다운로드 실패: " + e.message));
   };
   $("#escHexDlg .ehd-pc").onclick = openFromPC;
   $("#escHexDlg .ehd-x").onclick = () => $("#escHexDlg").classList.add("hidden");

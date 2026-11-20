@@ -1,9 +1,9 @@
-// 막대 → 드론에 가는 값(조종기 1.3.0 Joystick 과 같은 계산) + 조종기 CALIB 화면 꼴 곡선 그림 — 조종기 탭 '조종 곡선' 칸이 씀
+// 막대 → 드론에 가는 값(조종기 1.3.0 Joystick 과 같은 계산) + 조종기 CURVE 화면 꼴 곡선 그림 — 조종기 탭 '스틱 곡선' 칸이 씀
 // 계산 정본은 조종기 펌웨어 Source/Device/Joystick.Joystick.cpp(scaleReturnAxis · scaleThrottleAxis) · Joystick.cpp(convertControl)
 // 그래프는 미리보기 — 막대 끝값을 기본(가운데 2048 · 끝 600 · 3400)으로 보고 %로 그림
 
-const XS_RNP = [0, 12, 25, 37, 50, 75, 100];          // RnP · YAW CALIB 점 S1~S6 의 막대 자리
-const XS_THR = [0, 25, 50, 75, 100, 150, 200];        // THR CALIB 점(0~200)
+const XS_RNP = [0, 12, 25, 37, 50, 75, 100];          // R/P · YAW CURVE 점 S1~S6 의 막대 자리
+const XS_THR = [0, 25, 50, 75, 100, 150, 200];        // THR CURVE 점(0~200)
 const SPEED = [0.4, 0.7, 1];                           // SPEED 1 · 2 · 3
 
 const piece = (x, xs, ys) => {
@@ -28,14 +28,14 @@ export function outThrottle(p, dz, curve) {
   return Math.trunc(piece(Math.min(200, Math.max(0, raw)), XS_THR, [0, ...curve.map((v) => 2 * v)])) / 2;
 }
 
-/** 곡선 점 S1~S6 가 막대의 어디(%)에 오나 — 조종기 CALIB 화면과 같게 데드존만큼 안쪽으로(롤·피치·요 = 가운데 0 → 끝 100, 스로틀 = 바닥 0 → 꼭대기 100)
+/** 곡선 점 S1~S6 가 막대의 어디(%)에 오나 — 조종기 CURVE 화면과 같게 데드존만큼 안쪽으로(롤·피치·요 = 가운데 0 → 끝 100, 스로틀 = 바닥 0 → 꼭대기 100)
  *  조종기 정본: Source/Application/ModeSetupTreeDepth2.Draw.cpp drawCalibrationCurve */
 export function calibStickX(kind, dz) {
   if (kind !== "thr") return XS_RNP.slice(1).map((x) => dz + (x * (100 - 2 * dz)) / 100);
   return XS_THR.slice(1).map((r) => (r <= 100 ? dz + (r * (50 - dz)) / 100 : 50 + ((r - 100) * (50 - dz)) / 100));
 }
 
-/** 조종기 CALIB 화면과 같은 꼴의 곡선 그림 — 가로 = 막대 · 세로 = 곡선 값(0~100) · 점 S1~S6 · 고른 점 세로줄 · 데드존(회색) · 끝(주황) 띠
+/** 조종기 CURVE 화면과 같은 꼴의 곡선 그림 — 가로 = 막대 · 세로 = 곡선 값(0~100) · 점 S1~S6 · 고른 점 세로줄 · 데드존(회색) · 끝(주황) 띠
  *  롤·피치·요는 반쪽(가운데 → 끝)만(조종기 화면과 같음 · 반대쪽은 대칭) · SPEED 는 넣지 않음(아래 '데드존 · 막대 → 드론' 그래프에 있음) */
 export function drawCalib(canvas, { kind, dz, curve, sel, color }) {
   const g = canvas.getContext("2d");

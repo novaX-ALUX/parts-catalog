@@ -2,28 +2,22 @@
 //  · 드론·조종기(펌웨어 창 firmware.js): 깃카탈로그(parts-catalog)의 firmware/dsoccer/index.json 이 정본이다.
 //    앱 안에도 장치마다 가장 새 것 하나가 들어 있어(ui/assets/firmware/ · tools/fw_publish.mjs embed) 인터넷이 없어도 굽는다.
 //    카탈로그에서 받은 파일은 목록의 지문(SHA-256)과 맞춰 본 뒤에만 쓴다(src-tauri/src/net.rs).
-//  · ESC(esc_update.js): 원본 ESCFirmwareFileManager 그대로 — 회사 SharePoint 글 파일 "번호,이름,주소,…"(앞 세 칸은 머리).
-// 받기는 속(src-tauri/src/net.rs)이 한다 — SharePoint 링크는 쿠키가 있어야 파일을 내주고, 화면(fetch)은 다른 곳에서 막힌다.
+//  · ESC(esc_update.js): 같은 카탈로그의 firmware/dsoccer/esc/index.json(dsoccer-esc-firmware/1 · tools/fw_publish.mjs 가 만듦)
+//    — 웹·PC 같은 목록 · 파일은 지문을 맞춰 본 뒤에만 쓴다. 2.12.x 까지는 회사 SharePoint 글 파일이라 웹판은 받을 수 없었다.
+// PC 는 속(src-tauri/src/net.rs)이 받고, 웹은 같은 사이트(github.io)라 화면이 바로 받는다(web_api.js netGet).
 import { api } from "./api.js";
 
 export const CATALOG_FW = "https://novax-alux.github.io/parts-catalog/firmware/dsoccer/";
 const BUILTIN_FW = new URL("../assets/firmware/", import.meta.url).href;
 const SCHEMA = "dsoccer-firmware/1";
+const ESC_SCHEMA = "dsoccer-esc-firmware/1";
 
-const SP = "https://alux1004-my.sharepoint.com/:t:/g/personal/skji_aluxonline_com/";
-export const LIST_URL = {
-  esc: SP + "EWWweexXa4ROjArgDXqHV1IBOkftNeGmeD_GSeatmVX1zw?e=H4tqIE&download=1", // ESCFirmwareFileManager.url
-};
+export const LIST_URL = { esc: CATALOG_FW + "esc/index.json" };
 
-/** 원본 GetFileList 의 나누기 그대로 */
-export function parseFirmwareList(content) {
-  const f = content.split(",");
-  const list = [];
-  for (let i = 3; i < f.length; i += 3) {
-    if (i + 2 > f.length) break;
-    list.push({ num: String(parseInt(f[i], 10)), name: f[i + 1], url: f[i + 2] + "&download=1" });
-  }
-  return list;
+/** ESC 목록(dsoccer-esc-firmware/1) → [{ name, url, sha256, default }] — default = 처음에 골라 둘 것(카탈로그가 정함) */
+export function escRows(index, base) {
+  if (index?.schema !== ESC_SCHEMA || !Array.isArray(index.firmware)) throw new Error("ESC 펌웨어 목록 모양이 다름");
+  return index.firmware.map((f) => ({ name: f.name, url: base + f.file, sha256: f.sha256, default: !!f.default }));
 }
 
 /** 주소의 내용을 바이트로 받기 — 못 받으면 예외(원본 ConnectionError 갈래). sha256 을 주면 속이 맞춰 본다 */
@@ -31,9 +25,9 @@ export async function fetchBytes(url, sha256) {
   return new Uint8Array(await api.netGet(url.replace(/"/g, ""), sha256)); // 원본 DownloadFile: fileURL.Replace("\"", "")
 }
 
-/** 목록 받아 나누기(ESC) */
+/** ESC 목록 받기 — 파일 주소는 목록이 있는 폴더 기준 */
 export async function fetchList(url) {
-  return parseFirmwareList(new TextDecoder().decode(await fetchBytes(url)));
+  return escRows(JSON.parse(new TextDecoder().decode(await fetchBytes(url))), url.replace(/[^/]*$/, ""));
 }
 
 /** dsoccer-firmware/1 목록 → [{ device, name, file, version, date, size, sha256, url, builtin }] */

@@ -1,5 +1,7 @@
 /* 조종기 탭 — 원본 Unity 에 없는 새 탭. 칸(.box)·제목·밑줄·단추(.btn-line)·값 줄(.srow)은 다른 탭 것을 그대로 쓰고, 고르기 단추(.seg)는 PID 프로파일 단추(.prof)와 같은 색·모서리 */
-#ct-func { left: 20.9px; top: 0; width: 520px; height: 842.3px; }
+/* 2.13.0: 조종기 SETUP 과 같은 순서 — 왼쪽 위 LIGHT → 왼쪽 아래 FUNCTION(기능) → 오른쪽 위 CURVE(스틱 곡선) → 오른쪽 아래 CAL & RESET(보정·초기화) */
+#ct-light { left: 20.9px; top: 0; width: 520px; height: 228px; }
+#ct-func { left: 20.9px; top: 243px; width: 520px; height: 599.3px; }
 #ct-curve { left: 560px; top: 0; width: 1103.3px; height: 560px; }
 #ct-reset { left: 560px; top: 579px; width: 360px; height: 263.3px; }
 
@@ -8,11 +10,11 @@
 .seg button { min-width: 82px; height: 40px; padding: 0 14px; border: 0; background: #939598; color: #fff; font: 300 18px NK, sans-serif; cursor: pointer; white-space: nowrap; box-shadow: 0 0 0 1px rgba(255, 255, 255, .83); }
 .seg button:first-child { border-radius: 11px 0 0 11px; } .seg button:last-child { border-radius: 0 11px 11px 0; }
 .seg button.sel { background: #fff; color: #000; font-weight: 500; }
-.ct-note { position: absolute; left: 34px; top: 618px; width: 452px; height: 60px; display: flex; align-items: center; font-size: 16px; color: var(--text-dim); }
+.ct-note { position: absolute; left: 34px; top: 532px; width: 452px; height: 60px; display: flex; align-items: center; font-size: 16px; color: var(--text-dim); }
 
-.ct-c { position: absolute; left: 24px; width: 130px; height: 30px; display: flex; align-items: center; font-size: 18px; white-space: nowrap; }
+.ct-c { position: absolute; left: 24px; width: 134px; height: 30px; display: flex; align-items: center; font-size: 18px; white-space: nowrap; }
 .ct-s { position: absolute; width: 26px; height: 22px; display: flex; align-items: center; justify-content: flex-end; font-size: 14px; color: var(--text-dim); }
-.ct-c2 { left: 24px; }   /* 조종 곡선: 곡선마다 한 줄 — 이름 · 그래프(조종기 CALIB 칸과 같은 가로:세로 64:37) · 오른쪽 S1~S6 값(세로) */
+.ct-c2 { left: 24px; }   /* 스틱 곡선: 곡선마다 한 줄 — 이름 · 그래프(조종기 CURVE 칸과 같은 가로:세로 64:37) · 오른쪽 S1~S6 값(세로) */
 .ct-cal { position: absolute; left: 160px; width: 260px; height: 150px; cursor: pointer; background: rgba(0, 0, 0, .18); border-radius: 6px; }
 .ct-row2 { width: 120px; height: 22px; }
 .ct-row2 > .srange { display: none; }   /* 조종기처럼 값 + ▲▼(- +) 만 */
@@ -24,18 +26,37 @@
 #ct-apply { left: 940px; top: 498px; width: 140px; height: 40px; font-size: 16px; border-width: 1px; border-radius: 5.9px; }
 
 #ct-reset .btn-line { left: 40px; width: 280px; height: 50px; font-size: 18px; border-width: 1px; border-radius: 5.9px; }
-#ct-imu { top: 66px; } #ct-joy { top: 130px; } #ct-def { top: 194px; }
+#ct-imu { top: 66px; } #ct-imu-help { position: absolute; left: 336px; top: 80px; } #ct-joy { top: 130px; } #ct-def { top: 194px; }
 
-.ct-dzk { position: absolute; left: 24px; width: 130px; font-size: 14px; color: var(--text-dim); }   /* 데드존 값 이름(곡선 줄마다 이름 밑) */
+.ct-dzk { position: absolute; left: 24px; width: 134px; height: 22px; display: flex; align-items: center; white-space: nowrap; font-size: 14px; color: var(--text-dim); }   /* 한 줄 — 긴 말(일본어)은 data-fit 이 줄임 */   /* 데드존 값 이름(곡선 줄마다 이름 밑) */
 .ct-dzrow.ct-off { opacity: .3; pointer-events: none; }
 .ct-holdrow { width: 280px; }   /* CRASH HOLD 세기 0 ~ 100(드론 1.11.0) */
 .ct-holdrow > .sbtn.plus { left: 256px; }
 .ct-holdrow.ct-off { opacity: .3; pointer-events: none; }
 .ct-dzold { position: absolute; left: 640px; right: 24px; top: 190px; font-size: 14px; color: var(--text-dim); }   /* 옛 조종기: 데드존을 못 바꿈 안내 */
 .ct-help { font-size: 16px; color: var(--text-dim); cursor: help; }
-.ct-pend { top: 668px; color: var(--accent); }
+.ct-pend { top: 568px; color: var(--accent); }
 
-/* 드론만 꽂았을 때: 조종기 설정은 흐리게 막고 안내(상태 탭 LED 칸과 같은 규칙) — 충돌 자세 유지는 드론 값이라 그대로 씀 */
+/* 드론만 꽂았을 때: 조종기 설정(LIGHT · 기능 · 곡선 · 스틱 보정 · 공장 초기화)은 흐리게 막거나 숨기고 안내 —
+   충돌 자세 유지(드론 값)와 수평 보정(드론 명령 · 2.12 까지 상태 탭 단추)은 그대로 씀 */
 .ct-drone-only .ct-ctl { opacity: .3; pointer-events: none; }
-.ct-drone-only #ct-curve > :not(h3):not(.rule), .ct-drone-only #ct-reset > :not(h3):not(.rule) { visibility: hidden; }   /* 안내 상자 밑에 글자가 비치지 않게 내용은 숨김(칸·제목만 남김) */
+.ct-drone-only #ct-curve > :not(h3):not(.rule), .ct-drone-only #ct-reset > :not(h3):not(.rule):not(#ct-imu):not(#ct-imu-help) { visibility: hidden; }   /* 안내 상자 밑에 글자가 비치지 않게 내용은 숨김(칸·제목만 남김) */
 #ct-block { left: 871px; top: 240px; width: 480px; height: 120px; background: var(--msg); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 22px; font-weight: 500; white-space: pre-line; z-index: 5; }
+
+/* 이름 = 앱 말 + 조종기 화면 이름(작게 · 조종기 1.6.0 글자 그대로) */
+.ct-lcd { margin-left: .45em; font-size: .72em; font-weight: 300; color: var(--text-dim); letter-spacing: .02em; white-space: nowrap; }   /* em — 긴 말(일본어 등)은 data-fit 이 앱 이름과 같이 줄임 */
+#ct-light .ct-k, #ct-func .ct-k { width: 186px; }   /* 고르기 단추(230)와 띄움 */
+.btn-line .ct-lcd { color: inherit; opacity: .7; }
+
+/* LIGHT (2.12 까지 상태 탭 LED 칸 — 원본 Color: 팀 RED/BLUE 칸, 포지션 원 5개 · 색 · 고름 모양은 그대로, 자리만 조종기 탭 줄에 맞춤) */
+.team { position: absolute; left: 230px; top: 70px; width: 240px; height: 48px; display: flex; overflow: hidden; border-radius: 11px; } /* 원본 240 폭 · 높이는 기능 줄(40)에 맞춤 */
+.team div { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; background: #939598; }
+.team div.sel { font-weight: 500; } /* 원본 FontStyle.Bold = Light 글꼴을 굵게 그림(가짜 굵게) — 진짜 Bold 보다 얇음 */
+.team .red.sel { background: #ed1c24; }
+.team .blue.sel { background: #3ebfff; }
+/* 포지션: 원본 circle 100X100 47×47 · 색 --c (controller.js) · 고르면 PositionColorController.Selected → 1.35배 + Glow(glow140X140 65.8×65.8, 같은 색 알파 0.5) */
+.pos { position: absolute; width: 47px; height: 47px; border-radius: 50%; cursor: pointer; background: var(--c); }
+.pos::after { content: ""; position: absolute; left: -9.4px; top: -9.4px; width: 65.8px; height: 65.8px; background: var(--c); opacity: .502; z-index: -1; display: none;
+  -webkit-mask: url(../assets/img/glow140X140.png) no-repeat center / 66.75px 66.75px; pointer-events: none; }
+.pos.sel { transform: scale(1.35); }
+.pos.sel::after { display: block; }

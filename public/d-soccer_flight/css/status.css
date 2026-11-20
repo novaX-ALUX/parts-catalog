@@ -1,9 +1,8 @@
-/* 상태 탭 — 원본 Setup_Content (위치는 #view 기준 = 무대 좌표 −(230,130)) */
-#st-info { left: 20px; top: 0; width: 276px; height: 496px; }
-#st-led { left: 311px; top: 0; width: 276px; height: 496px; }
+/* 상태 탭 — 원본 Setup_Content (위치는 #view 기준 = 무대 좌표 −(230,130))
+   2.13.0: LED 칸(팀 · 포지션 색)과 캘리브레이션 칸은 조종기 탭(LIGHT · 보정·초기화)으로 옮김 → 드론 정보가 LED 자리까지 · 3D 가 캘리브레이션 자리까지 */
+#st-info { left: 20px; top: 0; width: 567.4px; height: 496px; }
 #st-graph { left: 20px; top: 511.5px; width: 567.4px; height: 418.5px; } /* 원본 Graph L250 T641.5 567.4×418.5 */
-#st-cal { left: 605px; top: 0; width: 1059px; height: 143px; }
-#st-3d { left: 605px; top: 158px; width: 1059px; height: 771px; }
+#st-3d { left: 605px; top: 0; width: 1059px; height: 929px; }
 
 /* 드론 정보 (원본 SystemInform: NotoSansKR-Light 19px, 줄 간격 34 · Content 위 196.6 → 칸 기준 67) */
 .info-rows { position: absolute; left: 22px; right: 28.6px; top: 67px; } /* 값 오른끝 = 원본 Value 칸 오른끝(배포판) */
@@ -14,23 +13,6 @@
 .info-row.fw { position: relative; }
 .info-row.fw .k { flex: none; width: 122.6px; max-width: none; } /* 단추 앞 10 까지 · 긴 글자(일본어)는 줄임(data-fit) */
 .info-row.fw .btn-line { position: absolute; left: 132.6px; top: 4.8px; width: 110px; height: 28.2px; font-size: 15px; font-weight: 300; border-width: 1px; border-radius: 7.8px; } /* 원본 Firmware_btn L404.6 T507.8 110×28.2 · RoundBox 배율 3 → 테 1 · 반지름 23.5/3 */
-
-/* LED (원본 Color: 팀 RED/BLUE 칸, 포지션 원 5개) */
-.led-sub { position: absolute; left: 0; right: 0; height: 40px; font-size: 20px; display: flex; align-items: center; justify-content: center; }
-.team { position: absolute; left: 18.6px; top: 159.5px; width: 240px; height: 70px; display: flex; overflow: hidden; border-radius: 15.7px; } /* 원본 Color Choice Buttons 240×70 · RoundBox_2 배율 1.5 → 23.5/1.5 · Mask */
-.team div { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; background: #939598; }
-.team div.sel { font-weight: 500; } /* 원본 FontStyle.Bold = Light 글꼴을 굵게 그림(가짜 굵게) — 진짜 Bold 보다 얇음 */
-.team .red.sel { background: #ed1c24; }
-.team .blue.sel { background: #3ebfff; }
-/* 포지션: 원본 circle 100X100 47×47 · 색 --c (status.js) · 고르면 PositionColorController.Selected → 1.35배 + Glow(glow140X140 65.8×65.8, 같은 색 알파 0.5 — 그림 138 칸이 140 그림 가운데) */
-.pos { position: absolute; width: 47px; height: 47px; border-radius: 50%; cursor: pointer; background: var(--c); }
-.pos::after { content: ""; position: absolute; left: -9.4px; top: -9.4px; width: 65.8px; height: 65.8px; background: var(--c); opacity: .502; z-index: -1; display: none;
-  -webkit-mask: url(../assets/img/glow140X140.png) no-repeat center / 66.75px 66.75px; pointer-events: none; }
-.pos.sel { transform: scale(1.35); }
-.pos.sel::after { display: block; }
-/* 원본 Warming: LED 칸 전체(제목까지)를 #000/0.902 로 덮고, 글자 칸 L28.1 T190.3 220×100 가운데 · NotoSansKR-Light 20(맞춤 16~20) */
-.led-block { position: absolute; inset: 0; z-index: 2; background: rgba(0, 0, 0, .77); border-radius: var(--radius); font-size: 0; }
-.led-block span { position: absolute; left: 28.1px; top: 190.3px; width: 220px; height: 100px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 20px; line-height: 1.448; white-space: pre-line; }
 
 /* 그래프 (원본 Graph: Roll 빨강 · Pitch 보라 · Yaw 노랑, ±180) */
 #st-graph canvas { position: absolute; left: 20px; top: 70px; width: 527px; height: 328px; }
@@ -55,10 +37,6 @@
 .dl.graph .vp::-webkit-scrollbar-track { background: #1c1c1c; }
 .dl.graph .vp::-webkit-scrollbar-thumb { background: #2e2e2e; border-radius: 5.9px; }
 
-/* 캘리브레이션 */
-#st-cal .btn-line { left: 41.3px; top: 76.6px; width: 275.3px; height: 40px; font-size: 20px; font-weight: 500; border-width: 1px; border-radius: 6px; } /* 원본 Button RoundBox(테 3·반지름 23.5) 배율 4 → 테 0.75 · 모서리 6 · 글자 NotoSansJP-Medium 20 */
-#st-cal .cal-text { position: absolute; left: 355px; top: 68px; width: 687px; height: 58px; font-size: 20px; line-height: 29px; /* 원본 22 — 자동 맞춤(58px 에 두 줄)으로 20 */ white-space: pre-line; display: flex; align-items: center; }
-
 /* 3D */
 /* 원본 3D 칸: 제목·밑줄 없음(Title 꺼짐) · 그림 자리 Background (855,358) 1019×682 */
 #st-3d .view3d { position: absolute; left: 20px; top: 70px; right: 20px; bottom: 20px; border-radius: 6px; overflow: hidden; }
@@ -78,14 +56,10 @@
 #st-3d .idle img { width: 46%; opacity: .25; }
 
 /* 칸 제목·밑줄 — 원본 Title·Line 칸 그대로(제목은 그 칸 가운데 · 밑줄 흰색 0.502 · 1px · 위 53.7) */
-#st-info > h3 { position: absolute; left: 20px; width: 236.3px; }
-#st-led > h3 { position: absolute; left: 21.3px; width: 227.8px; }
+#st-info > h3 { position: absolute; left: 20px; width: 527.4px; }
 #st-graph > h3 { position: absolute; left: 21.3px; width: 518.9px; }
-#st-cal > h3 { position: absolute; left: 379.5px; width: 300px; }
-#st-info > .rule, #st-led > .rule { left: 18.1px; right: auto; width: 240px; top: 53.7px; }
+#st-info > .rule { left: 18.1px; right: auto; width: 531.3px; top: 53.7px; }
 #st-graph > .rule { left: 23.7px; right: auto; width: 520px; top: 53.7px; }
-#st-cal > .rule { left: 29.5px; right: auto; width: 1000px; top: 53.7px; }
 
-/* 언어별 조정(원본 LanguageUIChange): 영어 교정 단추 290 폭(가운데 그대로) · 일본어 '펌웨어' 17 */
-:root[data-lang="English"] #st-cal .btn-line { left: 33.95px; width: 290px; }
+/* 언어별 조정(원본 LanguageUIChange): 일본어 '펌웨어' 17 */
 :root[data-lang="Japanese"] .info-row.fw { font-size: 17px; }
