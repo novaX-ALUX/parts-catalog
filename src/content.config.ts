@@ -88,6 +88,9 @@ const configParam = z.object({
 
 const detailSchema = baseSchema.extend({
   description: z.string().optional(),
+  // Highlights under the spec table, as on a retail product page (BetaFPV style, the director 2026-11-20 #o2f68e1b1):
+  // a bold headline, one or two sentences, and an optional picture. Blocks without pictures render as a tile grid.
+  features: z.array(z.object({ title: z.string(), text: z.string(), image: z.string().optional() })).optional(),
   pinoutImage: z.string().optional(),
   // Multiple pinout/diagram images shown stacked in the Pinout tab.
   // When present this takes priority over the single `pinoutImage`.

@@ -51,6 +51,18 @@ const pinoutImgs = d.pinoutImages && d.pinoutImages.length > 0
       </div>
       )}
 
+      {d.features && d.features.length > 0 && (
+        <div class={`features${d.features.some((f) => f.image) ? '' : ' tiles'}`}>
+          <div class="features-head">Highlights</div>
+          {d.features.map((f, i) => (
+            <div class={`feature${f.image ? '' : ' noimg'}${i % 2 ? ' flip' : ''}`}>
+              {f.image && <div class="feature-img"><img src={`${base}${f.image}`} alt={f.title} loading="lazy" /></div>}
+              <div class="feature-text"><h3>{f.title}</h3><p>{f.text}</p></div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div class="tabs-section">
         <Tabs tabs={[
           {id:'pinout', label:'Pinout'},
