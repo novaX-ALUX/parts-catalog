@@ -4,7 +4,6 @@ ndaa: true
 tagline: H7 Flight Controller · 2–8S LiPo · 10-pin ESC Port with Current and Telemetry · 5 V 1.5 A · 12 V 1.2 A
 image: /images/products/fc_AF-H7-nano-V2.png
 order: 21
-comingSoon: true
 manuals:
   - { label: "User Guide (booklet)", file: /manuals/fc_AF-H7-nano-V2_user_guide.pdf }
 specs:
@@ -30,7 +29,7 @@ specs:
   - { key: Size, value: "38.5 × 38.5 mm" }
   - { key: Mount Hole, value: "30.5 × 30.5 mm / Ø4 mm" }
   - { key: Core Chips, value: "MCU ST · IMU TDK · barometer Infineon · regulators MPS (USA) · LDOs and CAN TI · capacitors Samsung / Murata · resistors Yageo · 27 MHz crystal TXC — non-Chinese makers; the analog OSD chip (no non-Chinese part is made), the two 100 V input capacitors, the 12 V coil, the OR diodes, a few connectors, the LEDs, the boot button and the SD / USB-C sockets are the exceptions until the next board revision" }
-  - { key: Validation Status, value: "Design done — schematic, placement and routing (2026-11-04) checked pin for pin; first 20 samples in production. No firmware release yet." }
+  - { key: Validation Status, value: "Development and validation complete (2026-11-24) — schematic, placement and routing (2026-11-04) checked pin for pin" }
 description: |
   AF-H7 nano V2 is the next revision of AF-H7 nano. It keeps the STM32H743 core, the two ICM-42688-P IMUs and the 30.5 mm mounting, and replaces the ESC wiring with one 10-pin connector: battery, four motor signals, ESC current and ESC telemetry on a straight 1:1 cable, the same pin numbers as the novaX AE-8S-60A 4-in-1 V2 ESC. Both regulators are now rated 60 V for 8S and give 5 V 1.5 A and 12 V 1.2 A. The GPS, receiver and CAN ports also run from USB alone (unplug those devices, or use a USB-C supply of 1.5 A or more), so the aircraft can be set up on the bench without a battery, and the CAN port uses a 3.3 V CAN FD transceiver for the same reason. Every port follows the common pin order (Betaflight connector standard, Pixhawk CAN).
 pinoutImages:
@@ -124,7 +123,7 @@ pinTable:
       - { pin: 3, signal: SWDIO, function: "SWD data" }
       - { pin: 4, signal: SWCLK, function: "SWD clock" }
 firmwareNotes: |
-  No firmware release yet — V2 images will be listed here with the board. V2 keeps the AF-H7 nano serial mapping above, adds the ESC current (PC1) and telemetry (SERIAL7) inputs, and defaults to the Betaflight motor order (FRAME_TYPE 12).
+  No firmware release yet — V2 images will be listed here. V2 keeps the AF-H7 nano serial mapping above, adds the ESC current (PC1) and telemetry (SERIAL7) inputs, and defaults to the Betaflight motor order (FRAME_TYPE 12).
 gallery:
   - { src: /images/products/fc_AF-H7-nano-V2_iso.png, caption: "Isometric — 3D render, design stage" }
   - { src: /images/products/fc_AF-H7-nano-V2_front.png, caption: Front }

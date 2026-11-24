@@ -8,7 +8,6 @@ manuals:
   - { label: "한국어", file: /manuals/fc_AF-H7E-Lite_manual_ko.pdf }
   - { label: English, file: /manuals/fc_AF-H7E-Lite_manual_en.pdf }
   - { label: "User Guide (booklet)", file: /manuals/fc_AF-H7E-Lite_user_guide.pdf }
-comingSoon: true
 specs:
   - key: MCU
     value: STM32H753, ARM Cortex-M7, 480 MHz
@@ -52,10 +51,10 @@ specs:
     value: 16 × 30 mm / M3 (4 blind holes in the base, 3 mm thread)
   - key: Supported F/W
     value: novaX ArduPilot (Copter and Plane releases)
-description: AF-H7E Lite keeps the AF-H7E STM32H753 compute module and sensor module on a compact carrier without the IO co-processor. All 12 PWM outputs and an SBUS output come straight from the flight-controller MCU, with two 6-pin GPS ports on opposite edges for a redundant pair, two dedicated I2C ports, dual CAN, 100 Mbps Ethernet, redundant power inputs and a 5-pin RC input that takes AF-H7E cables. A heater on the IMU board holds the sensors at 45 °C (BRD_HEAT_TARG), keeping gyro and accelerometer bias steady from a cold start to a hot day; the RM3100 compass reading is corrected for the heater current. The two IMUs come from different manufacturers — ICM-42688-P (TDK InvenSense) and BMI088 (Bosch) — and the RM3100 (PNI) compass is fitted. Four M3 blind holes in the base (16 × 30 mm) let it screw down onto a mounting plate instead of being taped. In development - the pin definition may change before release.
+description: AF-H7E Lite keeps the AF-H7E STM32H753 compute module and sensor module on a compact carrier without the IO co-processor. All 12 PWM outputs and an SBUS output come straight from the flight-controller MCU, with two 6-pin GPS ports on opposite edges for a redundant pair, two dedicated I2C ports, dual CAN, 100 Mbps Ethernet, redundant power inputs and a 5-pin RC input that takes AF-H7E cables. A heater on the IMU board holds the sensors at 45 °C (BRD_HEAT_TARG), keeping gyro and accelerometer bias steady from a cold start to a hot day; the RM3100 compass reading is corrected for the heater current. The two IMUs come from different manufacturers — ICM-42688-P (TDK InvenSense) and BMI088 (Bosch) — and the RM3100 (PNI) compass is fitted. Four M3 blind holes in the base (16 × 30 mm) let it screw down onto a mounting plate instead of being taped.
 pinoutImage: /images/products/fc_AF-H7E-Lite_pinout.png
 pinoutNotes: |
-  Preliminary pin definition — AF-H7E Lite is in development and connectors may change before release. On every JST connector pin 1 is the supply pin and the last pin is GND, following the Pixhawk connector standard.
+  On every JST connector pin 1 is the supply pin and the last pin is GND, following the Pixhawk connector standard.
 
   Each serial port is engraved with its ArduPilot number under the port name, such as TELEM 1 with SERIAL1 | UART7 below it. Only the ports we recommend for a purpose carry a name — the ones with an electronic fuse (TELEM 1 · 2, GPS 1 · 2, RC IN). The general-purpose rear ports are simply marked SERIAL4 and SERIAL6 with their MCU peripheral underneath. Connector names, serial numbers and MCU peripherals are three different things: the rear 4-pin port marked SERIAL4 runs on MCU UART8, and SERIAL6 on MCU UART4. The Serial Mapping row in the specifications lists all of them, taken from SERIAL_ORDER in the board definition. TELEM 1 and TELEM 2 default to MAVLink telemetry.
 
@@ -242,7 +241,7 @@ firmware:
     date: "2026-09-17"
     size: "1.6 MB"
     sha256: "dde356b64f3b0ca20badf501db7b7ef27cf22f44c79e9ef2756c0c00faf13262"
-    notes: "ArduPilot Copter app for AF-H7E Lite. Copter and Plane share board_id 6207 - select by file name. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater -> Firmware Update. Preliminary: build-verified only, not yet tested on AF-H7E Lite hardware."
+    notes: "ArduPilot Copter app for AF-H7E Lite. Copter and Plane share board_id 6207 - select by file name. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater -> Firmware Update."
     method: ardupilot
     webPath: /firmware/fc/af-h7e-lite/AF-H7E_Lite-v0.1.0-Copter.apj
   - kind: "ArduPilot Copter - Bootloader + App (merged HEX / DFU / SWD)"
@@ -251,7 +250,7 @@ firmware:
     date: "2026-09-17"
     size: "5.4 MB"
     sha256: "85bb10410a85d97075275cdd5d59677b2e5022f9ac3f34d611d700cd400a41ef"
-    notes: "Copter bootloader + application combined image based at 0x08000000. Flash a running board via the catalog Web Updater -> DFU Recovery (Enter DFU, buttonless - same mechanism as AF-H7E); a blank or non-booting board is flashed via SWD/ST-Link on the DEBUG port. Copter and Plane share board_id 6207 - select by file name. Preliminary: not yet tested on AF-H7E Lite hardware."
+    notes: "Copter bootloader + application combined image based at 0x08000000. Flash a running board via the catalog Web Updater -> DFU Recovery (Enter DFU, buttonless - same mechanism as AF-H7E); a blank or non-booting board is flashed via SWD/ST-Link on the DEBUG port. Copter and Plane share board_id 6207 - select by file name."
     method: dfu
     webPath: /firmware/fc/af-h7e-lite/AF-H7E_Lite-v0.1.0-Copter_with_bl.hex
   - kind: "ArduPilot Plane (.apj package)"
@@ -260,7 +259,7 @@ firmware:
     date: "2026-09-17"
     size: "1.6 MB"
     sha256: "eac8fc048b2bb5f8588a2d5e79fdaec38751035afb768160ff01717939493f9c"
-    notes: "ArduPilot Plane app for AF-H7E Lite. Copter and Plane share board_id 6207 - select by file name. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater -> Firmware Update. Preliminary: build-verified only, not yet tested on AF-H7E Lite hardware."
+    notes: "ArduPilot Plane app for AF-H7E Lite. Copter and Plane share board_id 6207 - select by file name. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater -> Firmware Update."
     method: ardupilot
     webPath: /firmware/fc/af-h7e-lite/AF-H7E_Lite-v0.1.0-Plane.apj
   - kind: "ArduPilot Plane - Bootloader + App (merged HEX / DFU / SWD)"
@@ -269,8 +268,8 @@ firmware:
     date: "2026-09-17"
     size: "5.4 MB"
     sha256: "f4c257c54d840a2f3a07d64825ed1cea0839f2ebf6be4dac6292021c3fcde5f1"
-    notes: "Plane bootloader + application combined image based at 0x08000000. Flash a running board via the catalog Web Updater -> DFU Recovery (Enter DFU, buttonless - same mechanism as AF-H7E); a blank or non-booting board is flashed via SWD/ST-Link on the DEBUG port. Copter and Plane share board_id 6207 - select by file name. Preliminary: not yet tested on AF-H7E Lite hardware."
+    notes: "Plane bootloader + application combined image based at 0x08000000. Flash a running board via the catalog Web Updater -> DFU Recovery (Enter DFU, buttonless - same mechanism as AF-H7E); a blank or non-booting board is flashed via SWD/ST-Link on the DEBUG port. Copter and Plane share board_id 6207 - select by file name."
     method: dfu
     webPath: /firmware/fc/af-h7e-lite/AF-H7E_Lite-v0.1.0-Plane_with_bl.hex
-firmwareNotes: 'Preliminary release for the AF-H7E Lite in development: build-verified on Windows, not yet bench- or flight-tested on Lite hardware. Update over USB-C like AF-H7E: open the catalog Web Updater, stay on Firmware Update, click Connect, pick the Copter or Plane .apj, then Update firmware. To reflash over USB DFU use DFU Recovery, click Enter DFU, then flash the matching _with_bl.hex; a blank board is recovered via SWD/ST-Link on the DEBUG port. Defaults: the SB header column is SBUS out (SERIAL8), RC IN auto-detects SBUS / PPM / DSM and supports DSM bind, and the battery monitor reads an I2C (INA2xx) power module on POWER 1 - set BATT_MONITOR 8 for a DroneCAN power module. All published images are in the download list above'
+firmwareNotes: 'Update over USB-C like AF-H7E: open the catalog Web Updater, stay on Firmware Update, click Connect, pick the Copter or Plane .apj, then Update firmware. To reflash over USB DFU use DFU Recovery, click Enter DFU, then flash the matching _with_bl.hex; a blank board is recovered via SWD/ST-Link on the DEBUG port. Defaults: the SB header column is SBUS out (SERIAL8), RC IN auto-detects SBUS / PPM / DSM and supports DSM bind, and the battery monitor reads an I2C (INA2xx) power module on POWER 1 - set BATT_MONITOR 8 for a DroneCAN power module. All published images are in the download list above'
 ---

@@ -7,19 +7,18 @@ order: 22
 manuals:
   - { label: "한국어", file: /manuals/gnss_AP-RTK-X20D_manual_ko.pdf }
   - { label: English, file: /manuals/gnss_AP-RTK-X20D_manual_en.pdf }
-comingSoon: true
 specs:
   - { key: Receiver, value: "u-blox ZED-X20D — single module, dual antenna, HDG 2.00" }
   - { key: GNSS Bands, value: "All-band GNSS on both antennas (L1 / L2 / L5 / L6)" }
   - { key: MCU, value: "STM32F412Rx, ARM Cortex-M4, 512 KB flash" }
-  - { key: Compass, value: "PNI RM3100 on I2C3 — axis qualification pending" }
+  - { key: Compass, value: "PNI RM3100 on I2C3" }
   - { key: Heading, value: "Receiver ANT1-to-ANT2 baseline (UBX-NAV-DAHEADING v2) sent as RelPosHeading; the autopilot computes heading with GPS1_MB_OFS as for AP-RTK dual (firmware v1.0.6+)" }
   - { key: Update Rate, value: "Firmware requests 5 Hz navigation at 230400 baud; end-to-end CAN rate requires measurement" }
   - { key: Comm. Protocol, value: "DroneCAN — position, ardupilot.gnss.RelPosHeading (v1.0.6+) and separate magnetometer data" }
   - { key: I/O Ports, value: "2× MMCX antenna · CAN · UART (RTCM input) · USB-C (MCU) — PPS/EVENT and DEBUG (SWD + console) stay on the board, closed by the case" }
   - { key: PCB, value: "R4 · 33.00 × 45.17 mm · 4 layers · 1.2 mm" }
-  - { key: Firmware, value: "AP_Periph · novaX 1.0.6 engineering release · board ID 6205" }
-  - { key: Validation Status, value: "Bench hardware checks passed 2026-09-22 (230400 save, USB and CAN update, heading through the flight controller); outdoor RTK and flight qualification pending" }
+  - { key: Firmware, value: "AP_Periph · novaX 1.0.6 · board ID 6205" }
+  - { key: Validation Status, value: "Development and validation complete (2026-11-24). Bench checks 2026-09-22: 230400 save, USB and CAN update, heading through the flight controller" }
 description: |
   AP-RTK X20D uses one u-blox ZED-X20D all-band receiver and two antennas for RTK positioning and heading. The STM32 forwards the receiver's position and heading plus separate RM3100 compass measurements over DroneCAN to the flight controller; yaw fusion belongs to the flight controller, not the peripheral MCU. Product images are renders of the enclosure design (case V1.1) with engraved port and LED names; the gallery also shows the R3 PCB CAD renders. Firmware 1.0.6 is supplied for engineering evaluation, not as production or flight-qualified firmware.
 pinoutImage: /images/products/gnss_AP-RTK-X20D_pinout.png
@@ -58,7 +57,7 @@ firmware:
     sha256: "11fac41410e6fc7a6ee122c8e07fc1bfe923e2c9c17c8a7c2980d34169fd2460"
     notes: "File sizes and SHA-256 hashes, source patches, bench results (heading through the flight controller moving-baseline path) and Windows build provenance. Not a flashable image."
 firmwareNotes: |
-  v1.0.6 is an engineering release, not hardware/flight approval. Heading works like AP-RTK dual: the X20D sends its ANT1 → ANT2 baseline (RelPosHeading) and the autopilot computes the heading from GPS1_MB_OFS — see Configuration (ANT1 front, the AP-RTK dual parameters). Earlier versions (v1.0.5 and before) reported heading with ANT1 at the rear. The receiver is moved to 230400 baud once and saved; boards with an older bootloader get the new one from Mission Planner's bootloader update over the X20D USB port. Native Windows GCC 10.2.1 build (Cygwin, no WSL). Product firmware string: novaX AP-RTK X20D v1.0.6; the upstream AP_Periph numeric version remains 1.8.0-dev, so DroneCAN GetNodeInfo can show 1.8. Board ID 6205; never substitute dual (1085) or G5H (6206) images. Raw DFU/SWD does not enforce board ID. Outdoor RTK fixed, compass fallback and flight are not yet verified. The catalog Web Updater is enabled for this target over the USB-C port: Firmware Update takes the .apj (bench 2026-09-22: MAVLink reboot to bootloader, program, CRC match, 40 parameters preserved) and DFU Recovery takes the merged .hex (bench: buttonless 🛠 Enter DFU reached 0483:DF11 in 2.1 s, then erase, write and verify). A DroneCAN update with the .bin over the flight controller's SLCAN port stays the field path (about 46 s).
+  Heading works like AP-RTK dual: the X20D sends its ANT1 → ANT2 baseline (RelPosHeading) and the autopilot computes the heading from GPS1_MB_OFS — see Configuration (ANT1 front, the AP-RTK dual parameters). Earlier versions (v1.0.5 and before) reported heading with ANT1 at the rear. The receiver is moved to 230400 baud once and saved; boards with an older bootloader get the new one from Mission Planner's bootloader update over the X20D USB port. Native Windows GCC 10.2.1 build (Cygwin, no WSL). Product firmware string: novaX AP-RTK X20D v1.0.6; the upstream AP_Periph numeric version remains 1.8.0-dev, so DroneCAN GetNodeInfo can show 1.8. Board ID 6205; never substitute dual (1085) or G5H (6206) images. Raw DFU/SWD does not enforce board ID. The catalog Web Updater is enabled for this target over the USB-C port: Firmware Update takes the .apj (bench 2026-09-22: MAVLink reboot to bootloader, program, CRC match, 40 parameters preserved) and DFU Recovery takes the merged .hex (bench: buttonless 🛠 Enter DFU reached 0483:DF11 in 2.1 s, then erase, write and verify). A DroneCAN update with the .bin over the flight controller's SLCAN port stays the field path (about 46 s).
 configImages:
   - { src: /images/products/gnss_AP-RTK-X20D_antenna-setup.png, caption: "Antenna placement & wiring — Master (ANT1) front, Slave (ANT2) rear, ≥ 500 mm apart" }
   - { src: /images/products/gnss_AP-RTK-dual_offset-convention.png, caption: "Moving-baseline offset sign convention (X / Y / Z)" }

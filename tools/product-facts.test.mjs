@@ -41,7 +41,7 @@ test('GNSS receiver limits are not presented as measured end-to-end rates', () =
   assert.match(spec(g5, 'I/O Ports'), /combined current below 150 mA/);
 });
 
-test('X20D is a separate R3 engineering product with its own heading contract', () => {
+test('X20D is a separate product with its own heading contract', () => {
   const x20 = product('gnss', 'AP-RTK-X20D');
   assert.equal(x20.name, 'AP-RTK X20D');
   assert.equal(x20.order, 22);
@@ -55,7 +55,9 @@ test('X20D is a separate R3 engineering product with its own heading contract', 
   assert.match(x20.configNotes, /firmware v1\.0\.6/);
   const pv = (p) => p.configParams.map((c) => [c.name, c.value]);
   assert.deepEqual(pv(x20), pv(product('gnss', 'AP-RTK-dual')), 'X20D uses the AP-RTK dual parameter set');
-  assert.match(x20.firmwareNotes, /engineering release/);
+  // 2026-11-24 이사님 "개발완료됐고 검증도 됐어" — no engineering-release / pending wording left on the page.
+  assert.doesNotMatch(x20.firmwareNotes, /engineering release|not yet verified/);
+  assert.match(spec(x20, 'Validation Status'), /^Development and validation complete/);
   assert.match(x20.firmwareNotes, /6205/);
   assert.match(x20.firmwareNotes, /upstream AP_Periph numeric version remains 1\.8/);
   assert.equal(x20.firmware.length, 4);
@@ -90,14 +92,15 @@ test('X20D pinout = final R4 board in case V1.1 (standard order, pin 1 = 5 V; PP
   assert.match(spec(x20, 'I/O Ports'), /closed by the case/);
 });
 
-test('catalog status flags: G5H withdrawn, X20D and AF-H7E Lite announced as coming soon', () => {
+// 2026-11-24 이사님 "이거 커밍순 빼 이제" — X20D · AF-H7E Lite · AF-H7 nano V2 are listed without the Coming Soon badge.
+test('catalog status flags: G5H withdrawn, X20D and AF-H7E Lite listed without Coming Soon', () => {
   assert.equal(product('gnss', 'AP-RTK-G5H').hidden, true);
-  assert.equal(product('gnss', 'AP-RTK-X20D').comingSoon, true);
+  assert.ok(!product('gnss', 'AP-RTK-X20D').comingSoon, 'X20D is no longer Coming Soon');
   const lite = product('fc', 'AF-H7E-Lite');
-  assert.equal(lite.comingSoon, true);
+  assert.ok(!lite.comingSoon, 'AF-H7E Lite is no longer Coming Soon');
   assert.equal(lite.order, product('fc', 'AF-H7E').order + 1, 'Lite card sits right after AF-H7E');
-  // Firmware for a board still in development is published (2026-09-17, user request) but must say it is preliminary.
-  assert.ok(lite.firmware.every((fw) => /Preliminary/.test(fw.notes)), 'unreleased-board firmware is labelled preliminary');
+  // 2026-11-24 이사님 "개발완료됐고 검증도 됐어" — the firmware is no longer labelled preliminary.
+  assert.ok(lite.firmware.every((fw) => !/Preliminary|not yet tested/.test(fw.notes)), 'released-board firmware is not labelled preliminary');
 });
 
 test('AF-H7E Lite pin table follows the Pixhawk connector convention and ArduPilot defaults', () => {
@@ -169,7 +172,7 @@ test('AF-H7E Lite firmware ships Copter and Plane for board ID 6207, downloaded 
     assert.equal(createHash('sha256').update(bytes).digest('hex'), fw.sha256);
     if (fw.webPath.endsWith('.apj')) assert.equal(JSON.parse(bytes.toString()).board_id, 6207);
   }
-  assert.match(lite.firmwareNotes, /Preliminary/);
+  assert.doesNotMatch(lite.firmwareNotes, /Preliminary|in development/);
   assert.match(spec(lite, 'MCU'), /STM32H753/);
 });
 
@@ -292,11 +295,12 @@ test('every FC product states its ArduPilot serial mapping (SERIAL_ORDER in the 
 });
 
 // 2026-10-24 이사님 #oa01b41c3 "깃에 v2 넣어서 커밍순으로 하고 핀아웃까지 제대로" — V2 회로(fc/AF-H7-nano-V2 v0.0.12) 그대로.
-test('AF-H7 nano V2: coming soon after AF-H7 nano, ESC port = AE-8S-60A 4-in-1 V2 pin numbers, ports in the common order', () => {
+test('AF-H7 nano V2: listed after AF-H7 nano (Coming Soon removed 2026-11-24), ESC port = AE-8S-60A 4-in-1 V2 pin numbers, ports in the common order', () => {
   const v2 = product('fc', 'AF-H7-nano-V2');
-  assert.equal(v2.comingSoon, true);
+  assert.ok(!v2.comingSoon, 'AF-H7 nano V2 is no longer Coming Soon');
   assert.equal(v2.order, product('fc', 'AF-H7-nano').order + 1, 'V2 card sits right after AF-H7 nano');
-  assert.equal(v2.firmware, undefined, 'no firmware before the board is released');
+  assert.equal(v2.firmware, undefined, 'no V2 firmware image published yet');
+  assert.match(spec(v2, 'Validation Status'), /^Development and validation complete/);
   const pins = (name) => v2.pinTable.find((c) => c.name === name).pins.map((p) => `${p.pin}:${p.signal}`).join(' ');
   // board option A2 (fc/AF-H7-nano-V2 v2_changes.CONN_V2 = ESC P2): 1·2 VBAT · 3·4 GND — the card had the old option A order until 2026-11-17
   assert.equal(pins('ESC'), '1:VBAT 2:VBAT 3:GND 4:GND 5:M1 6:M2 7:M3 8:M4 9:CUR 10:TEL');
