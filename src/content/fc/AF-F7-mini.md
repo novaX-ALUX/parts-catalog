@@ -34,40 +34,40 @@ description: |
   AF-F7 mini uses an STM32F765 with ICM-20689, ICM-20602 and BMI055 IMUs, an IST8310 compass and an MS5611 barometer. Its novaX ArduPilot definition configures all three IMUs, eight FMU PWM outputs and three auxiliary PWM outputs, six hardware serial interfaces, four I2C buses including internal sensors, and two CAN buses. There is no IOMCU. Published firmware here is novaX ArduPilot Copter and Plane; PX4 compatibility is not verified by this catalog.
 firmware:
   - kind: "ArduPilot Copter (.apj package)"
-    file: /firmware/AF-F7_mini-v1.3.0-Copter.apj
+    file: /firmware/fc/af-f7-mini/AF-F7_mini-v1.3.0-Copter.apj
     version: "1.3.0"
     date: "2026-08-31"
     size: "1.5 MB"
     sha256: "8fec7e3bfeb618735e1b33d69477a28eef764643a33edbfa309f27ffd83fbc15"
     notes: "ArduPilot Copter app (board_id 6201). Copter and Plane share the same board_id - select by file name; the GCS banner also shows the vehicle (novaX Copter v1.3.0). Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater -> Firmware Update. Buttonless software DFU works once the matching _with_bl.hex has been flashed at least once."
     method: ardupilot
-    webPath: /firmware/AF-F7_mini-v1.3.0-Copter.apj
+    webPath: /firmware/fc/af-f7-mini/AF-F7_mini-v1.3.0-Copter.apj
   - kind: "ArduPilot Copter - Bootloader + App (merged HEX / DFU / SWD)"
-    file: /firmware/AF-F7_mini-v1.3.0-Copter_with_bl.hex
+    file: /firmware/fc/af-f7-mini/AF-F7_mini-v1.3.0-Copter_with_bl.hex
     version: "1.3.0"
     date: "2026-08-31"
     size: "4.8 MB"
     sha256: "d4b5c6ec782cac58e1aa7de088c8219f8531af1bca79f5167c09d0957325ef4a"
     notes: "Bootloader + application combined image based at 0x08000000 (board_id 6201, ENABLE_DFU_BOOT). Flash via the Web Updater -> DFU Recovery (buttonless: Enter DFU sends the app into ROM DFU; Windows needs a one-time WinUSB/Zadig on the 0483:df11 device), or SWD/ST-Link for a blank board. On F7 the ROM jump lives in the BOOTLOADER, so this merged image is what ENABLES buttonless DFU - a .apj alone cannot turn it on. Copter and Plane share board_id 6201 - select by file name."
     method: dfu
-    webPath: /firmware/AF-F7_mini-v1.3.0-Copter_with_bl.hex
+    webPath: /firmware/fc/af-f7-mini/AF-F7_mini-v1.3.0-Copter_with_bl.hex
   - kind: "ArduPilot Plane (.apj package)"
-    file: /firmware/AF-F7_mini-v1.3.0-Plane.apj
+    file: /firmware/fc/af-f7-mini/AF-F7_mini-v1.3.0-Plane.apj
     version: "1.3.0"
     date: "2026-08-31"
     size: "1.5 MB"
     sha256: "dda4b56f0c40f3f5d1a8d68192066ac0826439019a044cc150f8b6cee4313750"
     notes: "ArduPilot Plane app (board_id 6201). Copter and Plane share the same board_id - select by file name; the GCS banner also shows the vehicle (novaX Plane v1.3.0). Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater -> Firmware Update. Buttonless software DFU works once the matching _with_bl.hex has been flashed at least once."
     method: ardupilot
-    webPath: /firmware/AF-F7_mini-v1.3.0-Plane.apj
+    webPath: /firmware/fc/af-f7-mini/AF-F7_mini-v1.3.0-Plane.apj
   - kind: "ArduPilot Plane - Bootloader + App (merged HEX / DFU / SWD)"
-    file: /firmware/AF-F7_mini-v1.3.0-Plane_with_bl.hex
+    file: /firmware/fc/af-f7-mini/AF-F7_mini-v1.3.0-Plane_with_bl.hex
     version: "1.3.0"
     date: "2026-08-31"
     size: "4.8 MB"
     sha256: "2b3b8cb2dbe813d84fa152e5d0c4b27838ee0093cc8cee8dcdabca5a97755abd"
     notes: "Bootloader + application combined image based at 0x08000000 (board_id 6201, ENABLE_DFU_BOOT). Flash via the Web Updater -> DFU Recovery (buttonless: Enter DFU sends the app into ROM DFU; Windows needs a one-time WinUSB/Zadig on the 0483:df11 device), or SWD/ST-Link for a blank board. On F7 the ROM jump lives in the BOOTLOADER, so this merged image is what ENABLES buttonless DFU - a .apj alone cannot turn it on. Copter and Plane share board_id 6201 - select by file name."
     method: dfu
-    webPath: /firmware/AF-F7_mini-v1.3.0-Plane_with_bl.hex
+    webPath: /firmware/fc/af-f7-mini/AF-F7_mini-v1.3.0-Plane_with_bl.hex
 firmwareNotes: 'Every published image is downloadable here; the build sources stay in the private FC repository.'
 ---

@@ -10,7 +10,7 @@
 set -u
 cd "$(dirname "$0")"
 
-APJ="../public/firmware/AF-F4_T10_nano-v0.3.4.apj"
+APJ="../public/firmware/fc/af-f4-t10-nano/AF-F4_T10_nano-v0.3.4.apj"
 WORK="$(mktemp -d)"
 MAN="$WORK/AF-F4_T10_nano-v0.3.4.apj.aff4t10.json"
 SIG="python3 af_f4_t10_fwsig.py"

@@ -60,5 +60,5 @@ firmware:
     size: "67.2 KB"
     sha256: "5eecca4ea7ba0249a0e3dccd10de4c8fae79afdb94fb8a57d3c98623cadfe487"
     notes: "V16 bootloader (32K layout) + application v2.29 + a factory settings EEPROM at 0x7C00, in one image for a single SWD/ST-Link flash on a blank or bricked board. The EEPROM carries Motor KV 1140 to match the actual motors, coasting enabled, Startup power 100, 24–48 kHz variable PWM and protocol AUTO — so flashing this also resets every setting to those defaults. Include the EEPROM block: a Mass Erase leaves that area at 0xFF and the firmware then reads input_type as 255, which selects no input protocol at all (main.c gates it on input_type < 10). SWD only: do not flash a BootApp image over 4-way passthrough, whose 16-bit addressing truncates the EEPROM address and writes it to the wrong place."
-firmwareNotes: 'Downloads below are hosted in this catalog under /firmware/esc/. Active product-family source: novaX-ALUX/esc (private). Existing released firmware bytes and SHA-256 checksums are unchanged.'
+firmwareNotes: 'Downloads below are hosted in this catalog under /firmware/esc/. Existing released firmware bytes and SHA-256 checksums are unchanged.'
 ---

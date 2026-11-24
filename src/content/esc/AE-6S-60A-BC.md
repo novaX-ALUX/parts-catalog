@@ -54,5 +54,5 @@ firmware:
     size: "67.2 KB"
     sha256: "71f9fe36014aee37144e3510b9ce9302ba756e95e551dfda00ee0d925e1a3dc3"
     notes: "The same V16 bootloader (32K layout) and application v2.29 as the image above, with the factory settings EEPROM at 0x7C00 replaced by the parameter set finalised in the AE-6S 60A BC / T10 flight tests (2026-09-10): Complementary PWM on (deceleration braking, Running brake level 10, Brake on stop Off), Startup power 50, Minimum duty cycle 0.5 %, Motor KV 1140, 14 poles, Timing advance 15°, 24–48 kHz variable PWM, protocol AUTO, and normal rotation on every ESC — reverse the motors that need it with the flight controller's SERVO_BLH_RVMASK instead of per-ESC settings. Flashing this over SWD/ST-Link resets every setting to that preset. A 4-way application update never touches the settings, so an ESC still running the older factory defaults keeps them until this image is flashed or the values are entered in the configurator."
-firmwareNotes: 'Downloads below are hosted in this catalog under /firmware/esc/. Active product-family source: novaX-ALUX/esc (private). Existing released firmware bytes and SHA-256 checksums are unchanged.'
+firmwareNotes: 'Downloads below are hosted in this catalog under /firmware/esc/. Existing released firmware bytes and SHA-256 checksums are unchanged.'
 ---

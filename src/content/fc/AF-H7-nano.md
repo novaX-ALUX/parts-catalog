@@ -19,23 +19,23 @@ manuals:
   - { label: English, file: /manuals/fc_AF-H7-nano_manual_en.pdf }
 firmware:
   - kind: "ArduPilot (.apj package)"
-    file: /firmware/AF-H7_nano-v1.2.3.apj
+    file: /firmware/fc/af-h7-nano/AF-H7_nano-v1.2.3.apj
     version: "1.2.3"
     date: "2026-07-11"
     size: "1.3 MB"
     sha256: "90561a56ab947b194f339e7727f96ae6bc8e12a5f4b6c1f9f446548fbc3f553b"
     notes: "ArduPilot Copter app. Upload via the USB-C bootloader (Mission Planner) or the catalog Web Updater → Firmware Update."
     method: ardupilot
-    webPath: /firmware/AF-H7_nano-v1.2.3.apj
+    webPath: /firmware/fc/af-h7-nano/AF-H7_nano-v1.2.3.apj
   - kind: "Bootloader + App (merged HEX · DFU / SWD)"
-    file: /firmware/AF-H7_nano-v1.2.3_with_bl.hex
+    file: /firmware/fc/af-h7-nano/AF-H7_nano-v1.2.3_with_bl.hex
     version: "1.2.3"
     date: "2026-07-11"
     size: "5.2 MB"
     sha256: "be382fe05d7403d89fbaa1f98a9cebc5f6b07395e9d2943d46b1ee3b44aac4d1"
     notes: "Bootloader + application combined image based at 0x08000000. Flash via the catalog Web Updater → DFU Recovery (hold BOOT0) or SWD/ST-Link for a blank/bricked board."
     method: dfu
-    webPath: /firmware/AF-H7_nano-v1.2.3_with_bl.hex
+    webPath: /firmware/fc/af-h7-nano/AF-H7_nano-v1.2.3_with_bl.hex
 specs:
   - { key: MCU, value: "STM32H743VIH6, 480 MHz (1MB RAM, 2MB Flash)" }
   - { key: IMU, value: "2× ICM-42688-P" }

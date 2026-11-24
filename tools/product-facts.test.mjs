@@ -163,7 +163,7 @@ test('AF-H7E Lite firmware ships Copter and Plane for board ID 6207, downloaded 
   assert.equal(lite.firmware.length, 4);
   for (const fw of lite.firmware) {
     // The FC repository is private, so every download link must stay inside the catalog.
-    assert.match(fw.file, /^\/firmware\/AF-H7E_Lite-v0\.1\.0-(Copter|Plane)(\.apj|_with_bl\.hex)$/);
+    assert.match(fw.file, /^\/firmware\/fc\/af-h7e-lite\/AF-H7E_Lite-v0\.1\.0-(Copter|Plane)(\.apj|_with_bl\.hex)$/);
     assert.equal(fw.webPath, fw.file);
     const bytes = readFileSync(new URL(`../public${fw.webPath}`, import.meta.url));
     assert.equal(createHash('sha256').update(bytes).digest('hex'), fw.sha256);
