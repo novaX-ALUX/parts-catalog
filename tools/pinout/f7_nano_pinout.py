@@ -2,10 +2,10 @@
 """AF-F7 nano 핀아웃 한 장 — 윗면 3D 렌더 + 커넥터 표, 아랫면 3D 렌더 + 땜 패드 표 (AF-H7 nano V2 와 같은 꼴).
 
 2026-11-24 이사님(AF-F7_nano 채팅 → 인계) "렌더되고, 핀아웃, 등등 문제 없으면 … 카탈로그에 자료 올리라고 해".
-근거(정본 = fc/AF-F7222 저장소의 판 파일 hardware/kicad/aff7nano/aff7nano_placed.kicad_pcb, 2026-11-24):
+근거(정본 = fc/AF-F7_nano 저장소(옛 이름 AF-F7222)의 판 파일 hardware/kicad/aff7nano/aff7nano_placed.kicad_pcb, 2026-11-24):
   커넥터 J2~J7 · 패드 줄 P1~P9 · 점퍼 JP1 · 버튼 SW1 의 판 mm 상자 = 그 판의 패드 바깥 끝 · 핀 1 끝 = 1 번 패드 자리.
   핀 신호 = 이 저장소 src/content/fc/AF-F7-nano.md 의 pinTable(여기서는 읽기만) — 판 패드 넷과 6 개 커넥터 모두 같음을 확인.
-  패드 글자 = fc/AF-F7222/hardware/tools/padrows.py(아랫면 실크 정본, 윗면 기준 차례 → 아랫면 사진은 가로 줄만 좌우가 뒤집힘).
+  패드 글자 = fc/AF-F7_nano/hardware/tools/padrows.py(아랫면 실크 정본, 윗면 기준 차례 → 아랫면 사진은 가로 줄만 좌우가 뒤집힘).
 바탕 = public/images/products/fc_AF-F7-nano_{top,bottom}.png (catalog-render 스킬 HP 렌더 1600 × 1200, 정면 직교).
   mm → px: 판 테두리 = 234…1365 · 34…1165 px(board_bbox.py) ↔ 판 100…137 · 100…137 mm(Edge.Cuts) = 30.568 px/mm,
   그림은 x 180…1420 만 잘라 쓴다(CROP). 아랫면은 좌우가 거울(x px = 1365 − …).
