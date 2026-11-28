@@ -48,21 +48,21 @@ def v(words, pins=None):
 
 FC_REG = (180, 1420, 0, 1200)   # fc_AF-F4-nano-v2_top.png 1600 × 1200 — 판 235…1364 · 35…1164 px
 FC = [   # (이름, 상자 px (x0, x1, y0, y1) — fc_AF-F4-nano-v2_top.png, 부제, 표, 1 번 끝, 자리)
-    ("ESC Interface", (489, 836, 16, 168), "9-Pin · JST-SH · to the 4-in-1 ESC", h("CUR S4 S3 S2 S1 + + − −", list(range(9, 0, -1))), "R", "T"),
-    ("GPS", (1220, 1365, 250, 512), "6-Pin · JST-SH · USART1 + I2C1", v("− + TX RX SCL SDA", list(range(6, 0, -1))), "B", "R"),
-    ("BEC", (1220, 1369, 537, 864), "8-Pin · JST-SH · to the BEC board", v("− SCL SDA LED TX RX TX RX", list(range(8, 0, -1))), "B", "R"),
+    ("ESC Interface", (489, 836, 16, 168), "9-Pin · JST-SH · to the 4-in-1 ESC", h("CUR S4 S3 S2 S1 + + GND GND", list(range(9, 0, -1))), "R", "T"),
+    ("GPS", (1220, 1365, 250, 512), "6-Pin · JST-SH · USART1 + I2C1", v("GND + TX RX SCL SDA", list(range(6, 0, -1))), "B", "R"),
+    ("BEC", (1220, 1369, 537, 864), "8-Pin · JST-SH · to the BEC board", v("GND SCL SDA LED TX RX TX RX", list(range(8, 0, -1))), "B", "R"),
 ]
 # BEC 보드: src 그림 좌표 = 옛 그림(1250 × 1217) 좌표 − 잘라 낸 원점(190, 215)
 OX, OY = 190, 215
 BEC = [
-    ("POWER", (350, 556, 230, 359), "6-Pin · power in", h("SCL SDA + + − −"), "T", 1),
-    ("From FC", (629, 854, 230, 365), "8-Pin · from the FC BEC port", h("− SCL SDA LED RX TX RX TX"), "T", 1),
+    ("POWER", (350, 556, 230, 359), "6-Pin · power in", h("SCL SDA + + GND GND"), "T", 1),
+    ("From FC", (629, 854, 230, 365), "8-Pin · from the FC BEC port", h("GND SCL SDA LED RX TX RX TX"), "T", 1),
     ("LED", (195, 296, 409, 515), "", None, "L", 1),
     ("LED", (195, 296, 696, 840), "", None, "L", 1),
     ("LED", (906, 1015, 661, 767), "", None, "R", 1),
     ("LED", (906, 1015, 796, 902), "", None, "R", 1),
-    ("Camera SOC", (365, 566, 920, 1040), "6-Pin", h("− − RX TX + +"), "B", 1),
-    ("GIMBAL", (690, 837, 920, 1040), "4-Pin", h("+ − RX TX"), "B", 1),
+    ("Camera SOC", (365, 566, 920, 1040), "6-Pin", h("GND GND RX TX + +"), "B", 1),
+    ("GIMBAL", (690, 837, 920, 1040), "4-Pin", h("+ GND RX TX"), "B", 1),
 ]
 
 
@@ -72,7 +72,7 @@ def main():
     sh = Sheet()
     sh.header("AF-F4 nano v2 Pinout",
               "Each table lists the pins left → right (side connectors: top → bottom) as you see them in the picture.",
-              [("1", RED), "= pin 1, the red 1 in its table (FC board)", "+ = power    − = GND    blue = signal"])
+              [("1", RED), "= pin 1, the red 1 in its table (FC board)", "+ = power    black = GND    blue = signal"])
     sh.caption("FC board — top")
     x0, _, y0, _ = FC_REG
     sh.board(region(fc, *FC_REG),

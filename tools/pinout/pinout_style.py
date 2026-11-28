@@ -7,7 +7,7 @@
   한 장에 커넥터 표를 다 몰아넣으면 글자가 작아지므로:
   ① 지도 = 제품 그림 · 커넥터마다 파란 점선 상자 + 파란 글자 배지(A B …) + 빨간 ①(1 번 끝, 상자 안)
   ② 카드 = 커넥터마다 한 줄 [확대 그림(① 표시) | 글자 · 이름 · 부제 · 핀 표] — 표 칸 왼 → 오 = 확대 그림에서 보이는 핀 왼 → 오.
-핀 신호 정본은 카탈로그 md 의 pinTable 이고 여기서는 읽기만 한다. + = 5 V(빨강) · − = GND(검정) · 신호 = 파랑.
+핀 신호 정본은 카탈로그 md 의 pinTable 이고 여기서는 읽기만 한다. + = 5 V(빨강) · GND(검정) · 신호 = 파랑.
 """
 import json
 import os
@@ -36,7 +36,7 @@ _FCACHE = {}
 
 # 범례 조각: 글자 = 그대로, (글자, 색) = 배지
 LEGEND = [("A", BLUE), "= connector, its table below", ("1", RED), "= pin 1, the red 1 in its table",
-          "+ = 5 V    − = GND    blue = signal"]
+          "+ = 5 V    black = GND    blue = signal"]
 
 
 def text_w(s, px, bold=False):
@@ -79,11 +79,11 @@ def pin_table(md_path):
 
 
 def label(sig):
-    """신호 이름 → (칸 글자, 색). 5 V = +, GND = −."""
+    """신호 이름 → (칸 글자, 색). 5 V = +, GND = GND(2026-11-28 이사님 "− 표시가 NC 같다 · GND 로")."""
     if sig in ("VCC", "VCC_IN", "V_SERVO"):
         return "+", RED
     if sig == "GND":
-        return "−", INK
+        return "GND", INK
     if sig in ("VCC_3V3", "VBUS"):
         return {"VCC_3V3": "3V3"}.get(sig, sig), RED
     if sig == "NC":
@@ -611,7 +611,19 @@ def _crows_w(rows):
 
 
 def _cgrid_w(table):
-    return max([52] + [text_w(v, csig_px(v) if len(v) < 3 else CX["pin"], True) + 14 for _, _, vals in table[2] for v in vals])
+    return max([52] + [text_w(v, csig_px(v) if len(v) < 3 else CX["pin"], True) + (14 if len(v) < 3 else 30) for _, _, vals in table[2] for v in vals])
+
+
+def _clab_w(table):
+    """격자 줄 이름 칸 폭 — 'GND' 같은 세 글자 줄 이름이 들어가게(2026-11-28)."""
+    return max([C_LAB_W] + [text_w(rl, CX["pin"], True) + 24 for rl, _, _ in table[2]])
+
+
+def _fit_px(lab, px, width):
+    """칸 폭에 들어가게 글자 크기를 줄인다(격자 칸 · 줄 이름 칸 — 'GND' 처럼 세 글자가 좁은 칸에 들어갈 때, 2026-11-28)."""
+    while px > CX["pin"] and text_w(lab, px, True) > width - 8:       # 화면 13 px 밑으로는 줄이지 않는다(칸이 넓어진다)
+        px -= 1
+    return px
 
 
 def ctable_size(name, sub, table):
@@ -626,7 +638,7 @@ def ctable_size(name, sub, table):
     elif kind == "rows":
         bw, bh = sum(_crows_w(table[1])), C_SIG_H * len(table[1])
     elif kind == "grid":
-        bw, bh = C_LAB_W + _cgrid_w(table) * len(table[1]), C_SIG_H * len(table[2])
+        bw, bh = _clab_w(table) + _cgrid_w(table) * len(table[1]), C_SIG_H * len(table[2])
     elif kind == "one":
         bw, bh = max(150, text_w(table[1], CX["sig"], True) + 40), C_SIG_H
     else:
@@ -690,14 +702,16 @@ def draw_ctable(sh, ax, x, y, name, sub, table):
                 cx += cw
     elif kind == "grid":
         cols, rws = table[1], table[2]
-        gw = (w - C_LAB_W) / len(cols)
+        lw = _clab_w(table)
+        gw = (w - lw) / len(cols)
         for i, (rl, col, vals) in enumerate(rws):
             yy = y0 + i * C_SIG_H
-            cell(x, yy, C_LAB_W, C_SIG_H, "#eef1f5")
-            sig_txt(x + C_LAB_W / 2, yy + C_SIG_H / 2 - 1, rl, col)
+            cell(x, yy, lw, C_SIG_H, "#eef1f5")
+            sig_txt(x + lw / 2, yy + C_SIG_H / 2 - 1, rl, col, _fit_px(rl, csig_px(rl), lw))
             for j, v in enumerate(vals):
-                cell(x + C_LAB_W + j * gw, yy, gw, C_SIG_H)
-                sig_txt(x + C_LAB_W + j * gw + gw / 2, yy + C_SIG_H / 2 - 1, v, col, csig_px(v) if len(v) < 3 else CX["pin"])
+                cell(x + lw + j * gw, yy, gw, C_SIG_H)
+                sig_txt(x + lw + j * gw + gw / 2, yy + C_SIG_H / 2 - 1, v, col,
+                        _fit_px(v, csig_px(v) if len(v) < 3 else CX["pin"], gw))
     elif kind == "one":
         cell(x, y0, w, C_SIG_H)
         sig_txt(x + w / 2, y0 + C_SIG_H / 2 - 1, table[1], table[2], CX["sig"])

@@ -33,12 +33,12 @@ def box(x0, y0, x1, y1, bottom=False):
 
 
 def word(sig):
-    return "−" if sig in ("GND", "GD", "G") else sig
+    return "GND" if sig in ("GND", "GD", "G") else sig
 
 
 def color(w):
     """패드 글자 색 — VIN(배터리) · JMP(VTX 전원 점퍼 출력)도 전원 빨강, GD · G 는 GND."""
-    return RED if w in ("VIN", "JMP") else INK if w == "−" else word_color(w)
+    return RED if w in ("VIN", "JMP") else INK if w == "GND" else word_color(w)
 
 
 def table(entry, order, kind):
@@ -87,7 +87,7 @@ def main():
     sh = Sheet()
     sh.header("AF-F7 nano Pinout",
               "Each table lists the pins as you see them in the picture: left → right, side connectors top → bottom.",
-              [("1", RED), "= pin 1, the red 1 in its table", "red = power    − = GND    blue = signal"])
+              [("1", RED), "= pin 1, the red 1 in its table", "red = power    black = GND    blue = signal"])
     sh.caption("Top — connectors (all JST-SH 1.0 mm, pin 1 marked) · the A of the ALUX logo points forward")
     items = [{"box": box(*b), "name": n, "sub": subtitle(pins[n]), "table": table(pins[n], o, k), "p1": p1, "side": sd}
              for n, b, k, o, p1, sd in TOP]

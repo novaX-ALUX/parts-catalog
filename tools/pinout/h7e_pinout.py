@@ -85,7 +85,7 @@ def section(sh, title, view, reg, items, img_w=None):
 sh = Sheet()
 sh.header("AF-H7E Pinout",
           "Each table lists the pins left → right exactly as you see them in the picture it points to.",
-          [("1", RED), "= pin 1, the red 1 in its table", "+ = 5 V (PWM +: servo rail)    − = GND    blue = signal"])
+          [("1", RED), "= pin 1, the red 1 in its table", "+ = 5 V (PWM +: servo rail)    black = GND    blue = signal"])
 
 # ════════ 윗면: 뒤(PWM) 위 · 앞 계단 아래 ════════
 posts = G["power_c_posts"]
@@ -101,8 +101,8 @@ R = (0, 1400, 20, 2690)
 T = lambda nm, side, **kw: item(nm, pbox("top", hole.get(nm) or pc.get(nm) or {"POWER 1": pw1, "POWER 2": pw2}[nm]), side, R, **kw)
 section(sh, "Top view — rear (PWM header) at the top", "top", R, [
     item("PWM", pbox("top", [-20.6, 20.6, 20.9, 28.5, 10.4, 10.4]), "T", R, name="PWM OUT — 3 × 16 header",
-         sub="M1–M8 MAIN (IOMCU) · A1–A8 AUX (FMU) · rows as seen: S rear, +, − front",
-         table=("grid", names, [("S", BLUE, names), ("+", RED, ["+"] * 16), ("−", INK, ["−"] * 16)])),
+         sub="M1–M8 MAIN (IOMCU) · A1–A8 AUX (FMU) · rows as seen: S rear, +, GND front",
+         table=("grid", names, [("S", BLUE, names), ("+", RED, ["+"] * 16), ("GND", INK, ["GND"] * 16)])),
     T("POWER C1", "L"), T("POWER 1", "L"), T("TELEM 3", "L"), T("CAN 1", "L"),
     T("POWER C2", "R"), T("POWER 2", "R"), T("GPS 2", "R"), T("TELEM 2", "R"),
     T("CAN 2", "B", tx=W / 2 - 330), T("TELEM 1", "B", tx=W / 2 + 330),

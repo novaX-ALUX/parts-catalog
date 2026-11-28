@@ -17,8 +17,8 @@ CAT = os.path.normpath(os.path.join(HERE, "..", ".."))
 IMG = os.path.join(CAT, "public", "images", "products")
 OUT = sys.argv[1] if len(sys.argv) > 1 else IMG
 CONNS = [   # (이름, 상자 px (x0, x1, y0, y1), 부제, 칸 왼 → 오)
-    ("POWER", (307, 405, 62, 142), "4-Pin connector", "+ + − −"),
-    ("ESC INTERFACE", (424, 599, 62, 142), "9-Pin · current sense, motor signals S1–S4 and power", "CUR S4 S3 S2 S1 + + − −"),
+    ("POWER", (307, 405, 62, 142), "4-Pin connector", "+ + GND GND"),
+    ("ESC INTERFACE", (424, 599, 62, 142), "9-Pin · current sense, motor signals S1–S4 and power", "CUR S4 S3 S2 S1 + + GND GND"),
 ]
 
 
@@ -28,7 +28,7 @@ def main():
     sh.header("AE-6S 60A BC Pinout",
               "Seen from the top. Each table lists the pins left → right as you see them in the photo. "
               "Order as in the maker's pinout drawing; there are no pin numbers.",
-              ["+ = power    − = GND    blue = signal"])
+              ["+ = power    black = GND    blue = signal"])
     reg = (0, img.shape[1], 0, img.shape[0])
     sh.board(region(img, *reg), [{"box": b, "name": name, "sub": sub, "table": ("h", word_cells(words.split())), "p1": None,
                                   "side": "T", "tx": tx} for (name, b, sub, words), tx in zip(CONNS, (560, 1120))], img_w=900)

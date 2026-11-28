@@ -34,7 +34,7 @@ def box(x0, y0, x1, y1, bottom=False):
 
 
 def word(sig):
-    return "−" if sig == "GND" else sig
+    return "GND" if sig == "GND" else sig
 
 
 def table(entry, order, kind):
@@ -65,16 +65,16 @@ OPT = [
     ("Buzzer + supply", "jumper JP3 · cut 5V side, bridge 12V", (141.14, 90.28, 143.97, 94.92), words("12V BZ+ 5V", "v"), "T"),
     ("BZ+ pad", "BZ− = the edge pad", (131.41, 92.66, 133.96, 95.2), words("BZ+", "h"), "R"),
     ("Flashing jig pads", "D1.0 mm · 2.54 mm · BOOT0 to 3V3 = USB DFU", (137.07, 117.97, 151.82, 120.03),
-     words("3V3 BOOT0 − D− D+ VBUS", "h"), "B"),
+     words("3V3 BOOT0 GND D− D+ VBUS", "h"), "B"),
 ]
 # 아랫면 땜 패드(사진 = 아래에서 본 모습, 좌우 거울): (이름, 부제, 판 mm 상자, 표, 표 자리)
 PADS = [
-    ("PWM pads", "outer column · silk S5–S10", (165.39, 94.63, 166.89, 115.98), words("S5 S6 S7 S8 S9 S10 5V −", "v"), "L"),
+    ("PWM pads", "outer column · silk S5–S10", (165.39, 94.63, 166.89, 115.98), words("S5 S6 S7 S8 S9 S10 5V GND", "v"), "L"),
     ("ESC pads", "inner column · same M1–M4 as the ESC port", (161.33, 94.63, 162.83, 115.86),
-     words("M1 M2 M3 M4 − VBAT RX4 TX4", "v"), "L"),
+     words("M1 M2 M3 M4 GND VBAT RX4 TX4", "v"), "L"),
     ("Edge pads", "SPI3 · UART3 · buzzer", (129.83, 94.63, 131.33, 115.86), words("BZ− SCK MISO MOSI CS2 CS1 RX3 TX3", "v"), "R"),
-    ("Top pads", "UART1 · WS2812 LED · I2C2", (138.6, 86.42, 160.54, 88.42), words("5V SCL2 SDA2 − LED 5V − RX1 TX1", "h"), "T"),
-    ("Bottom pads", "UART2 · UART8 · CAN1 · 12 V", (137.45, 121.63, 159.12, 123.63), words("RX2 TX2 12V RX8 TX8 5V CANL CANH −", "h"),
+    ("Top pads", "UART1 · WS2812 LED · I2C2", (138.6, 86.42, 160.54, 88.42), words("5V SCL2 SDA2 GND LED 5V GND RX1 TX1", "h"), "T"),
+    ("Bottom pads", "UART2 · UART8 · CAN1 · 12 V", (137.45, 121.63, 159.12, 123.63), words("RX2 TX2 12V RX8 TX8 5V CANL CANH GND", "h"),
      "B"),
 ]
 
@@ -86,7 +86,7 @@ def main():
     sh = Sheet()
     sh.header("AF-H7 nano V2 Pinout",
               "Each table lists the pins as you see them in the picture: left → right, side connectors top → bottom.",
-              [("1", RED), "= pin 1, the red 1 in its table", "red = power    − = GND    blue = signal"])
+              [("1", RED), "= pin 1, the red 1 in its table", "red = power    black = GND    blue = signal"])
     sh.caption("Top — connectors (all JST, pin 1 marked)")
     items = [{"box": box(*b), "name": n, "sub": subtitle(pins[n]), "table": table(pins[n], o, k), "p1": p1, "side": sd}
              for n, b, k, o, p1, sd in TOP]

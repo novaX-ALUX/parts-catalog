@@ -52,7 +52,7 @@ def v(words):
 
 REG = (180, 1420, 0, 1200)   # 렌더 1600 × 1200 — 판 235…1364 · 35…1165 px
 TOP = [   # (이름, 상자 px (x0, x1, y0, y1), 부제, 표, 자리 T · B · L · R, 줄) — 윗면 렌더 fc_AF-F4-nano_top.png
-    ("ESC", (591, 922, 29, 163), "8-Pin · silk 4 3 2 1 + + − − (+ = VBAT)", h("S4 S3 S2 S1 + + − −"), "T", 1),
+    ("ESC", (591, 922, 29, 163), "8-Pin · silk 4 3 2 1 + + − − (+ = VBAT)", h("S4 S3 S2 S1 + + GND GND"), "T", 1),
     ("ELRS", (951, 1146, 25, 163), "4-Pin · UART4 · silk G 5V TX RX", h("GND 5V TX4 RX4"), "T", 1),
     ("VTX", (1243, 1389, 210, 477), "6-Pin · UART3 TX" + MAKER, v("NC GND NC NC VTX TX3"), "R", 1),
     ("CAM", (1243, 1380, 502, 654), "3-Pin · video in" + MAKER, v("5V GND CAM"), "R", 1),

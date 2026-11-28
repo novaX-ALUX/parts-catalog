@@ -26,7 +26,7 @@ CROP = (600, 1000, 470, 1105)                       # 두 끝 그림 모두: 케
 # (이름, 그림 0 = 배터리 쪽 · 1 = 모터 쪽, 상자 px (x0, x1, y0, y1), 부제, 칸, 칸 번호, 위 T · 아래 B)
 # 11-03 이사님: "SPI 케이블 · 캔통신은 GH 4pin 커넥터" → 두 케이블은 끝의 플러그를 가리킨다 · "PWM 도 넣어, 옵션 · 핀맵만" → 표만
 WIRES = [
-    ("BATTERY −", 0, (704.2, 741.4, 630.2, 667.4), "black · 14 AWG", "−", None, "T"),
+    ("BATTERY −", 0, (704.2, 741.4, 630.2, 667.4), "black · 14 AWG", "GND", None, "T"),
     ("PWM (OPTION)", 0, (779.4, 820.6, 627.4, 668.6), "can_pwm = 1 · optically isolated", "PWM PWM−", None, "T"),
     ("BATTERY +", 0, (858.6, 895.8, 630.2, 667.4), "red · 14 AWG", "+", None, "T"),
     ("CAN", 0, (770.4, 829.6, 976.2, 1082.0), "JST-GH 4P plug · DroneCAN", "NC CAN_H CAN_L GND", "1 2 3 4", "B"),
@@ -44,7 +44,7 @@ def main():
     sh.header("AE-14S 60A FOC Pinout",
               "Seen from outside each end of the case: battery end (left) and motor end (right). The CAN cable ends in a "
               "JST-GH 4P plug (pin 1, 5 V, not connected), the encoder cable in a round 6-pin plug. PWM is an option (can_pwm = 1).",
-              ["+ = battery    − = GND    blue = signal    NC = not connected"])
+              ["+ = battery    black = GND    blue = signal    NC = not connected"])
     items = []
     for name, src, (bx0, bx1, by0, by1), sub, words, nums, side in WIRES:
         ox, k = offs[src]
