@@ -12,6 +12,7 @@
 import argparse
 import html
 import json
+import os
 import re
 import subprocess
 import sys
@@ -27,7 +28,10 @@ ROOT = HERE.parents[1]
 sys.path.insert(0, str(HERE))
 import manual_content as MC  # noqa: E402
 
-CHROME = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
+CHROME = next((p for p in (r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+                           r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+                           r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe") if os.path.exists(p)),
+              r"C:\Program Files\Google\Chrome\Application\chrome.exe")   # white 엔 엣지만(같은 크로미움 인쇄 · 미리보기/fc-manual/make_pdf.py 와 같게)
 SITE = "https://novax-alux.github.io/parts-catalog"
 LOGO_PDF = ROOT / "public" / "manuals" / "fc_AF-F7-mini_manual_en.pdf"      # novaX 로고 원본 벡터가 있는 쪽(8쪽)
 
